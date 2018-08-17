@@ -1,0 +1,103 @@
+resource limit for pods
+  container level cpu/memory request and limit
+  request == minimal resource requirement
+  limit == hard limit resource usage
+
+1 cpu == 1000m (m == millicore)
+if no limit is set, ratio of request affect most resource one pod could use
+
+if container use more memory than its limit, it will be killed, after serverl
+times restart, its status becomes to CrashLoopBackOff, since k8s will restart
+the container in a backoff fasion.
+$ kubectl describe pod //will get information, why pod is restarted.
+
+when pod needs more resource than node could provide, and k8s has to make decision
+about which pod to kill, the QoS class of pods will be considered. 
+QoS:
+  BestEffort
+  Burstable
+  Guranteed  (the highest)
+QoS isn't set through a separate field, it's derived from the combination of resource
+requiest and limit.
+
+BestEffort:
+no request or limit is setting 
+
+Guranteed:
+request and limit need to be set for both cpu and memeory 
+set for each container
+limit == request
+(since when request isn't set explicity, they will be default to limits, so only set limits
+is enough)
+
+Burstable:
+setting between BestEffort and Guranteed
+
+when pod has same QoS as to be killed, the one has used more of its request memory will be killed. 
+
+
+LimitRange is used to valid each pod when api server get the pod creation request.
+apiVersion: v1
+kind: LimitRange
+metadata:
+ name: example
+spec:
+ limits:
+ - type: Pod
+   min:
+    cpu: 50m
+    memory: 5Mi
+   max:
+    cpu: 1
+    memory: 1Gi
+
+ - type: Container
+   defaultRequest:
+    cpu: 100m
+    memory: 10Mi
+   default:
+    cpu: 200m
+    memory: 100Mi
+   min:
+    cpu: 50m
+    memory: 5Mi
+   max:
+    cpu: 1
+    memory: 1Gi
+   maxLmitRequestRatio:
+    cpu: 4
+    memjory: 10
+ - type: PersistentVolumeClaim
+   min:
+    storage: 1Gi
+   max:
+    storage: 10Gi 
+
+
+ResourceQuota
+  It limits the amount of computational resources the pods and the
+  amount of storage PersistentVolumeClaims in a namespace can consume. It can also
+  limit the number of pods, claims, and other API objects users are allowed to create
+  inside the namespace
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+ name: cpu-and-mem
+spec:
+ hard:
+  requests.cpu: 400m
+  requests.memory: 200Mi
+  limits.cpu: 600m
+  limits.memory: 500Mi
+
+A ResourceQuota object applies to the namespace it’s created in, like a LimitRange,
+but it applies to all the pods’ resource requests and limits in total and not to
+each individual pod or container separately.
+
+
+reousrce mointoring:
+cAdvisor --- collect container and node info
+Heapster --- collect information as a cluster
+
+$ kubectl top pod --all-namespaces

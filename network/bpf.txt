@@ -1,0 +1,36 @@
+BPF 
+  programming compile to bytecode
+  bytecode will be execute on vm in linux kernel
+
+cBPF == classic berkeley package filter which is mainly focus on filtering network packets
+eBPF == extended BPF 
+the difference is the ISA of vm is redesigned, support 64 bit register
+these days, BPF == eBPF
+
+eBPF has in-kernel verifier which will verify the user code
+which will be executed in kernel mode is safe enough
+
+BCC == BPF compiler collection which is a BPF frontend library
+
+BPF map
+maps is a generic storage of different types for sharing data between kernel and userspace
+The maps are accessed from user space via BPF syscall, which has commands:
+  create a map with given type and attributes
+  map_fd = bpf(BPF_MAP_CREATE, union bpf_attr *attr, u32 size)
+  lookup key/value, update, delete, iterate, delete a map
+userspace programs use this syscall to create/access maps that BPF programs are concurrently updating 
+
+
+BPF used in two aspect:
+1 kernel trace:
+  kprobe, pref event
+
+2 network packet management
+  XDP, tc
+
+3 security
+
+XDP:
+Framework for running BPF programs in driver’s RX path
+
+seccomp is based on eBPF

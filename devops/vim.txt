@@ -1,0 +1,14 @@
+:6,8m.
+:g/^\s*$/d
+:v/^\s*"/d
+
+:%s/`[^`]*`//g  ----> remove `....`
+
+
+qq                  #start to record and save it to q
+:9,$norm! @q        #apply the macro from 9 to the end of file
+g/pattern/norm! @q  #apply the macro  to line match the pattern
+
+
+ctrl - n  #next match word
+ctrl - p  #prev match word

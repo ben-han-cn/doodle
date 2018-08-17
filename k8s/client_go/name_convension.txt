@@ -1,0 +1,43 @@
+kind: name of a particular object schema, normally in singular and captial format (Pod)
+resource:
+  a representation of a system entity, sent or retrieved as JSON, exposed as:
+  1 collections -- list of resource of same type(kind), PodLists
+  2 elements -- individualare resource,  Pod
+api group:
+  a set of resources that are exposed together. GROUP/VERSION, e.g. policy.k8s.io/v1
+  group name is usually same with organization domain name
+
+sub-resources: resources wish to expose alternative actions or views that are closely coupled
+  to single resource.
+
+objects:
+1 metadata
+  object kind:
+    namespace
+    name
+    uid
+
+  object:
+    resourceVersion: concurrent modification control
+    generation
+    create/deletionTimestamp
+    labels
+    annotations
+
+2 spec and status
+  condition represent the latest available observation of an object's current state
+  Type               FooConditionType  `json:"type" description:"type of Foo condition"`
+  Status             ConditionStatus   `json:"status" description:"status of the condition, one of True, False, Unknown"`
+  // +optional
+  LastHeartbeatTime  unversioned.Time  `json:"lastHeartbeatTime,omitempty" description:"last time we got an update on a given condition"`
+  // +optional
+  LastTransitionTime unversioned.Time  `json:"lastTransitionTime,omitempty" description:"last time the condition transit from one status to another"`
+  // +optional
+  Reason             string            `json:"reason,omitempty" description:"one-word CamelCase reason for the condition's last transition"`
+  // +optional
+  Message            string            `json:"message,omitempty" description:"human-readable message indicating details about last transition"`
+
+optional field
+They have the +optional comment tag in Go.
+They are a pointer type in the Go definition (e.g. bool *awesomeFlag) or have a built-in nil value (e.g. maps and slices).
+The API server should allow POSTing and PUTing a resource with this field unset.

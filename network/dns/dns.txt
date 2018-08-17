@@ -1,0 +1,4 @@
+email:
+  mx (mail exchanger) specify email server
+  spf (sender policy framework) a simple validation system
+  dkim(domain key identified mail) an email authentication method

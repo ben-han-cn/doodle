@@ -1,0 +1,95 @@
+clientset
+informers
+listers
+
+client-go usage:
+1 get client --- kubernetes.ClientSet ---- kubernetes.NewForConfig(config)
+2 get basic CRUDs
+  nodes, err := client.Core().Nodes().List(v1.ListOptions{FieldSelector: "xxx"})
+  node := nodes.Items[0]
+  node.Annotations["checked"] = true
+  updatedNode, err := client.Core().Nodes().Update(&node)
+  gracePeriod := int64(10)
+  err = client.Core().Nodes().Delete(updateNode.Name, &v1.DeleteOptions{GracePeriodSeconds: &gracePeriod})
+3 watch updates
+  watchList := cache.NewListWatchFromClient(client.Core().RESTClient(), "nodes", v1.NamesapceAll, fields.Everything())
+  store, controller := cache.NewInformer(
+    watchList,
+    &api.Node{},
+    time.Seconds*30,
+    cache.ResourceEventHandlerFuncs{
+      AddFunc: handleNodeAdd,
+      UpdateFunc: handleNodeUpdate,
+    },
+  )
+  stop := make(chan struct{})
+  go controller.Run(stop)
+  nodeInterface, exists, err := store.GetByKey("minikube")
+  ....
+
+  //shared informer which could have several controller
+  informer := cache.NewSharedIndexInformer(
+    watchList,
+    &api.Node{},
+    time.Second*10,
+    cache.Indexers{},
+  )
+
+  informer.AddEventHandler(cache.ResourceEventHandlerFuncs {
+    AddFunc:    handleNodeAdd,
+    UpdateFunc: handleNodeUpdate,
+  })
+  informer.AddEventHandler(cache.ResourceEventHandlerFuncs {
+    AddFunc:    handleNodeAddExtra,
+    UpdateFunc: handleNodeUpdateExtra,
+  })
+
+controller pattern
+
+           +----------------+
+           |                |                     CRUD
+           | api server     |<----------------------------------------------+
+           |                |                                               |
+           +-------+--------+                                               |
+         List/watch|                                                        |
+                   |                                                        |
+           Informer|                                                  +-----+----+
+           +-------|--------+                                         |client    |
+           |       |        |                                         +-----^----+
+           |   +---v----+   |                                               |
+           |   |        |   |                                               |
+           |   |reflector   |                                               |
+           |   |        |   |                                               |
+           |   +---+----+   |      +---------+                        +-----+---+
+           |       |        |      |         |                        | worker  |
+           |   +---v----+   |      |callbacks|                   +---->         |
+           |   |        +--------->|         |      +------------|    +---------+
+           |   |deltafifo   |      |OnAdd    |      |            |    +---------+
+           |   |        |   |      |OnUpdate +----->|workqueue   +---->         |
+           |   +---+----+   |      |OnDelete |      +------------|    | worker  |
+           |       |        |      |         |                   |    +---------+
+           |   +---v----+   |      +---------+                   +---->---------+
+           |   |        |   |                    Readonly             |         |
+           |   |store   +--------------------------------------------->worker   |
+           |   +--------+   |                                         +---------+
+           +----------------+
+
+
+generator:
+client-gen
+conversion-gen
+deepcopy-gen
+defaulter-gen
+go-to-protobuf
+informer-gen
+lister-gen
+openapi-gen
+codec-gen
+
+
+1 API aggregation provides far greater flexibility
+2 Generate supporting code, don't write it yourself
+3 follow the types.go rules, Generators are picky
+4 never modify resources in the cache
+5 define conversions between external versions
+

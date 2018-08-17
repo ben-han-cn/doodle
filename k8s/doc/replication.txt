@@ -1,0 +1,133 @@
+container 
+liveness probe
+  http get
+  tcp socket
+  exec script //execute cmd inside container
+
+
+spec:
+ containers:
+ - image: luksa/kubia-unhealthy
+   name: kubia
+   livenessProbe:
+   httpGet:
+      path: /
+      port: 8080 
+   initialDelaySeconds: 15 //k8s will wait 15 seconds before executing the first probe
+   failure: 3
+
+$ kubectl logs mypod --previous //obtaining the application log of a crashed container
+
+
+three key parts of ReplicationController
+  pod selector      ---> detect target pods 
+  replicate count   ---> desired pods count
+  pod template      ---> create new pod if necessary
+
+create rc
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: kubia
+spec:
+  replicas: 3
+  selector:
+    app: kubia
+template:
+  metadata:
+    labels:
+      app: kubia
+  spec:
+    containers:
+      - name: kubia
+        image: luksa/kubia
+        ports:
+        - containerPort: 8080 
+
+
+rc is use label to select pod to management, so a pod could be move in and out of its
+control scope
+
+if a pod is managed(created) by a rc, the rc could be found through its metadata.ownerReferences
+$ kubectl label pod kubia-dmdck app=foo --overwrite
+change a pod label will move it out of rc control
+
+export KUBE_EDITOR="/usr/bin/nano"
+$ kubectl edit rc kubia
+use file editor the modify the yaml file
+another way:
+$ kubectl scale rc kubia --replicas=3
+
+delete resource controller and leave its pods untouched
+$ kubectl delete rc kubia --cascade=false
+
+
+ReplicaSet will replace ReplicationController with much flexible label selection
+
+apiVersion: apps/v1beta2
+kind: ReplicaSet
+metadata:
+  name: kubia
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: kubia
+  template:
+    metadata:
+      labels:
+        app: kubia
+    spec:
+      containers:
+      - name: kubia
+        image: luksa/kubia 
+
+
+replicate controller/set will schedule the pods by itself which could make pods run anywher.
+If we want a pod to run on each and every node in the cluster, these pods may be system-level
+operation and infrastructure-related, log collector maybe such a use case.
+
+domainset make sure one pod is running on every nodes, when new node is added, a new pod will 
+be deployed on it. node selector could be used to let pods only run on specified nodes.
+
+
+apiVersion: apps/v1beta2
+kind: DaemonSet
+metadata:
+  name: ssd-monitor
+spec:
+  selector:
+    matchLabels:
+      app: ssd-monitor
+
+  template:
+    metadata:
+      labels:
+        app: ssd-monitor
+    spec:
+      nodeSelector:
+        disk: ssd
+    containers:
+      - name: main
+        image: luksa/ssd-monitor
+
+
+run a one shot process using job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: batch-job
+    spec:
+      completions: 5 //how many pod should be run
+      parallelism: 2 //how many pods should run parallely
+      restartPolicy: OnFailure
+      containers:
+        - name: main
+          image: luksa/batch-job
+
+kind: CronJob

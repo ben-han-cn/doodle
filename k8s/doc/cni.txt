@@ -1,0 +1,31 @@
+CNI:
+specification
+ADD     (add container)
+DELETE  (delete container)
+
+support plugin chaining
+
+ADD: A -> B -> C // plugin B get result of A, and C get the result of B
+DELETE: C -> B -> A
+
+CNI is a binary, it get configure from stdin.
+When a pod is added to a node, a CNI plugin is called on to do 3 basic things:
+1 create eth0 inside the pod's network namespace (network namespace, veth pair)
+2 allocate the ip for pod (ipam)
+3 make the ip is reachable by the whole cluster(a daemon on every host, programs
+the network with learned routes:
+  overlay network(Flannel, Weave, Calico)
+  routing protocols(Calico, Romana), talk to real router(hardware)
+
+which means CNI has two components:
+  binary
+  daemon
+
+
+kubernetes using CNI:
+kubelet scan --cni-conf-dir every 5 seconds, uses whichever one has lowest-ordered filename
+It keeps scanning and parsing forever.
+
+send one ADD request for each CNI_CONTAINERID
+plugin always implement in host's namespace
+

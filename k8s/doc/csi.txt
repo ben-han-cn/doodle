@@ -1,0 +1,63 @@
+CSI(container storage interface)
+
+CO(container orchestrators)
+
+uncoupled with implementation
+lightweight
+vendor neutral
+control plane only
+
+
+1 in tree/ out tree
+  plugin is maintained by the vendor instead of included in k8s repository
+
+2 cli/service
+controller/node service
+  for controller:
+      controller manager(master) ---> control agent (node)
+            |
+            |
+      controller service
+
+3 api should be idempotent
+
+4 wire protocol: gRPC
+
+5 synchronous api
+
+6 plugin packaging
+  provide gRPC endpoints over unix socket
+  could be deployed by CO
+  systemd services depolyed by cluster admin
+
+7 essential interfaces
+  service Identity {
+    rpc GetPluginInfo()
+    rpc GetPluginCapabilities()
+    rpc Probe()
+  }
+
+  service Controller {
+    rpc CreateVolume()
+    rpc DeleteVolume()
+    rpc ControllerPublishVolume() //make volume avaiable on given node
+    rpc ControllerUnpublishVolume() //make volume avaiable on given node
+    rpc ValidateVolumeCapabilities()
+    rpc ListVolumes()
+    rpc GetCapacity()
+    rpc ControllerGetCapabilities()
+  }
+
+  service Node {
+    rpc NodeStageVolumen()
+    rpc NodeUnstageVolume() //stage should be called only once
+
+    rpc NodePublishVolume() //stage 
+    rpc NodeUnpublishVolume() 
+    rpc NodeGetId()
+    rpc NodeGetCapabilities()
+  }
+
+
+create -> node ready -> volume ready -> publish
+

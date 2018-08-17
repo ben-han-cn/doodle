@@ -1,0 +1,65 @@
+what to instrument
+
+USE method: Utilization, Saturation and Errors method
+resource:     all physical server functional components
+utilization:  average time that the resource are busy servicing work
+saturatoin:   the degree to which the resource has extra wok which 
+              it cann't service, often queued
+errors:       the count of error events
+resource to check:
+  cpu
+  memory
+  network interface
+  storage device
+  controllers
+  interconnect
+
+RED method: Rate, Errors, Duration
+Rate:     the number of request per second
+Erorrs:   the number of failed request per second
+Duration: the amount of time each request takes expressed as a time interval
+
+metric name:
+application(namespace)_event_unit, unit should in plural form, and should use
+base unit (seconds, bytes, meters ...)
+use label to differentiate the characteristic
+
+time serial == unique label set, so keep label values well-bounded
+
+missing series
+
+storage:
+metric name         dimensions/labels          timestamp        samplevalue
+http_request_total{status="200", method="get"}@1434317560938 => 94355
+
+
+
+data model:
+type LabelName string
+type LabelValue string
+type LabelPair struct {
+  Name  LabelName
+  Value LabelValue
+}
+type LabelSet map[LabelName]LabelValue
+type Metric LabelSet
+type SampleValue float64
+type Sample struct {
+  Metric    Metric      `json:"metric"`
+  Value     SampleValue `json:"value"`
+  Timestamp Time        `json:"timestamp"`
+}
+type Time int64
+type SamplePair struct {
+ Timestamp Time
+ Value     SampleValue
+}
+
+type Label struct {
+  Name, Value string
+}
+type Labels []Label
+ReservedLabelPrefix = "__"
+
+
+relabel_config --> scrape ---> metric_relabel_config --> ingrestion(put to db) --> alert_relabel_config --> alert

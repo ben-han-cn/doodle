@@ -1,0 +1,16 @@
+Dedicated infrastructure layer for adding reliability, security, visibility to a cloud native applicaiton by managing all the runtime service communication. It provides circuit breaking, request routing, security policy etc. 
+
+conduit design specifically for k8s
+control plan
+data plan
+  proxy
+    service -> proxy -------> proxy -> service
+    monitoring:
+      latency
+      success/failure rate
+      request per second (volumn)
+      caller and callee relationship
+
+
+
+      

@@ -1,0 +1,55 @@
+We consider any long-lived process a service. These long-lived processes follow 
+a general template regarding metrics, configuration, and logging for ease of 
+deployment and operation. Typically our services fall into one of two groups: 
+RPC services, or consumer services. RPC services provide commands to synchronously 
+interact with the service using an in-house library very similar to GRPC, while 
+consumer services process messages off of Kafka streams and perform service-specific 
+operations on those messages.
+
+To meet our performance and scale requirements we rely heavily on HBase and 
+Cassandra for our data storage needs. 
+
+As a general rule, each database is only accessed by a single service, which 
+is responsible for providing database access to other services via a less 
+specialized interface.
+
+Enforcing this 1:1 relationship between service and its backing database has a 
+number of benefits:
+1 By treating the backing datastore of a service as an implementation detail, and 
+not a shared resource, we gain flexibility.
+2 We can adjust the data model for a service while only changing that service’s code.
+3 Usage tracking is more straightforward, which makes capacity planning easier.
+4 Troubleshooting is easier. Sometimes an issue lies with the service code, other times 
+it is a backing database issue. Having the service and database be a logical unit vastly 
+simplifies the troubleshooting process. We don’t have to wonder “Who else could be accessing 
+this database to make it behave in such a way?” Instead, we can rely on our application-level 
+metrics from the service itself and only worry about one set of access patterns.
+5 Because there is only one service interacting with a database, we can perform nearly 
+all of our maintenance activities without taking downtime. Heavy maintenance tasks become 
+a service-level concern: data repair, schema migration and even switching to a completely 
+different database can be done without disrupting service.
+
+Most of our services deal with the same data, just in different formats. Everything has 
+to be consistent. To keep all of these services’ data up to date we rely heavily on Kafka
+Kafka messages are only guaranteed to be sent at least once, and they aren’t guaranteed 
+to arrive in order.
+How do we deal with this? We’ve modeled all mutation paths to be commutative: operations 
+can be applied in any order and end up with the same result. They’re also idempotent. 
+This has a nice side-effect that we can replay Kafka streams for one-off data repair jobs, 
+backfills, or even migrations.
+idempotent: f(x) == f(f...(f(x)))
+By ensuring messages from the stream follow a strict set of rules, and designing the consuming 
+service to expect out-of-order and repeated messages, we can keep a very large number of disparate 
+services in sync with only a second or two of lag on updates.
+* idempotent interface is easy to implement like rest style api
+* message order is implemented by add seq number to message, use a persistend store to buffer the
+message, and only to handle the next message.
+(message order should be avoid which will degrade the performance)
+
+Bound your queues - We use queues all over our services, they’re a great way to batch up requests 
+and fan things out to workers that will end up doing tasks that block externally. All queues should 
+be bounded. Bounding queues does raise a number of questions, however:
+1 What happens to producers when the queue is full? Should they block? Except? Drop?
+2 How big should my queue be? To answer this question it helps to assume the queue is always full.
+3 How do I shut down cleanly?
+Each service will have a different answer for these questions depending on the exact use case.

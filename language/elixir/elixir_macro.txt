@@ -1,0 +1,136 @@
+Since Elixir creator exposed the AST in a form that can be represented by
+Elixir's own data structure.
+
+
+iex> quote do: :atom 
+:atom
+iex> quote do: 123 
+123
+iex> quote do: 3.14
+3.14
+iex> quote do: [1, 2, 3]
+[1, 2, 3]
+iex> quote do: "string" 
+"string"
+iex> quote do: {:ok, 1}
+{:ok, 1}
+iex> quote do: {:ok, [1, 2, 3]} 
+{:ok, [1, 2, 3]}
+
+iex> quote do: %{a: 1, b: 2}
+{:%{}, [], [a: 1, b: 2]}
+iex> quote do: Enum
+{:__aliases__, [alias: false], [:Enum]}
+
+
+eval context
+defmodule Mod do 
+  defmacro definfo do
+    IO.puts "In macro's context (#{__MODULE__})." 
+    quote do
+      IO.puts "In caller's context (#{__MODULE__})."
+      def friendly_info do
+          IO.puts """
+          My name is #{__MODULE__}
+          My functions are #{inspect __info__(:functions)} 
+          """
+      end 
+    end
+  end 
+end
+
+
+use macro to extend module
+defmodule Assertion do
+  defmacro __using__(_options) do 
+    quote do
+      import unquote(__MODULE__)
+      Module.register_attribute __MODULE__, :tests, accumulate: true 
+      @before_compile unquote(__MODULE__)
+    end 
+  end
+
+  defmacro __before_compile__(_env) do 
+    quote do
+      def run, do: Assertion.Test.run(@tests, __MODULE__) 
+    end
+  end
+
+  defmacro test(description, do: test_block) do 
+    test_func = String.to_atom(description) 
+    quote do
+      @tests {unquote(test_func), unquote(description)}
+      def unquote(test_func)(), do: unquote(test_block) 
+    end
+  end
+
+  defmacro assert({operator, _, [lhs, rhs]}) do
+    quote bind_quoted: [operator: operator, lhs: lhs, rhs: rhs] do
+      Assertion.Test.assert(operator, lhs, rhs)
+    end 
+  end
+end
+
+
+defmodule Assertion.Test do 
+  def run(tests, module) do
+    Enum.each tests, fn {test_func, description} ->
+      case apply(module, test_func, []) do 
+        :ok -> IO.write "." 
+        {:fail, reason} -> IO.puts """
+        ===============================================
+        FAILURE: #{description}
+        ===============================================
+        #{reason}
+        """
+    end 
+  end
+
+  def assert(:==, lhs, rhs) when lhs == rhs, do :ok
+  def assert(:==, lhs, rhs) do
+    {:fail, """
+      Expected: #{lhs} to be equal to: #{rhs} """
+    }
+  end 
+
+  def assert(:>, lhs, rhs) when lhs > rhs, do: :ok
+  def assert(:>, lhs, rhs) do
+    {:fail, """ 
+    Expected:           #{lhs}
+    to be greater than: #{rhs}
+    """
+    }
+  end
+end
+
+
+Macros are by default hygienic. This means that variables introduced by a macro are its own private 
+affair that won’t interfere with the rest of the code.
+In same cases, a macro must create a variable that is not hygienic and must be visible beyond 
+macro’s quoted code
+defmacro get(route, body) do
+  quote do
+    defp do_match("GET", unquote(route), var!(conn)) do
+      # put body AST here
+    end
+  end
+end
+Notice how we use var!(conn). By doing this, we’re specifying that conn is a variable that must 
+
+
+@cards (
+  for suit <- [:spades, :hearts, :diamonds, :clubs],
+      rank <- [2, 3, 4, 5, 6, 7, 8, 9, 10, :jack, :queen, :king, :ace],
+    do: %{suit: suit, rank: rank}
+)
+module attribute could be used as const variable, which is generated at compile time, and totally 
+invisible during runtime
+be visible to the caller.
+
+The call 
+my_macro arg1, arg2 do ... end
+my_macro(arg1, arg2, do: ...)
+This is just a special syntactical sugar of Elixir. The parser transforms do..end into {:do, ...}.
+atoms, numbers, strings, list, (two element tuple), the quoted presentation is exactly same as the input value
+quote(do: a) == {:a, [], Elixir}
+quote(do: :a) == :a

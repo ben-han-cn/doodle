@@ -1,0 +1,31 @@
+n interface is an abstraction that is the point of interaction between components.
+An interface can exist independent of an implementation, which
+means an interface can have many different implementations. The interface
+hides the complexity of the implementation but sometimes knowledge of the
+implementation is required to use the component correctly or efficiently.
+Interface Complexity is a metric designed to quantify the complexity of
+an interface based on types, so that quick assessment can be made about
+the necessity of understanding the implementation. Types offer information
+about the components they are part of. Quantifying this information provides
+the developer with a hint as to how much he needs to know to use the
+component effectively.
+The metric is defined from the bottom up. First, all primitive types are
+defined, based on the physical space they occupy and their deviation from
+the default. More complex types are created using a set of composition rules.
+This combination of primitives and composition rules means that any type’s
+complexity can be measured recursively. Once a type signature has been
+measured, it can be compared with other type signatures.
+There is a distinction between types and new definitions of types. Defining
+a new type is the process of adding a new complexity to an environment.
+Once the type is defined, it can be used to define new types. Interface Complexity 
+can serve at least two useful purposes. First, it can be used by a developer to get 
+an idea of what libraries might be worth becoming acquainted with. Secondly, 
+it can be used to assist in writing simpler, more maintainable code.
+While much effort is put into justifying the complexities based on theory,
+the complexity is still attempting to measure something subjective. The goal
+is to have as much of the metric grounded as possible, but there are some
+instances where intuition and judgment prevail or where it is the only option.
+
+
+void == unit type
+void * == bottom type

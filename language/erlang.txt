@@ -1,0 +1,50 @@
+APP
+OTP
+BEAM     erlang vm (bj.. erlang abstract machine)
+ERTS     erlang runtime system
+OS
+HW/VM
+
+
+erlang parallelism
+one scheduler has two queues, ready queue and waiting queue, 
+scheduler pick process from ready queue and handle it to BEAM,
+the process's time slice is used up, it's pushed into the bottom
+of the ready queue,  when process is wait for message, it's pushed
+into waiting queue.
+Each physical core has one scheduler, this way erlang achieve 
+parallelism
+
+
+Erlang tag scheme
+Each data object or pointer to a data objet also has a tag with
+information about the data type of the object. Some bits of pointer
+are reserved for tag which is used to determine the type of the 
+object as well as garbage collector.
+
+Process are just memory
+stack
+heap
+mail box 
+PCB(process control block)
+PD(process dictionary)
+
+
+Erlang type system
+any
+    number
+      integer
+      float
+    atom
+    reference
+    fun
+    port
+    pid
+    tuple
+    map
+    list
+      nil
+      cons
+    binary
+                  none
+

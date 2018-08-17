@@ -1,0 +1,20 @@
+localStorage  = &tsdb.ReadyStorage{}
+remoteStorage = remote.NewStorage()
+fanoutStorage = storage.NewFanout(localStorage, remoteStorage) 
+
+notifier = notifier.NewManager() //alarm
+scrapeManager = scrape.NewManager() //metric polling service
+queryEngine = promql.NewEngine()
+ruleManager = rules.NewManager()
+
+discoveryManagerScrape  = discovery.NewManager() //cfg.ScrapeConfigs
+discoveryManagerNotify  = discovery.NewManager() //cfg.AlertingConfig.AlertmanagerConfigs
+
+
+db, err := tsdb.Open(
+  cfg.localStoragePath,
+  log.With(logger, "component", "tsdb"),
+  prometheus.DefaultRegisterer,
+  &cfg.tsdb,
+)
+localStorage.Set(db, startTimeMargin)

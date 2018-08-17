@@ -1,0 +1,69 @@
+                       etcd
+                        |
+                        |
+                    api server 
+                        |
+                        |
+   -----------------------------------------
+   |             |            |            | 
+scheduler    controller    kubelet      kubeproxy
+
+
+CA(certificate authority) is the trust root for a cluster
+all certificates are signed by cluster CA
+
+
+// server certificate
+1 api server https ---> cert and private key which is signed by CA
+--tls-cert-file 
+--tls-private-key-file
+
+if loadbalance is placed before several api server, the dns name
+and ip address of the load balancer should be placed into the certificate
+
+2 kubelet https
+    certificate is signed by cluster CA
+
+
+server authenticate client through x.509
+    user is obtained from Common Name(CN) field
+    groups are obtained from Organization field
+
+
+
+//client certificate
+Component             Common Name                           Organization
+controller manager    system:kube-controller-manager
+scheduler             system:kube-scheduler
+kube proxy            system:kube-proxy
+kubelet               system:node:${hostname}               system:nodes
+
+
+
+each kubelet has its own identity, which avoid one node to modify the 
+resources allocated on other node.
+
+
+
+
+certificates in k8s:
+api server:
+    cluster ca            --> authenticate clients 
+    serving certicate     --> serving api
+    etcd ca
+    etcd client ca
+    kubelet client cert   --> kubelet
+
+controller manager:
+    client certificate    ---> api server
+    cluster ca            ---> service account
+
+scheduler:
+    client certificate    ---> api server
+
+kubelet:
+    serving certificate   ---> serving api
+    cluster ca            ---> authenticate client
+    client certificate    ---> api server
+
+cluster ca is the root, which is used to authenticate other componenet

@@ -1,0 +1,10 @@
+when build a library A which will be reused latter
+private :if source file include A's header file, but head file 
+         doesn't include A's header
+public: source file and header file both include A's header
+interface: only header file include A's header
+
+these properties will affect the target's build process
+target_include_directories()
+target_compile_definitions() 
+target_compile_options()

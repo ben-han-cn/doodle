@@ -1,0 +1,65 @@
+ +---------------------------+
+ | controller plane (master) |
+ |  +-----+    +---------+   |
+ |  |     |    |         |<----------------------------------------+
+ |  |etcd |<---+ api     |<---------------------+                  |
+ |  |     |    | server  |   |                  |                  |
+ |  +-----+    +---------+   |                  |                  |
+ |       +----------> ^      |                  |                  |
+ |       |            |      |               +--|------------------|---------+
+ |  +----+---+  +-----+----+ |               |  |   worker nodes   |         |
+ |  |        |  |          | |               |  |                  |         |
+ |  |scheduler  | controller |               |  |--------+    +----+----+    |
+ |  |        |  | manager  | |               |  +        |    |kube-proxy    |
+ |  +--------+  |          | |               |  |kubelet |    |         |    |
+ |              |          | |               |  +-----+--+    +---------+    |
+ |              +----------+ |               |        |                      |
+ +---------------------------+               |       +v---------------+      |
+                                             |       |                |      |
+                                             |       | container runtime     |
+                                             |       +----------------+      |
+                                             +-------------------------------+
+
+
+1 api server:
+authentication (who are you)      ->
+authorization  (what you can do)  ->
+admission      (when request try to update resource, 
+                admission modify the resource for different reason) ->
+resource validatiaon  ->
+etcd
+
+api server suport resource notifcation to register watchers.
+
+
+2 scheduler
+scheduler is update the pod definition through the api server, then api server
+notify all the kubelet(kubelet watch the resource), and when kubelet on the specified
+node found a new pod is under his control, he will create and run the pod's containers.
+step's to find a node:
+filter all nodes to find acceptable one
+    node selector
+    hardware resource requirement
+    network requirement, like whether the required port is occupied
+    taint and toleration
+    node affinity or anti-affinity 
+prioritize nodes and select the top one
+
+multiple scheduler could be running simultanously, and each pod could sepcify the scheduler
+name
+
+3 controller
+for each resource type, there is a related controller. they make sure the actual state
+of the system converges toward the desired(decleared) state.
+
+controller is a watcher for api server, they also perform a re-list operation periodically to 
+make sure they haven't missed anything.
+
+controller do all the operation through api to create or update the resource
+
+4 kubelet
+ register the node it's running on by creating a Node resource
+ continuously monitor the api server for pods that have been scheduled to node, and start the container through the container runtime
+  consitently monitors running containers and reports to api server(running liveness probe)
+
+5 servie proxy

@@ -1,0 +1,77 @@
+Affinity
+comes in two falvors:
+    node affinity
+    pod affinity
+
+
+node affinity will replace node selector in pod
+apiVersion: v1
+kind: Pod
+metadata:
+ name: kubia-gpu
+spec:
+ affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: gpu
+          operator: In
+          values:
+            - "true"
+node affinity provide two more advanced feature:
+1 more flexible matching algorithm 
+2 will affect running pods if node label changed (in the future k8s version)
+3 Prioritizing nodes when scheduling a pod
+
+preferredDuringSchedulingIgnoredDuringExecution:
+ - weight: 80
+   preference:
+      matchExpressions:
+      - key: availability-zone
+        operator: In
+        values:
+        - zone1
+ - weight: 20
+   preference:
+      matchExpressions:
+      - key: share-type
+        operator: In
+        values:
+        - dedicated 
+
+
+pod affinity to make pod close to each other
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: frontend
+spec:
+ replicas: 5
+ template:
+ ...
+ spec:
+ affinity:
+  podAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - topologyKey: kubernetes.io/hostname
+      labelSelector:
+        matchLabels:
+          app: backend 
+
+
+topologyKey doesn't have special meaning, it just means which node's label will be
+checked againtst
+
+for affinity, 
+  requiredDuringSchedulingIgnoredDuringExecution //hard requirement
+  preferredDuringSchedulingIgnoredDuringExecution //optional 
+
+
+anti-affinity: avoid pod resides in same node, possibly they will affect each other's performance
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - topologyKey: kubernetes.io/hostname
+      labelSelector:
+        matchLabels:
+          app: frontend 

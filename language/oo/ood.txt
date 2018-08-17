@@ -1,0 +1,44 @@
+metric of good code
+1 SLOC (source lines of code)
+2 cyclomatic complexity
+3 Assignments, Branches and Conditions(ABC) metric
+
+
+potential expense of code:
+1 How difficult was it to write?
+2 How hard is it to understand?
+3 How expensive will it be to change?
+
+Naming method at slightly higher level of abstraction isolates
+the code from changes in the implementation details.
+
+S: single responsibility
+O: open for extension but close for midifcation
+L: subclass should be substituable for their superclass
+I: object shouldn't be forced to depend on methods they don't use
+D: depend on abstractions, not on concreations.
+
+Difference holds the key to understanding. If two concrete examples
+reprensent the same abstraction and they contain a difference, that 
+difference must represent a smaller abstraction within the larger one.
+If you can name the difference, you've identified that smaller abstraction.
+
+Flocking Rules
+1 Select the things that are most alike.
+2 Find the smallest difference between them.
+3 Make the simplest change that will remove that difference.
+
+oo == reusable abstraction
+
+sign for new class
+Question 1: Do any methods have the same shape?
+Question 2: Do any methods take an argument of the same name?
+Question 3: Do arguments of the same name always mean the same thing?
+Question 4: If you were to add the private keyword, where would it go?
+Question 5: If you were going to break this class into two pieces, where’s the dividing line?
+Question 6: Do the tests in the conditionals have anything in common?
+Question 7: How many branches do the conditionals have?
+Question 8: Do the methods contain any code other than the conditional?
+Question 9: Do methods that depend more on argument, or more on the class as a whole?
+
+class == physical or idea(rule)

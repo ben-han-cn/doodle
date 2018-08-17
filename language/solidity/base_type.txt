@@ -1,0 +1,77 @@
+base variable type
+uint256
+pragma solidity ^0.4.11;
+contract C {
+    uint256 a;
+    uint256 b;
+    uint256 c;
+    uint256 d;
+    uint256 e;
+    uint256 f;
+    function C() {
+      f = 0xc0fefe;
+    }
+}
+sstore(5, 0xc0fefe) //variable pos is in declare order
+
+fixsized array:
+pragma solidity ^0.4.11;
+contract C {
+    uint256[6] numbers;
+    function C() {
+      numbers[5] = 0xC0FEFE;
+    }
+}
+sstore(5, 0xc0fefe) //lay the elements in order
+
+struct:
+pragma solidity ^0.4.11;
+contract C {
+    struct Tuple {
+      uint256 a;
+      uint256 b;
+      uint256 c;
+      uint256 d;
+      uint256 e;
+      uint256 f;
+    }
+    Tuple t;
+    function C() {
+      t.f = 0xC0FEFE;
+    }
+}
+store(5, 0xc0fefe) //lay the fields of struct in order 
+
+map:
+contract C {
+    mapping(uint256 => uint256) items;
+    function C() {
+      items[0xC0FEFE] = 0x42;
+    }
+}
+
+key == 0xC0FEFE, position == 0
+sstore(keccak256(bytes32(key) + bytes32(position)), 0x42)
+
+
+
+dynamic array
+pragma solidity ^0.4.11;
+contract C {
+    uint256[] chunks;
+    function C() {
+      chunks.push(0xAA);
+      chunks.push(0xBB);
+      chunks.push(0xCC);
+    }
+}
+
+sstore[0] = 3 //len
+start_pos = keccak256(bytes32(0))
+sstore(start_pos, 0xAA)
+sstore(start_pos+1, 0xBB)
+sstore(start_pos+2, 0xCC)
+
+bytes will be optimized if len is smaller than 31
+otherwise it will be like array
+

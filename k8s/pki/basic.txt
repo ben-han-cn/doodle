@@ -1,0 +1,6 @@
+public key --> encrypt the message
+private key --> decrypt the message
+
+certificate ---> prove the owner of the public key, 
+bind the identity/other mete data to the public key, 
+it also includes issuer and expire time 

@@ -1,0 +1,6 @@
+Security profile
+  bootstrapping rules (command line flags)
+  cluster-scope policy object (PodSercurityPolicy)
+  namespace-scope policy objects (networkpolicy)
+
+Pluggable Enforcers

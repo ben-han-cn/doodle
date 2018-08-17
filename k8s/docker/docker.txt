@@ -1,0 +1,109 @@
+Docker
+  namespace
+  cgroup
+  docker engine
+
+image spec
+runtime spec
+
+Dockerfile
+ENTRYPOINT defines the executable invoked when the container is started.
+CMD specifies the arguments that get passed to the ENTRYPOINT.
+
+ENTRYPOINT ["node", "app.js"] //exec form
+ENTRYPOINT node app.js //shell format 
+shell form will run node using shell
+  /bin/sh -c node app.js
+
+ENV PG_MAJOR 9.3
+ENV PG_VERSION 9.3.4
+RUN curl -SL http://example.com/postgres-$PG_VERSION.tar.xz | tar -xJC /usr/src/postgress && …
+ENV PATH /usr/local/postgres-$PG_MAJOR/bin:$PATH
+
+
+docker engine:
+
+docker client  ----->             daemon     (api, image management, security, network, orchestration)
+                                  
+                                  containerd
+
+                  shim          shim
+                  runc          runc  
+                  container     container      ....
+
+containerd == container supervisor
+runc       == container runtime (use libcontainer)
+
+runc as container parent, when container launched, runc will exists, and
+containerd-shim process becomes the container's parent process.
+
+
+image name:
+<repsotory>:<tag>
+
+layers are fully independent and have no concept of being part of a collective image
+id of image == hash of the config object(list of layers and some metadata) 
+id of layer == hash of the layer content
+distribute hash of layer == hash of compressed content
+
+docker image pull alphine@sha256:74f634b1bc1bd74535d5209589734efbd44a25f4e2dc96d78784576a3eb5b335
+
+
+docker container stop ---> send SIGTERM to the process, and if 10 seconds later, it doesn't exist 
+SIGKILL will be sent to it
+
+ctrl-p + ctrl - q will detach shell from the container and leave it running at backgroup
+
+//check the image info  which could be used to find the default entry point
+$ docker image inspect nigelpoulton/pluralsight-docker-ci
+$ docker container inspect id/name
+
+
+//check the instruction to build the image
+$ docker image history web:latest
+
+
+multi-stage build
+use several base image to build several targets
+only copy the targets into the final image
+
+docker port mapping is implemented by host iptables
+
+
+network mode:
+1 bridge (default, has isolated network namespace)
+2 host (share network namespace with host)
+3 container (share network namespace with other container)
+4 null (has isolated network namespace, but doesn't configure network)
+
+
+config use other registry:
+/etc/docker/daemon.json <<EOF
+{
+    "registry-mirrors" : ["http://2595fda0.m.daocloud.io"]
+}
+EOF
+
+docker build -t image_name:v1 .
+
+docker container run --rm -d --name web1 -p 8080:8080 test:latest
+docker run --rm -it --name counter-test -v /home/vagrant/workspace/code/go/src/counterservice:/counterservice alpine
+//host path should be full path
+
+/bin/sh: ./counterservice: not found
+readelf -l counterservice | grep "program interpreter"
+      [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]
+the error is caused by the "program interpreter" (runtime linker) doesn't exist in the docker environment
+
+//retag docker image form ubuntu:15.10 ---> runoob/ubuntu:v3
+docker tag ubuntu:15.10 runoob/ubuntu:v3
+
+
+docker login
+docker tag counter bikecn81/counter
+docker push bikecn81/counter
+
+
+docker exec -it 91262536f7c9 bash
+docker attach --sig-proxy=false 91262536f7c9
+ctrl + p  + ctrl + q --> detach from a docker

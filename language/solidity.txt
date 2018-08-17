@@ -1,0 +1,46 @@
+compiler: CompilerStack
+  compile()
+    parse()
+
+    map<ContractDefinition const*, bytes const*> contractBytecode;
+
+    shared_ptr<Compiler> compiler = make_shared<Compiler>(_optimize, _runs);
+    compiler->compileContract(*contract, contractBytecode);
+
+    Contract& compiledContract = m_contracts.at(contract->getName());
+    compiledContract.bytecode = compiler->getAssembledBytecode();
+    compiledContract.runtimeBytecode = compiler->getRuntimeBytecode();
+    compiledContract.compiler = move(compiler);
+
+    compiler = make_shared<Compiler>(_optimize, _runs);
+    compiler->compileContract(*contract, contractBytecode);
+    contractBytecode[compiledContract.contract] = &compiledContract.bytecode;
+
+    Compiler cloneCompiler(_optimize, _runs);
+    cloneCompiler.compileClone(*contract, contractBytecode);
+    compiledContract.cloneBytecode = cloneCompiler.getAssembledBytecode();
+
+
+
+void CompilerStack::parse()
+    sourcePair.second.scanner->reset();
+    sourcePair.second.ast = Parser().parse(sourcePair.second.scanner);
+
+    resolveImports();
+    NameAndTypeResolver resolver(m_globalContext->getDeclarations());
+    
+    m_globalContext->setCurrentContract(*contract);
+    resolver.updateDeclaration(*m_globalContext->getCurrentThis());
+    resolver.updateDeclaration(*m_globalContext->getCurrentSuper());
+    resolver.resolveNamesAndTypes(*contract);
+    m_contracts[contract->getName()].contract = contract;
+
+    //interface handler
+    m_globalContext->setCurrentContract(*contract);
+    resolver.updateDeclaration(*m_globalContext->getCurrentThis());
+    resolver.checkTypeRequirements(*contract);
+    contract->setDevDocumentation(interfaceHandler.devDocumentation(*contract));
+    contract->setUserDocumentation(interfaceHandler.userDocumentation(*contract));
+    m_contracts[contract->getName()].contract = contract;
+
+

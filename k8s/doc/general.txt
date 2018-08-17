@@ -1,0 +1,89 @@
+DevOps
+This means the developer, QA, and operations teams need to collaberate
+throughout the whole process (development and deployment).
+
+
+For containers, all system calls on the exact same kernel running in the
+host OS.
+containers == namespace + cgroup (linux control groups)
+docker is a platform for packaging, distribution and running applications.
+
+docker images are composed of layers. Two different images can both use the
+same parent images as their base which will reduce the storage footprint.
+
+k8s advantage:
+deploy the application using declare style
+health chekcing and self-healing
+atomaic scaling
+simplify application developement 
+  some feautre (like leader election) has already implemented by k8s, application could just use it
+
+docker build, docker client will upload all the content in current directory to docker daemon, 
+docker daemon will build the image, and it could be located remotely.
+docker inspect could get the detail info of specified container.
+
+
+pod: a group of one or more tightly related containers that will always run together on the same worker nde and
+in the same linux namespaces. All the containers in a pod will appear to be running on the same logical machine.
+                      create and management
+replicationcontroller -----------------------> pods
+service will expose several pods with static ip and port pair, and make is accessable inside or outside the cluster
+
+application == serveral components, if each of them have different scaling requirement, they should be put
+into different pods.
+
+
+api object:
+apiVersion
+kind
+metadata: name, namespace, labels
+spec 
+status
+
+containerized application usually log to the standard output and standard error stream instead of logging to files.
+Docker redirect those streams to files and use
+docker logs <container id>
+to get the information
+
+
+using labels to organize and manage pods
+front ui pods:
+  app: ui
+  rel: stable
+
+order service pods:
+pod1
+  app: order
+  rel: stable
+pods2
+  app: order
+  relL canary (canary release means new version next to the stable version, and only let a small fraction of user
+               hit the version to see how it behaviors before rolling it out to all users
+kubectl get pods --show-labels
+kubectl get pods -L creation_method, env //show lable as individual column
+kubectl label pod kubia-manual creation_method=manual //add pod's label
+kubectl label pod kubia-manual env=debug --overwrite //modify pod's label
+kubectl get pods -l creation_method=manual //label selector
+kubectl get pods -l env //list pod has label key env
+kubectl get pods -l '!env' //list pod doesnot have label key env
+
+using label to categorize nodes, and use label to schedule pods to node
+kubectl label node gke-kubia-85f6-node-0rrx gpu=true //set node with gpu
+in pod spec
+spec:
+  nodeSelector:
+    gpu: "true"
+
+annotations like labels, but could be only used to add more description
+
+(--namespace == -n specify namespace into kubectl command)
+namespace:
+  isolation
+  access limitation
+  resource management
+  doesn't provide network isolation by default
+  delete namespace will delete all the pods in it
+
+
+pods can include init containers. they will run one after another.
+after the last one, main container will start.

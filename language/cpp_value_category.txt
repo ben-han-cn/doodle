@@ -1,0 +1,47 @@
+1 void func(Widget w) //pass by value
+
+valid:
+Widget x;
+func(x);
+
+func(Widget{}); 
+
+
+2 void func(const Widget& w) //pass by const reference
+valid:
+Widget x;
+func(&x);
+func(&Widget{});  
+
+
+3 void func(Widget& w) //pass by lvalue reference, func can modify data,
+                       //caller will observe any modification
+valid:
+Widget x;
+func(&x);
+
+invalid:
+func(&Widget{});  
+
+4 void func(Widget&& w) //pass by rvalue reference, func can modify data,
+                        //caller cannot see changes
+valid:
+func(Widget{})
+    
+invalid:
+Widget x;
+func(x);
+
+
+value category: 
+  glvalue: has identity
+  lvalue < glvalue: cann't be moved from
+  rvalue: can be moved from
+  xvalue < glvalue + rvalue
+  prvalue: doesn't have identity and can be moved from == literal, function call, etc
+
+
+const int& c = 7
+// a rvalue may be used to initailize a const lvalue reference, in
+// which case the lifetime of the object identified by the rvalue
+// is extended until the scope of the reference end

@@ -1,0 +1,8 @@
+ ilesystem -> partition -> hard driver
+
+each hard driver -> partition table -> up to four partition( primary + extend partition)
+one primary partition is bootable which os resides in.
+
+extend partition == container of logic partition
+
+mbr == boot loader(code) + partition table

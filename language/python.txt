@@ -1,0 +1,718 @@
+itertools
+
+iter(c) call c.__iter__, this funciton return object who has __next__ method 
+next(c) call c.__next__
+
+
+with context:
+
+import sys
+class RedirectStdoutTo:
+  def __init__(self, out_new):
+    self.out_new = out_new
+
+  def __enter__(self):
+    self.out_old = sys.stdout
+    sys.stdout = self.out_new
+
+  def __exit__(self, *args):
+    sys.stdout = self.out_old
+    
+print('A')
+with open('out.log', mode='w', encoding='utf-8') as a_file, RedirectStdoutTo(a_file):
+  print('B')
+  print('C')
+
+
+isinstance(o, bytes)
+
+
+repr(x)         x.__repr__
+str(x)          x.__str__
+bytes(x)        x.__bytes__
+format(x, spec) x.__format__(spec)
+iter(x)         x.__iter__
+next(x)         x.__next__
+reversed(x)     x.__reversed__
+
+x.y             x.__getattribute__('y')
+x.y             x.__getattr__('y') //y isn't a normal attribute, this is fallback check
+x.y = 1         x.__setattr__('y', 1)
+del x.y         x.__delattr__('y')
+dir(x)          x.__dir__
+
+f()             f.__call__ //function like object
+len(s)          s.__len__
+if x in s       s.__contains__(x)
+
+x[k]                x.__getitem__(k)
+x[k] = v            x.__setitem__(k, v)
+del x[k]            x.__delitem__(k)
+x[nonexistent_key]  x.__missing__(nonexistent_key)
+
+x+y             x.__add__(y)
+x-y             x.__sub__(y)
+....
+
+x == y          x.__eq__(y)
+x < y           x.__lt__(y)
+if x:           x.__bool__
+
+
+//binary search for sorted container
+import bisect
+def __getitem__(self, key):
+ ix= bisect.bisect_left(self._keys, key)
+ if ix != len(self._keys) and self._keys[ix] == key:
+  return self._data[ix][1]
+ raise ValueError("{0!r} not found".format(key))
+
+
+def pairs(iterable):
+  def pair_from(head, tail):
+    nxt = next(tail)
+    yield head, nxt
+    yield from pair_from(nxt, tail)
+
+  try:
+    return pair_from(next(iterable), iterable)
+  except StopIteration:
+    return
+
+pairs == zip(l, l[1:]) //but zip only work on seq objects
+
+
+(x for line in blocked for x in line) //generator expression 
+==
+for line in blocked:
+  for x in line:
+    yield x
+
+python slice:
+a[start:end] # items start through end-1
+a[start:]    # items start through the rest of the array
+a[:end]      # items from the beginning through end-1
+a[:]         # a copy of the whole array
+a[start:end:step] # start through not past end, by step
+
+
+
+collection function category:
+map:    zip, enumerate(generate pair of (index, original_elem)), map, sorted(container, key=fun),
+reduce: any,all,len,sum, max(container, key=fun), min(container, key=fun)
+filter: filter
+filter(lambda x: x%3==0 or x%5==0, range(10))
+
+map(fun, container) is more fast than generator expression
+map(function, zip(one_iterable, another_iterable)) > 
+(function(x,y) for x,y in zip(one_iterable, another_iterable))
+
+
+//use abc (abstract base class), we could be sure that we implement the 
+//necessary interface
+from collections.abc import Callable
+class NullAware(Callable):
+ def __init__(self, some_func):
+  self.some_func= some_func
+ def __call__(self, arg):
+  return None if arg is None else self.some_func(arg)
+
+//return multi results will turned into a tuple
+//use * to unflatten tuple into inner elements
+def read_head():
+ return (1, 2), 3 
+def read_tail(headers, tail):
+  ...
+read_tail(*read_head()) //headers == (1, 2), tail == 3
+
+
+functional programming perfer immutable datastructure:
+unwrap(process(wrap(raw)))
+
+use raw to create namedtuple which will add more intermidate attribute
+process the tuples based on the intermidate attribute, unwrap will return
+the old value
+
+perfer iterator and generators(generator is iterator, iterator has __next__ and __iter__, 
+generator is a convinent way to write iterator)
+def squares(start, stop):
+    for i in range(start, stop):
+        yield i * i
+squares ---> function
+squares(1, 20) --->  generator
+(i * i for i in range(start, stop)) ---> generator
+iterator is more memory efficient
+
+
+itertools
+1 enrich an iterable source of data
+count: count(1) ---> 1, 2, 3 ... 
+       count(1, 3) --> 1, 4, 7, 10 ...
+cycle: cycle(range(3)) ---> 0, 1, 2, 0, 1, 2 
+repeat: repeat(2, times=3) ---> 2, 2, 2
+
+2 iterator transformer
+enumerate
+accumulate
+chain
+groupby
+zip_longet
+compress
+islice
+dropwhile/takewhile
+filterfalse
+starmap
+
+//itertools recipes
+def take(n, iterable):
+    "Return first n items of the iterable as a list"
+    return list(islice(iterable, n))
+
+def prepend(value, iterator):
+    "Prepend a single value in front of an iterator"
+    # prepend(1, [2, 3, 4]) -> 1 2 3 4
+    return chain([value], iterator)
+
+def tabulate(function, start=0):
+    "Return function(0), function(1), ..."
+    return map(function, count(start))
+
+def tail(n, iterable):
+    "Return an iterator over the last n items"
+    # tail(3, 'ABCDEFG') --> E F G
+    return iter(collections.deque(iterable, maxlen=n))
+
+def consume(iterator, n=None):
+    "Advance the iterator n-steps ahead. If n is None, consume entirely."
+    # Use functions that consume iterators at C speed.
+    if n is None:
+        # feed the entire iterator into a zero-length deque
+        collections.deque(iterator, maxlen=0)
+    else:
+        # advance to the empty slice starting at position n
+        next(islice(iterator, n, n), None)
+
+def nth(iterable, n, default=None):
+    "Returns the nth item or a default value"
+    return next(islice(iterable, n, None), default)
+
+def all_equal(iterable):
+    "Returns True if all the elements are equal to each other"
+    g = groupby(iterable)
+    return next(g, True) and not next(g, False)
+
+def quantify(iterable, pred=bool):
+    "Count how many times the predicate is true"
+    return sum(map(pred, iterable))
+
+def padnone(iterable):
+    """Returns the sequence elements and then returns None indefinitely.
+
+    Useful for emulating the behavior of the built-in map() function.
+    """
+    return chain(iterable, repeat(None))
+
+def ncycles(iterable, n):
+    "Returns the sequence elements n times"
+    return chain.from_iterable(repeat(tuple(iterable), n))
+
+def dotproduct(vec1, vec2):
+    return sum(map(operator.mul, vec1, vec2))
+
+def flatten(listOfLists):
+    "Flatten one level of nesting"
+    return chain.from_iterable(listOfLists)
+
+def repeatfunc(func, times=None, *args):
+    """Repeat calls to func with specified arguments.
+
+    Example:  repeatfunc(random.random)
+    """
+    if times is None:
+        return starmap(func, repeat(args))
+    return starmap(func, repeat(args, times))
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+def grouper(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
+
+def roundrobin(*iterables):
+    "roundrobin('ABC', 'D', 'EF') --> A D E B F C"
+    # Recipe credited to George Sakkis
+    num_active = len(iterables)
+    nexts = cycle(iter(it).__next__ for it in iterables)
+    while num_active:
+        try:
+            for next in nexts:
+                yield next()
+        except StopIteration:
+            # Remove the iterator we just exhausted from the cycle.
+            num_active -= 1
+            nexts = cycle(islice(nexts, num_active))
+
+def partition(pred, iterable):
+    'Use a predicate to partition entries into false entries and true entries'
+    # partition(is_odd, range(10)) --> 0 2 4 6 8   and  1 3 5 7 9
+    t1, t2 = tee(iterable)
+    return filterfalse(pred, t1), filter(pred, t2)
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+def unique_everseen(iterable, key=None):
+    "List unique elements, preserving order. Remember all elements ever seen."
+    # unique_everseen('AAAABBBCCDAABBB') --> A B C D
+    # unique_everseen('ABBCcAD', str.lower) --> A B C D
+    seen = set()
+    seen_add = seen.add
+    if key is None:
+        for element in filterfalse(seen.__contains__, iterable):
+            seen_add(element)
+            yield element
+    else:
+        for element in iterable:
+            k = key(element)
+            if k not in seen:
+                seen_add(k)
+                yield element
+
+def unique_justseen(iterable, key=None):
+    "List unique elements, preserving order. Remember only the element just seen."
+    # unique_justseen('AAAABBBCCDAABBB') --> A B C D A B
+    # unique_justseen('ABBCcAD', str.lower) --> A B C A D
+    return map(next, map(itemgetter(1), groupby(iterable, key)))
+
+def iter_except(func, exception, first=None):
+    """ Call a function repeatedly until an exception is raised.
+
+    Converts a call-until-exception interface to an iterator interface.
+    Like builtins.iter(func, sentinel) but uses an exception instead
+    of a sentinel to end the loop.
+
+    Examples:
+        iter_except(functools.partial(heappop, h), IndexError)   # priority queue iterator
+        iter_except(d.popitem, KeyError)                         # non-blocking dict iterator
+        iter_except(d.popleft, IndexError)                       # non-blocking deque iterator
+        iter_except(q.get_nowait, Queue.Empty)                   # loop over a producer Queue
+        iter_except(s.pop, KeyError)                             # non-blocking set iterator
+
+    """
+    try:
+        if first is not None:
+            yield first()            # For database APIs needing an initial cast to db.first()
+        while True:
+            yield func()
+    except exception:
+        pass
+
+def first_true(iterable, default=False, pred=None):
+    """Returns the first true value in the iterable.
+
+    If no true value is found, returns *default*
+
+    If *pred* is not None, returns the first item
+    for which pred(item) is true.
+
+    """
+    # first_true([a,b,c], x) --> a or b or c or x
+    # first_true([a,b], x, f) --> a if f(a) else b if f(b) else x
+    return next(filter(pred, iterable), default)
+
+def random_product(*args, repeat=1):
+    "Random selection from itertools.product(*args, **kwds)"
+    pools = [tuple(pool) for pool in args] * repeat
+    return tuple(random.choice(pool) for pool in pools)
+
+def random_permutation(iterable, r=None):
+    "Random selection from itertools.permutations(iterable, r)"
+    pool = tuple(iterable)
+    r = len(pool) if r is None else r
+    return tuple(random.sample(pool, r))
+
+def random_combination(iterable, r):
+    "Random selection from itertools.combinations(iterable, r)"
+    pool = tuple(iterable)
+    n = len(pool)
+    indices = sorted(random.sample(range(n), r))
+    return tuple(pool[i] for i in indices)
+
+def random_combination_with_replacement(iterable, r):
+    "Random selection from itertools.combinations_with_replacement(iterable, r)"
+    pool = tuple(iterable)
+    n = len(pool)
+    indices = sorted(random.randrange(n) for i in range(r))
+    return tuple(pool[i] for i in indices)
+
+def nth_combination(iterable, r, index):
+    'Equivalent to list(combinations(iterable, r))[index]'
+    pool = tuple(iterable)
+    n = len(pool)
+    if r < 0 or r > n:
+        raise ValueError
+    c = 1
+    k = min(r, n-r)
+    for i in range(1, k+1):
+        c = c * (n - k + i) // i
+    if index < 0:
+        index += c
+    if index < 0 or index >= c:
+        raise IndexError
+    result = []
+    while r:
+        c, n, r = c*r//n, n-1, r-1
+        while index >= c:
+            index -= c
+            c, n = c*(n-r)//n, n-1
+        result.append(pool[-1-n])
+    return tuple(result)
+
+product
+permutation
+combinations
+
+
+
+function tools
+import functools
+1 decorators:
+  @lru_cache(n)
+  @totol_ordering
+2 paritial
+3 reduce
+4 @wraps
+
+from functools import wraps
+def nullable(f):
+ @wraps(f) //copy __doc__, __name__
+ def null_wrapper(arg):
+  return None if arg is None else f(arg)
+ return null_wrapper
+
+
+multi-processor module
+import multiprocessing
+
+pattern = "*.gz"
+combined = Counter()
+with multiprocessing.Pool() as workers:
+  for result in workers.imap_unordered(analysis, glob.glob(pattern)):
+    combined.update(result)
+
+fork without wait
+  with multiprocessing.Pool() as workers:
+    results = workers.map_async(analysis, glob.glob(pattern))
+    data = results.get()
+    for c in data:
+      combined.update(c)
+
+
+return x if n == 1 else y
+operator module export severl operator to method, which make functional interface
+usage more nature
+
+
+async python
+  async def hello(n):
+    print("hello {}".format(n))
+
+async function isn't normal function, it will be invoked by runtime. only in 
+async function you can call another async function use await, which means await 
+could only exists inside async function and to call another async function.
+
+the one invoke a async function is like 
+def run(f):
+  try
+    f.send(None)
+  except StopIteration as e:
+    return e.value
+await cann't be used in comprehension and lambda
+
+
+
+package organize
+module: any *.py file, file name is the module name
+package: any folder is considered a package
+when import module, python run all the code in the module file
+when import package, python run all the code in __init__.py of the folder
+
+libname
+  __init__.py 
+  mod1.py
+  mod2.py
+  pkg1
+    mod11.py
+  pkg2
+    __init__.py
+    mod21.py
+
+
+in __init__.py, mainly is used to expose all the main object in the package, these objects
+are the main object which compose the interface
+
+from .fields import AddField
+from .models import (                                                           
+    AddIndex, AlterIndexTogether, 
+    AlterModelManagers,        
+)                                                                                  
+from .special import RunPython, RunSQL
+                                                                                   
+__all__ = [                                                                        
+    'AddField', 'AddIndex', 'AlterIndexTogether', 'AlterModelManagers', 
+    'RunPython', 'RunSQL',
+]   
+
+in all the child file(module) use absolute import path
+from libname.pkg2 import xxxx
+
+
+pytest
+  pip3 install pytest-cov
+pytest -lf (last failed)
+pytest -l (show locals)
+pytest --duration=N (report the slowest n number of test)
+pytest -v test_task_fail.py::test_task_equality //only test specified funciton in one file
+
+#exception test
+def test_add_raises():
+  with pytest.raises(TypeError):
+    tasks.add(task='not a Task object')
+
+# mark test
+# run subset tests
+@pytest.mark.smoke
+def test_list_raises():
+  with pytest.raises(TypeError):
+    tasks.list_tasks(owner=123)
+
+@pytest.mark.get
+@pytest.mark.smoke
+def test_get_raises():
+  with pytest.raises(TypeError):
+    tasks.get(task_id='123')
+
+pytest -v -m 'smoke' test_api_exception.py
+pytest -v -m 'get' test_api_exceptions.py
+pytest -v -m 'smoke and get' test_api_exceptions.py
+pytest -v -m 'smoke and not get' test_api_exceptions.py
+
+
+#test class
+class TestUpdate():
+  def test_bad_id(self):
+    with pytest.raises(TypeError):
+      tasks.update(task_id={'dict instead': 1},
+                   task=tasks.Task())
+
+  def test_bad_task(self):
+    with pytest.raises(TypeError):
+      tasks.update(task_id=1, task='not a task')
+
+pytest -v tests/func/test_api_exceptions.py::TestUpdate
+pytest -v tests/func/test_api_exceptions.py::TestUpdate::test_bad_id
+
+
+usage of pytest fixture
+1 generate data
+@pytest.fixture                                                                 
+def db():                                                                       
+  db_ = TinyDB(storage=MemoryStorage)                                         
+  db_.purge_tables()                                                          
+  db_.insert_multiple({'int': 1, 'char': c} for c in 'abc')                   
+  return db_     
+
+# db is used as a parameter, pytest its name is same with 
+# fixture, and the function will be invoked and return value
+# is used as parameter
+def test_purge(db):                                                                
+    db.purge()                                                                     
+    db.insert({})                                                                  
+    db.purge()                                                                     
+    assert len(db) == 0 
+
+2 setup and tear down environment
+@pytest.fixture()
+def tasks_db(tmpdir):
+  tasks.start_tasks_db(str(tmpdir), 'tiny')
+  yield 
+  tasks.stop_tasks_db()
+
+def test_add_returns_valid_id(tasks_db):
+  new_task = Task('do something')
+  task_id = tasks.add(new_task)
+  assert isinstance(task_id, int)
+
+
+fixture use other fixtures
+@pytest.fixture()
+def tasks_just_a_few():
+  return (
+    Task('Write some code', 'Brian', True),
+    Task("Code review Brian's code", 'Katie', False),
+    Task('Fix what Brian did', 'Michelle', False))
+
+@pytest.fixture()
+def db_with_3_tasks(tasks_db, tasks_just_a_few):
+  for t in tasks_just_a_few:
+    tasks.add(t)
+
+pytest --setup-show test_add.py::test_add_increases_count
+
+built-in fixture
+def test_tmpdir(tmpdir):
+  a_file = tmpdir.join('something.txt')
+  a_sub_dir = tmpdir.mkdir('anything')
+  another_file = a_sub_dir.join('something_else.txt')
+  a_file.write('contents may settle during shipping')
+  another_file.write('something different')
+  assert a_file.read() == 'contents may settle during shipping'
+  assert another_file.read() == 'something different'
+
+
+setup.cfg
+[aliases]
+test=pytest
+
+[tool:pytest]
+addopts = -l -v --cov-append --cov-report
+
+
+built-in exception:
+ValueError, TypeError, KeyError
+
+&: bitwise add
+and: logic and,  
+&&: illegal
+
+"{0:b}".format(n)
+b -- binary
+x -- hex
+o -- octal
+int("xxx", 16)
+
+class Msg(object):
+  __slots__ = ('subject', 'reply', 'data', 'sid')
+__slots__ will avoid create __dict__ save memory
+__slots__ make attribute access more efficient
+
+
+
+error handling: 
+class ParsingError(Exception):
+  def __init__(self, message, source_pos):
+    self.message = message
+    self.source_pos = source_pos
+
+  def getsourcepos(self):
+    return self.source_pos
+
+class ParserGeneratorWarning(Warning):
+  pass
+
+
+import warnings
+for unused_term in g.unused_terminals():
+  warnings.warn("token %r is unsed" % unused_term,
+                ParserGeneratorWarning, 
+                stacklevel=2
+  )
+
+raise ParserGeneratorError("Unknown conflict in state %d" % st)
+
+
+when implement dict lik data struct which is essentially a mapping,
+inherit from dict is bad idea, dict is implemented in c, and its interface
+isn't depend on each other, the better way is inherit from
+collections.Mapping or collections.MutableMapping
+
+
+
+attribute look up:
+  __getattribute__():
+      look for class data descriptor
+      look for instance __dict__
+      look for class __dict__
+      look for parent class __dict__
+      look for class non data descriptor
+  __getattr__()
+  
+if not found return AttributeError
+
+import inspect
+inspect.getmro(cls) //get all the ancestors of cls
+
+
+decorator is a funciton or class, it will swallow the decorated function and
+return a object with the same name as the decorated function to the interpreter.
+decorators with arguments is different.
+
+class DecoratorWithoutArgument(object):
+    def __init__(self, f):
+        """
+        If there are no decorator arguments, the function
+        to be decorated is passed to the constructor.
+        """
+        self.f = f
+
+    def __call__(self, *args):
+        """
+        The __call__ method is not called until the
+        decorated function is called.
+        """
+        print("Inside __call__()")
+        self.f(*args)
+        print("After self.f(*args)")
+
+
+class DecoratorWithArgument(object):
+    def __init__(self, arg1, arg2, arg3):
+        """
+        If there are decorator arguments, the function
+        to be decorated is not passed to the constructor!
+        """
+        self.arg1 = arg1
+        self.arg2 = arg2
+        self.arg3 = arg3
+
+    def __call__(self, f):
+        """
+        If there are decorator arguments, __call__() is only called
+        once, as part of the decoration process! You can only give
+        it a single argument, which is the function object.
+        """
+        def wrapped_f(*args):
+            print("Inside wrapped_f()")
+            print("Decorator arguments:", self.arg1, self.arg2, self.arg3)
+            f(*args)
+            print("After f(*args)")
+        return wrapped_f
+
+
+def decorator_function_without_arguments(f):
+    @functools.wraps(f)
+    def new_f():
+        print("Entering", f.__name__)
+        f()
+        print("Exited", f.__name__)
+    return new_f
+
+def decorator_function_with_arguments(arg1, arg2, arg3):
+    def wrap(f):
+        def wrapped_f(*args):
+            print("Inside wrapped_f()")
+            print("Decorator arguments:", arg1, arg2, arg3)
+            f(*args)
+            print("After f(*args)")
+        return wrapped_f
+    return wrap
+
+with arguments, returned object will be called immediately and return the final object

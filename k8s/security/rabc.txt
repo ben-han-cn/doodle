@@ -1,0 +1,93 @@
+role ---> what can be done
+
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""] # "" indicates the core API group
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+
+
+rolebinding ---> bind rule to entity
+    entity including:
+        service account
+        user
+
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: jane
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+
+
+service account:
+    assign an identity to the processes running in a pod
+    if not specified, default service account of the namespace
+    will be used
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flask
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flask-backend
+  namespace: flask
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flask-backend-role
+  namespace: flask
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flask-backend-role-binding
+  namespace: flask
+subjects:
+  - kind: ServiceAccount
+    name: flask-backend
+    namespace: flask
+roleRef:
+  kind: Role
+  name: flask-backend-role
+  apiGroup: rbac.authorization.k8s.io
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: flask
+  namespace: flask
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      serviceAccount: flask-backend
+      containers:
+      - image: mateobur/flask:latest
+        name: flask
+        ports:
+        - containerPort: 5000
+
+authority check:
+k2 auth can-i list pods -n default --as=system:serviceaccount:default:default

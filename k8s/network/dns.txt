@@ -1,0 +1,56 @@
+kubelet //config file
+KUBELET_ARGS="--cluster-dns=10.254.0.2 --cluster-domain=cluster.local"
+
+kubelet.kubeconfig //configure file
+specify the info to contact the kube-apiserver
+
+
+//k8s.io/kubernetes/cmd/kubelet/app/options/options.go
+func AddKubeletConfigFlags(mainfs *pflag.FlagSet, c *kubeletconfig.KubeletConfiguration) {
+    fs.StringVar(&c.ClusterDomain, "cluster-domain", c.ClusterDomain, "Domain for this cluster.  If set, kubelet will configure all containers to search this domain in addition to the host's search domains")
+
+    fs.StringSliceVar(&c.ClusterDNS, "cluster-dns", c.ClusterDNS, "Comma-separated list of DNS server IP address.  This value is used for containers DNS server in case of Pods with \"dnsPolicy=ClusterFirst\". Note: all DNS servers appearing in the list MUST serve the same set of records otherwise name resolution within the cluster may not work correctly. There is no guarantee as to which DNS server may be contacted for name resolution.")
+}
+
+
+//k8s.io/kubernetes/cmd/kubelet/app/server.go
+//CreateAndInitKubelet -> kubelet.NewMainKubelet
+
+//k8s.io/kubernetes/pkg/kubelet/kubelet.go
+func NewMainKubelet(kubeCfg *kubeletconfiginternal.KubeletConfiguration, ..) {
+  klet := &Kubelet{
+    dnsConfigurer: dns.NewConfigurer(
+      kubeDeps.Recorder, 
+      nodeRef, 
+      parsedNodeIP, 
+      clusterDNS, 
+      kubeCfg.ClusterDomain, 
+      kubeCfg.ResolverConfig),
+  }
+}
+
+//k8s.io/kubernetes/pkg/kubelet/network/dns/dns.go
+func (c *Configurer) GetPodDNS(pod *v1.Pod) (*runtimeapi.DNSConfig, error) {
+}
+
+
+//k8s.io/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_sandbox.go
+func (m *kubeGenericRuntimeManager) generatePodSandboxConfig(pod *v1.Pod, attempt uint32) (*runtimeapi.PodSandboxConfig, error) {
+  dnsConfig, err := m.runtimeHelper.GetPodDNS(pod)
+  if err != nil {
+    return nil, err
+  }
+  podSandboxConfig.DnsConfig = dnsConfig
+}
+
+(kl *Kubelet) syncPod(o syncPodOptions) -> (m *kubeGenericRuntimeManager) SyncPod -> createPodSandbox --> generatePodSandboxConfig
+//k8s.io/kubernetes/pkg/kubelet/apis/cri/runtime/v1alpha2/api.pb.go
+type DNSConfig struct {
+    // List of DNS servers of the cluster.
+    Servers []string `protobuf:"bytes,1,rep,name=servers" json:"servers,omitempty"`
+    // List of DNS search domains of the cluster.
+    Searches []string `protobuf:"bytes,2,rep,name=searches" json:"searches,omitempty"`
+    // List of DNS options. See https://linux.die.net/man/5/resolv.conf
+    // for all available options.
+    Options []string `protobuf:"bytes,3,rep,name=options" json:"options,omitempty"`
+}

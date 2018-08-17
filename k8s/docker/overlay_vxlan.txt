@@ -1,0 +1,18 @@
+new l2 network based on underlaying l3 network (tunnel based on udp)
+
+container c1                         container c2
+     veth                               veth
+      |                                   |
+virtual switch(br0)               virtual switch(br0)
+      |                                   | 
+vtep (:4789/udp)                    vtep (:4789/udp)
+      |                                   |
+  host 1 network   ---------------    host 2 network
+
+
+messge (from c1 to c2 10.0.0.4)
+c1(10.0.0.3) -> br (br do arp broadcast) -> vtep return its own mac, this is 
+call ARP proxy
+vtep in host1 knows c2 through builtin gossip protocol
+
+vxlan add some info into ethereum frame which is used for vlan isolation

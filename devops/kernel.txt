@@ -1,0 +1,9 @@
+wget https://git.kernel.org/torvalds/t/linux-4.17-rc2.tar.gz
+sudo apt-get install git fakeroot build-essential ncurses-dev xz-utils libssl-dev bc flex libelf-dev bison
+tar xvzf linux-4.17-rc2.tar.gz
+cp /boot/config-$(uname -r) .config
+make
+make modules_install
+sudo make install
+sudo update-initramfs -c -k 4.17-rc2
+sudo update-grub

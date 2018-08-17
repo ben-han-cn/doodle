@@ -1,0 +1,17 @@
+.ll file, llvm level asm, human readable code
+.bc file, bit code, llvm levem object file, binary
+
+llvm-as llvm assembler
+llvm-as  add.ll -o add.bc
+
+llvm-link link more bc file
+llvm-link main.bc add.bc -o out.bc
+
+lli directly run bitcode format
+lli output.bc
+
+llc static compiler, transform .ll, .bc file to local .s file
+llc output.bc -o output.s
+
+llvm-IR:
+

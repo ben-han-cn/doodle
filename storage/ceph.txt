@@ -1,0 +1,27 @@
+ceph /sef/ 
+
+user space distributed application
+based on hosts filesystem
+provide several interface
+  lib based object storage
+  adapter for vm as a block device
+  http server with REST interface
+
+metadata node + monitor node + osd(object storage device) node
+monitor node has the cluster info
+osd handle the data replication and management
+metadata node has the attribute for objects including file system info
+
+object look up is done by library(CRUSH algorithm: controlled replication under scalable hash)
+mintor use paxo as consensus algorithm
+
+node failure
+osd has heartbeat each other
+if one fails, its peers tell the monitor
+if new osd turns on, it tells the monitor
+the monitor issues a new OSD map recording the change in state
+the osd cooperatively work together to move data to new nodes
+
+object -> location
+hash(obj name/key) % pg(replication group)
+CRUSH(pg, cluster state, rule set) //the latter two parameter is get from monitor

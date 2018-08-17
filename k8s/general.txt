@@ -1,0 +1,31 @@
+build and run application
+
+micro service
+application run on the platform not one physical machine
+
+orchestration:
+organizational primitives
+scheduling
+scaling
+health checking
+upgrades
+sevice discovery
+
+
+kubernetes is the new application server
+
+container ---> pod ----> service ---> endpoints
+
+pod -> pod in same host
+pod -> pod in different host
+
+pod:
+    one or more container share 
+        namespace
+        storage
+        same network interface
+        control group
+        scheduler
+
+
+    relative to vm

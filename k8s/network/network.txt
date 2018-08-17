@@ -1,0 +1,55 @@
+service:
+  (ip + port)+
+  virtual, doesn't assigned to any network interface
+
+service create process:
+  api server notify all the kube-proxy new service is created
+  kube-proxy make the ip/port addressable
+    set up the iptable, when pkt destined for the ip/port
+    the pkt is intercepted and dst ip/port is modified to one of the pod in the node
+
+  kube-proxy also monitor all the endpoint resource, when endpoint is changed, 
+  it will modify the iptable rules
+
+both kubelet and kubeproxy will manipulate iptable entries, kubelet port forward
+iptable rule conflict or one will hide the other one completely.
+
+$iptables-save //dump iptables
+$conntrack -L
+
+three kind of addresses:
+1 physical network
+2 pod network (container in one pod share the network namespace, virtual address configured on virtual device)
+3 service network (cluster internal ip, pure virtual address which doesn't configured on any device)
+
+RFC 1918 addresses are: 
+  10.0.0.0/8 
+  172.16.0.0/12 
+  192.168.0.0/16
+
+key understanding:
+pod can communicate directly with each other without nat, pod see its ip is same with other node see its ip
+pod network is not seen on physical network
+services are crucial for service discovery and distributing traffic to pods
+ingresses are entry points into the kubernetes network, most of them are
+layer 7 load balancers.
+
+kubelet could use json confgure file to setup CNI
+
+pod to pod communication is implemented by add route entry into route table on each node in the cluster, 
+which make the node knows which node to send the pkt when the destination pod is on that node,
+the dest node has forward info in its route table, make it forward the package to the virtual bridge.
+
+when pod crash and rescheduled, its ip is changed
+vip(cluster ip) of service will be constant, it hide the unstable pods
+
+pod --> service
+iptable is modified by kube-proxy, and iptable will pick one endpoint(related to one pod behind the service) randomly.
+
+iptable:
+  tables classified by the action it will take // NAT, FILTER, Mangle, RAW, Security
+    table have chains, chain is named with the stage in the hook framework(netfilter), PREROUTING, INPUT, FORWARD, OUTPUT, POSTROUTING
+    table may not have all 5 chains
+  
+  whan a hook is triggered related chain will be processed, and the order is
+  nat(snat) -> security -> filter -> nat(dnat) -> mangle -> raw

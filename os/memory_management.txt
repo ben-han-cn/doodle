@@ -1,0 +1,63 @@
+address mapping
+  virtual address ---> physical address
+  virtual address ---> hardware devices: registers or ram 
+                        PCI device
+                        GUP RAM
+                        On-SoC IP blocks
+
+
+virtual memory:
+  different memory space == different mapping
+  memory could be protected and shared
+  memory can be moved and be swapped to disk
+
+
+mapping is performaed by hardware (MMU)
+  software in user or kernel space all use virtual memory
+  MMU sits between cpu core and memory 
+  MMU is often part of physical CPU itself and separate from RAM controller
+  MMU generate page fault exception 
+  ALU ----> MMU ----> Memory Controller  ----> RAM
+             |
+             |
+            TLB
+
+  TLB(translation lookaside buffer) is part of MMU
+    it's a list of mapping from virtual to physical address space
+    TLB isn't big enough to hold all the maping for one process
+
+page fault condition:
+  virtual address is not mapped, kernel will use page table to decide what to do
+  insufficient permission
+  virtual address is swapped out
+
+linux memory management:
+virtual memory is split to kernel and user space memory, and normally kernel space is
+in the higher address space 
+
+three types of virutal address(Bus address):
+kernel logical address:
+  get from kmalloc and most other allocation methods 
+  kernel stack
+  has fixed offset from their physical address
+  never swapped out
+  DMA only handle contigous and unswapable physical addresses
+kernel virtual address
+  return by vmalloc
+  often used for large buffers
+  memory mapped IO
+user virtual address
+  below PAGE_OFFSET 
+  threads just share a mapping
+  saved in struct mm which resides in struct task
+  context switch will switch memory mapping ///////?
+  lazy allocation will generate page fault
+  mlock could be used to lock the memory to be swapped out
+  brk increase the size of heap
+
+note:
+MMU and kernel page table(memory management) all work on page size, they only care about which 
+Page Table Base Register(PTBR) is the hardware register which store the address of each process's page table
+page is mapped to which frame, the offset in the page isn't changed during the mapping.
+Page table is designed to a multi level structure which is used to save space, since the space is determined by
+the real physical address usage of one process

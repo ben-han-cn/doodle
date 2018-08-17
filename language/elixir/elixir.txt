@@ -1,0 +1,142 @@
+wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb 
+sudo dpkg -i erlang-solutions_1.0_all.deb
+sudo apt-get update
+sudo apt-get install esl-erlang
+sudo apt-get install elixir
+
+mix archive.install https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez
+
+anything is function
+module is namespace
+project path
+  deps get the code compiled, then use can use its modules
+  project self code, start from lib
+
+"xxx" is string == binary != list ('xxx')
+list is data + next pointer
+
+keyword list 
+[a: 1, b: 2] == [{:a, 1}, {:b, 2}]
+m = %{a: 10}
+m.a == m[:a]
+atom used as key has several syntax sugar
+some_fn(p1, p2, a: 10, b: 20), parameter after p2 is used as a keyword list
+
+
+beam runtime
+Once the system is started, you run some code, typically by calling functions from modules. 
+How does the runtime access the code? The VM keeps track of all modules loaded in memory. 
+When you call a function from a module, BEAM first checks whether the module is loaded. 
+If it is, then the code of the corresponding function is executed. Otherwise, the VM tries 
+to find the compiled module file—the bytecode—on the disk and then load it and execute the function.
+
+Module in elixir is an alias:
+defmodule MyModule, do: ... end
+MyModule == :"Elixir.MyModule"
+
+
+This isn’t an accident. When you compile the source containing the MyModule module, the file generated 
+on the disk is named Elixir.MyModule.beam, regardless of the name of the input source file. In fact, 
+if multiple modules are defined in a single source file, compiler will produce multiple beam files that 
+correspond to those modules. You can try this by calling the Elixir compiler (elixirc) from the command line
+$ elixirc source.ex
+where the file source.ex defines a couple of modules. Assuming there are no syntax errors, you’ll see 
+multiple beam files generated on the disk.
+In the runtime, module names are aliases; and as we said, aliases are atoms. The first time you call the 
+function of a module, BEAM tries to find the corresponding file on the disk. The VM looks for the file 
+in the current folder and then in the code paths. When you start BEAM with Elixir tools (such as iex), 
+some code paths are predefined for you. You can add additional code paths by providing the -pa switch:
+$ iex -pa my/code/path -pa another/code/path
+You can check which code paths are used at runtime by calling the Erlang function :code.get_path.
+If the module is loaded, the runtime doesn’t search for it on the disk. This can be used when starting the shell, 
+to autoload modules:
+$ iex my_source.ex
+This command compiles the source file and then immediately loads all generated modules. Notice that in this case, 
+beam files aren’t saved to disk. The iex tool performs an in-memory generation of bytecode generation and 
+loads the modules.
+
+Kernal.apply/3 receives three arguments: the module atom, the function atom, and the list of arguments passed to 
+the function. Together, these three arguments, often called MFA (for module, function, arguments), contain all 
+the information needed to call an exported (public) function. Kernel.apply/3 can be useful when you need to make 
+a runtime decision about which function to call.
+
+
+The basic principles of data abstraction in Elixir can be summarized as follows:
+1 A module is in charge of abstracting some data.
+2 The module’s functions usually expect an instance of the data abstraction as the
+first argument.
+3 Modifier functions return a modified version of the abstraction.
+4 Query functions return some other type of data.
+follow the priciples will make pipeline call much easier
+
+todo_list = TodoList.new 
+            |> TodoList.add_entry({2013, 12, 19}, "Dentist") 
+            |> TodoList.add_entry({2013, 12, 20}, "Shopping") 
+            |> TodoList.add_entry({2013, 12, 19}, "Movies")
+
+
+struct is just a map with a specifal key, which is used to avoid illegal pattern matching 
+defmodule Ben do
+  defstruct name: nil, age: 10
+%Ben{name: "good", age: 20} == %{__struct__: Ben, name: "good", age: 20}
+
+Although the technique presented works, it may become cumbersome for deeper hierarchies. 
+Remember, to update an element deep in the hierarchy, you have to walk to that element 
+and then update all of its parents. To simplify this, Elixir offers support for more 
+elegant deep hierarchical updates.
+put_in/2
+
+
+defprotocol Empty do //Definition of the protocol 
+  def is_empty(thing) //Declaration of protocol functions
+end
+
+defimpl Empty, for: List do
+  def is_empty([]) do: true
+  def is_empty([h|_]) do: false
+end
+
+use protocol
+Empty.is_empty(v) 
+it will based on v invoke different method
+with consolidate, the dispatch will be more efficient. Consolidation is a part of compilation,
+it is the process of optimising dispatches by looking at all of the implementation.
+
+
+The receive construct works as follows:
+1 Take the first message from the mailbox.
+2 Try to match it against any of the provided patterns, going from top to bottom.
+3 If a pattern matches the message, run the corresponding code.
+4 If no pattern matches, put the message back into the mailbox at the same posi-
+tion it originally occupied. Then try the next message.
+5 If there are no more messages in the queue, wait for a new one to arrive. When
+  a new message arrives, start from step 1, inspecting the first message in the mail- box.
+6 If the after clause is specified and no message arrives in the given amount of
+time, run the code from the after block.
+
+mailbox length is unlimited, so unhandle message will keep ocuppy memory and finally 
+crash the whole beam
+
+module.__info__(:functions) returns all the exported funcitons
+
+GenServer
+call/cast is sending speicified message to the process, for example {:cast, ...}, {:call, ....}
+so handle_info is used to handle other kind of messages
+
+handle call through another process
+def handle_call({:get, key}, caller, db_folder) do
+  spawn(fn ->
+    data = case File.read(file_name(db_folder, key)) do
+      {:ok, contents} -> :erlang.binary_to_term(contents)
+      _ -> nil
+    end
+    GenServer.reply(caller, data) //send the result back to the client, this is why we use
+                                  //handle_call/3 instead of handle_call/2
+  end) //spawn the handler 
+  {:noreply, db_folder} //return nothing in the main loop 
+end
+
+Always keep in mind that multiple processes run concurrently, whereas a single process handles 
+requests sequentially. If computations can safely run in parallel, you should consider running 
+them in separate processes. In contrast, if an operation must be synchronized, you’ll want to 
+run it in a single process.

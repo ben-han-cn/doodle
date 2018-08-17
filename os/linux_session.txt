@@ -1,0 +1,5 @@
+for posix compliant system, run a command in backgroup with &,
+only detach stdin from control terminal.
+
+commnd &>log.txt &
+command 1>/dev/null 2>error.log &

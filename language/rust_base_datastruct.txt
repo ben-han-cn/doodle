@@ -1,0 +1,20 @@
+&str 
+String  = "xx".to_string //dynamic string
+
+&[T]
+std::slice::Itert<T> = slice.iter()
+std::slice::IterMut<T> = slice.iter_mut()
+
+let arr = [66, -8, 43, 19, 0, -31];
+for n in arr.iter().filter(|x| **x < 0) {
+ print!("{} ", n);
+}
+filter is iterator adaptor, the closure it 
+calls will get the reference from iter, iter
+return a reference of elem in arr, so two *
+is needed
+map is another iterator adaptor, but it will pass
+the value not the referencd to its funciton.
+any, all, count, sum, min, max, collect is iterator 
+consumer 
+collect return a new seq

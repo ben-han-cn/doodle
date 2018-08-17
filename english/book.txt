@@ -1,0 +1,44 @@
+Their removal would make the operating system not fully usable, since important 
+features would be lost or some programs may behave differently or become unusable. 
+
+An automated version of the validation process might just flag a strange code for
+human approval, rather than rejecting the whole order outright.
+
+Most people effortlessly recognize those digits as 504192. That ease is deceptive.
+
+When you try to make such rules precise, you quickly get lost in a morass of exceptions 
+and caveats and special cases.
+
+The situation is better than this view suggests.
+
+In particular, it's not possible to sum up the disign process for the hidden layers 
+with a few simple rules of thumb.
+
+Despite the fact that these definitions are undeniably correct, none are precise 
+in a measurable way.
+
+The term abstraction, referes to the distinction between the external properties of an 
+entity and the details of the entity's internal composition.
+
+It it by applying abstraction, then, that we are able to contruct, analyze, and manage
+large, complex computer systems, which would be overwhelming if viewed in their entirely
+at a detailed level.
+
+Indeed 实际上
+moreover 此外
+however 然而
+thus 因此，于是
+in short 简单说
+in particular 特别，尤其
+At first glance 咋一看
+In contrast to 和xx相反
+Under these circumstances 在这种情况下
+otherwise 否则
+whereas 然而（对比两个事实），鉴于
+suppose ... 假设
+
+The concept of public libraries is largely based on the premise that all citizens
+in a democracy must have access to information. As more information
+is stored and disseminated via computer technology, does access to this technology
+become a right of every individual?
+

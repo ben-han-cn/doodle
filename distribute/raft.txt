@@ -1,0 +1,47 @@
+election timeout:
+  follower wait to becaome a candidate, randomized to be between(150 -> 300 ms)
+
+
+after election timeout:
+  follower -> candidate and start new election term, and vote for himself 
+  1 send Request vote to other nodes 
+  2 receiving node hasn't voted yet in this term then it vote for the candidate
+    and the node reset its election timeout
+  3 when candidate get a majority votes it becomes leader
+
+
+leader will keep sending appenEntry message in heart beat interval
+
+election will continue until a follower stops receiving heartbeats.
+
+
+split vote: two nodes both start an election for the same term
+and each reaches a single follower node before the other, and each
+candidate cann't get majority vote, and it will wait for another round election.
+
+
+client send entry -> leader 
+leader -> follower
+  once a majority follower respond, leader commit the entry and respond to the client
+
+
+any leader when it receive a higher election term, it will step down
+any node when it receive a higher election term, it will roll back all uncommitted entries
+and match the new leader's log
+
+
+note:
+for each cluster, quorum == (n/2) + 1, it's the majority number of the cluster, so a 
+n node cluster only can has n - quorum failure node, shorter than quorum node will cause
+no leader is elected.
+
+Servers   Quorum Size    Failure Tolerance
+1           1             0
+2           2             0
+3           2             1
+4           3             1
+5           3             2
+6           4             2
+
+so compared with odd number cluster, even number cluster increase the overhead for 1 node, but
+get no failure tolerance benefit.

@@ -1,0 +1,54 @@
+alias k=kubectl
+k run ghost --image=ghost:0.9 --replicas=2
+k expose deployments ghost --port=2368 --type=NodePort
+
+
+k get pods,rs,deployments
+k get pods --output=wide
+
+k logs redis-xxxxxxx
+
+k cluster-info
+
+k get all
+
+k delete svc,deploy -l app=niceone // -l == select label with
+k delete pods --all --namespace test
+
+k get pods --watch
+
+k get pods -o json
+k get pods -o wide
+k get pods -o jsonpath="{.items[*].spec.containers[*].name}"
+k exec ghost-6b8f77589d-lfcv8 -c ghost -- cat /etc/resolv.conf
+k exec -it ghost-6b8f77589d-lfcv8 /bin/sh
+
+k annotate namespace default daughter=xuru
+
+ETCDCTL_API=2 ./etcdctl ls / --recursive
+
+//run etcd
+./etcd
+
+//run single api-server, this may needs root
+kube-apiserver 
+    --secure-port 0 
+    --etcd-servers http://127.0.0.1:2379 
+    --service-cluster-ip-range 10.0.0.0/16 
+    --storage-backend etcd2 
+    --storage-media-type application/json
+
+
+
+etcdctl --endpoints=https://10.0.0.31:2379 \
+    --key=ssl/kube-node-key.pem \
+    --cert=ssl/kube-node.pem \
+    --cacert=ssl/kube-ca.pem \
+    get / --prefix
+
+
+//install docker
+curl https://releases.rancher.com/install-docker/17.03.sh | sh
+
+alias k2="kubectl --kubeconfig /home/vagrant/workspace/test/rke/kube_config_cluster.yml"
+k2 logs -f -n kube-system kube-flannel-pfgxt kube-flannel

@@ -1,0 +1,33 @@
+counter: value always increase
+gauges:  current state which could up or down
+histograms: value in different range (bucket), analyse distribution of a data set
+  latency in 10ms, 100ms, 1s, 10s, +Inf
+  http_request_duration_milliseconds_bucket{le="10"}
+  http_request_duration_milliseconds_bucket{le="100"}
+  http_request_duration_milliseconds_bucket{le="1000"}
+  http_request_duration_milliseconds_bucket{le="10000"}
+  http_request_duration_milliseconds_bucket{le="+Inf"}
+  http_request_duration_milliseconds_sum  //sum of all the value
+  http_request_duration_milliseconds_count //sum of sample count
+summary: 
+  http_request_duration_milliseconds_sum  //sum of all the value
+  http_request_duration_milliseconds_count //sum of sample count
+  http_request_duration_milliseconds_count{quantile='0.x'} //percentage of all samples in 
+range (0, value)
+  
+
+
+curl http://localhost:9090/api/v1/query?query=latest_block_height
+
+query language:
+latest_block_height  // get latest value
+latest_block_height{method="GET", uri="/hello"} // with labels
+latest_block_height{instance=~"^.*bb.*$"} // match label with regex
+latest_block_height{method="GET|POST"} // match label with regex
+
+latest_block_height offset 5m   //value five minutes ago
+sum(latest_block_height)        //
+rate(latest_block_height [5m])
+
+
+

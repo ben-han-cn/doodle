@@ -1,0 +1,22 @@
+clang++ -std=c++14 -c -fpic static.cpp
+ar rcs libstatic.a static.o
+
+clang++ -std=c++14 -c -fpic dynamic.cpp
+clang++ -shared -o libdynamic.so dynamic.o 
+
+clang++ -std=c++14 -c main.cpp
+clang++ -L. -Wl,-rpath=./ main.o -lstatic -ldynamic
+//rpath is used to embed customized search path in 
+//the executable itself 
+
+$ LD_DEBUG=libs a.out 
+$ LD_DEBUG=bindings python
+
+
+complicated pointers
+For a misbehaved c++ program, sometimes it's very hard to debug 
+One reason for this is that some pointer operation overwrite the data
+of another class or struct which make the state of the system very subtle.
+Pointers are just integers, but just because two pointers point to the same
+address (with same value), doesn't mean they are equal and can be used 
+interchangeably

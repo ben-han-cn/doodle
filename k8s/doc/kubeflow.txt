@@ -1,0 +1,5 @@
+Build portable ML(machine learning) solutions using kubernetes
+
+k8s custom resources for managing ML tasks(distributed trainning, orchestration, model deployment, ...)
+microservice for ML(data registries, model database)
+ksonnet packages to manage infrastructure declaratively

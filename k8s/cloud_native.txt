@@ -1,0 +1,34 @@
+cloud native infrastructure is infrastructure that is hidden
+behind useful abstractions, controlled by APIs, managed by
+software, and has the purpose of running applications.
+
+cloud native application is engineered to run on a platform
+and is designed for resiliency, agility, operability and 
+observability.
+
+Resiliency embrace failures instead of trying to prevnet them.
+Agility allows for fast deployment and quick iteration
+Operability adds control of application life cycles from inside 
+the application
+Observability provides information to answer questions about 
+application state.
+
+
+Microservice vs Monoliths
+As complexity of applicaiton grows, Monoliths becomes hard to 
+understand and modify.  Modularity is the way to fight the complexity.
+And use different service to implement module is the effective
+enforcement of principle of API dependency.
+It make the application much esaier to modify and grow in parallel.
+
+Application should provide the state info for platform to manage it.
+the state(life cycle state) including:
+    ready 
+    healthy
+    error
+
+Telemetry data
+    SLI == service-level indicator
+    KPI == key performance indicator
+    Rate, Errors, Duration(Latency)
+it mostly used to alert or history tracing

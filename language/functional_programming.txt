@@ -1,0 +1,9 @@
+function as first citizen & high order function
+prefer pure funciton and immutable data
+algebra data structure and pattern matching
+funciton composition 
+recursion & compiler tail recursion optimization 
+generic type system & parametic polymorphism
+
+
+statefull class == method must be used in order

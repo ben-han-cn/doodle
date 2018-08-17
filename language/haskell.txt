@@ -1,0 +1,129 @@
+lambda
+𝜆x.x+1 (head . body)
+only accpet one paremter 
+application == redution, binding value to paremeter(sustitude x with value)
+
+𝜆x.xy, x is bound variable which is named in the header, y is free variable 
+multiply parameter means nested lambda
+𝜆xy.xy == 𝜆x.(𝜆y.xy) 
+
+combinator is lambda without free variable
+divergence means lambda reduction process will never terminates or ends
+
+haskell is a implementation of lambda
+
+(->) is a function's type constructor, it has no value constructor
+
+where / let is different
+
+operator == function with infix position
+
+
+polymorphism
+
+ad-hoc(constrained)
+  interface
+  typeclass
+paramatic
+  template
+  type variable
+
+
+data constructor == value (only way to express value except the basic/primary types)
+
+
+foldr (^) 2 [4..6] == (4 ^ (5 ^ (6 ^ 2)))
+foldl (^) 2 [4..6] == (2 ^ (4 ^ (5 ^ 6)))
+
+
+foldMap :: (Monoid m, Foldable t) => (a -> m) -> t a -> m
+traverse :: (Applicative f, Traversable t) => (a -> f b) -> t a -> f (t b)
+sequenceA :: (Applicative f, Traversable t) => t (f a) -> f (t a)
+sequence :: (Monad m, Traversable t) => t (m a) -> m (t a)
+
+class Applicative f => Alternative f where
+  empty :: f a
+  (<|>) :: f a -> f a -> f a
+  guard :: Bool -> f () 
+
+class Monad m => MonadPlus m where
+  mzero :: m a
+  mplus :: m a -> m a -> m a
+
+Functor
+(<$>) :: (a -> b) -> f a -> f b
+(<$) ::  a -> f b -> f a 
+($>) ::  f a -> b -> f a 
+
+Applicative
+(<*>) :: f (a -> b) -> f a -> f b
+(<**>) :: f a -> f (a -> b) -> f b 
+(*>) :: f a -> f b -> f b 
+(<*) :: f a -> f b -> f a 
+
+Monad
+>>=   :: m a -> (a -> m b) -> m b
+liftM :: (a1 -> r) -> m a1 -> m r
+ap    :: m (a -> b) -> m a -> m b
+
+
+function is functor, applicative, monad
+<$>, fmap :: (b -> c) -> (a -> b) -> (a -> c)
+    g <$> h = \x -> g (h x)  // f . g means modify the return type of g and use the return type of f
+<*> :: (a -> b -> c) -> (a -> b) -> (a -> c)
+    g <*> h = \x -> g x (h x)
+>>= :: (a -> b) -> (b -> a -> c) -> (a -> c)
+    g >>= h = \x -> h (g x) x
+
+
+
+a is isomorphic to b ==  a -> b , b -> a without lose information
+
+
+combine two general monad into one is impossible. In order to make the join
+happen, we need to reduce the polymorphism and get concrete information about
+one of the monads we are working with. And the other monad remains polymorphic as
+a variable type argument to our type constructor.
+
+MaybeT m a == m (Maybe a)  (MaybeT, runMaybeT)
+ExceptT e m a == m (Either e a) (ExceptT, runExceptT)
+  mapExceptT  :: (m (Either e a) -> n (Either e' b)) -> ExceptT e m a -> ExceptT e' n b
+  withExceptT :: Functor m => (e -> e') -> ExceptT e m a -> ExceptT e' m a
+  throwE      :: Monad m => e -> ExceptT e m a
+  catchE      :: Monad m => ExceptT e m a -> (e -> ExceptT e' m a) -> ExceptT e' m a
+
+ReaderT r m a == r -> m a (runReaderT)
+  ask    ::  Monad m => ReaderT r m r
+  local  ::  (r -> r) -> ReaderT r m a -> ReaderT r m a
+  asks   ::  Monad m => (r -> a) -> ReaderT r m a
+
+StateT s m a == s -> m (a, s) (StateT, runStateT)
+  evalStateT :: Monad m => StateT s m a -> s -> m a
+  execStateT :: Monad m => StateT s m a -> s -> m s
+  mapStateT  :: (m (a, s) -> n (b, s)) -> StateT s m a -> StateT s n b
+  withStateT :: (s -> s) -> StateT s m a -> StateT s m a
+  get ::     Monad m => StateT s m s
+  put ::     Monad m => s -> StateT s m ()
+  modify ::  Monad m => (s -> s) -> StateT s m ()
+  modify' :: Monad m => (s -> s) -> StateT s m () // the computation is strict
+  gets ::    Monad m => (s -> a) -> StateT s m a
+
+(m is the base monad which is structurally outermost)
+
+class MonadTrans t where
+  lift :: Monad m => m a -> t m a
+
+class (Monad m) => MonadIO m where
+  liftIO :: IO a -> m a
+
+
+Data.Map
+Data.Set
+Data.Sequence (list is quick add header, but sequence is quick at both side)
+Data.Vector (Mutable Vectors: Data.Vector.Mutable)
+Data.Text(Data.Text.Lazy)
+Data.ByteString(Data.ByteString.Lazy)
+
+
+MonadTrans, MonadBase, MonadTransControl, MonadPlus, Alternative, MonadError, MonadThrow, MonadCatch
+

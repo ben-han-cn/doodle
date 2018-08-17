@@ -1,0 +1,86 @@
+High-level overview of recursion
+
+Initial Preparation:
+
+Read a packet; check it for general validity; if it is not valid DNS, exit.
+
+Parse the packet. If it is an update, notify, or XFR query, pass it to the appropriate module, and exit. If it is a response which matches a current resolver query, go to RESUME. If it is not a query, exit.
+
+If the packet contains an EDNS OPT RR, handle it: set size limits for the response, note whether DO is set, etc.
+
+If the packet has a TSIG option, determine whether the packet is validly signed by a known TSIG key. If so, make note of the key.
+
+Check the query ACL against the srcaddr/srcport/dstaddr/dstport/key. If it does not match, exit.
+
+Allocate space for a response message; copy the question into it.
+
+If the server is configured to support recursive queries, check the recursion and cache-query ACLs; make note of the results. If the client is allowed to recurse, set the RA bit in the response. If the client is not allowed to recurse, clear the RA bit.
+
+LOOKUP:
+
+Attempt to answer the query as an authoritative server (as BIND 10 does now). If a full authoritative answer can be given for the requested name, set the AA bit, and go to ANSWER.
+
+If the client is not allowed to query the cache, go to ANSWER.
+
+Search the cache for an exact match on QNAME/QCLASS/QTYPE or QNAME/QCLASS/CNAME. If found (and still within TTL, and flagged as either validated or not secure), add it to the answer; if the rrset found is a CNAME but QTYPE wasn't, then change QNAME to the CNAME target and go to LOOKUP.
+
+If we have a complete answer now, or if recursion was not requested or permitted, go to ANSWER.
+
+Check to see if the data from the authoritative data source contains a delegation; if not, or if so but the delegation is not to the immediate parent of QNAME, then search the cache for an NS rrset that matches closer. If no delegation is found using either of these methods, use root hints, generate a priming query, get a fresh ./NS RRset, and delegate to that.
+
+RESQUERY:
+
+For each name server in the NS rrset to which we're delegating, set up a list of addresses. Round robin through the addresses, sending DNS queries for QNAME/QCLASS/QTYPE (using random srcport and txid, and keeping track of them). Send out the query and exit (we will resume processing after receiving the response packet).
+
+RESUME:
+
+We have received a response to an outstanding resquery. If we have a complete answer, go to ANSWER. If we have an answer with an incomplete CNAME chain, reset QNAME to TARGET and go to LOOKUP. If the response contains a delegation, go to DELEGATION.
+
+DELEGATION:
+
+If the answer contains a secure delegation, validate and cache it (if there is no DNSKEY for the current zone in cache, send a query to the nameserver to obtain that, then validate and cache it, before validating and caching the DS). Cache the NS and address data as glue. Switch to the delgated name server, and go back to RESQUERY.
+
+ANSWER:
+
+Validate all the signed RR's in the answer data we've acquired; if validation fails, return a SERVFAIL, otherwise cache the data as secure. Cache glue at a lower trust level. Render the answer to wire format; if it is incomplete, just put in what we have. Send the answer to the client, and exit.
+
+
+Timeline for a recursive query
+
+Packet is sent by client, requesting QNAME/QTYPE, QR=0, RD=1, CD=0. EDNS0 OPT RR contains DO=1.
+Packet is received by server.
+Packet is parsed and determined to be a valid DNS query.
+EDNS0 OPT RR is parsed. DO status is noted, UDP payload size is noted.
+Packet is checked for a TSIG RR. If present, signature is checked against known keys. If a match is found, the keyname is noted.
+The "query" ACL is checked against the packet's source and destination addr/port, and matching key if any. If a match is found, query is permitted.
+Space is allocated for the answer.
+Server attempts to answer the query using authoritative data sources (following the algorithm described in AuthServerQueryLogic). There are five possible outcomes:
+Complete positive answer: We are authoritative for QNAME, and QNAME/QTYPE exists (or QNAME/CNAME exists, we are also authoritative for TARGET, and TARGET/QTYPE exists). In this case we set CD=0 and AA=1 and return the answer.
+Complete negative answer: We are authoritative for QNAME, and neither QNAME/QTYPE nor QNAME/CNAME exist. In this case we set CD=0 and AA=1, add SOA, and return NXDOMAIN or NODATA/NOERROR.
+Incomplete answer: We are authoritative for QNAME, but QNAME/CNAME exists and we are *not* authoritative for TARGET. In this case we reset QNAME to TARGET, set AA=1, and proceed to the next step.
+Delegation: We are *not* authoritative for QNAME, but we *are* authoritative for an ancestor of QNAME, and we can return a delegation to a closer zone. In this case we proceed to the next step.
+Zone not found: We are not authoritative for QNAME. In this case we proceed to the next step.
+The "query-cache" ACL is checked. If a match is not found, querying the cache is not permitted; we return as much of the answer as we have.
+The "recursion" ACL is checked. If a match is found, set RA=1 in the response, and note that recursion is permitted.
+We search the cache for an exact match on QNAME/QTYPE. If found (and the data is within TTL and is flagged as authentic), add it to the answer. If not found and QTYPE != CNAME, search the cache for QNAME/CNAME; if found, add it to the answer; reset QNAME to TARGET and repeat the search until data is found matching QTYPE, OR until a cache miss occurs.
+If a complete answer has been found, return it.
+If the information we have collected so far does NOT include a delegation to another name server, then search the cache for the NS RRset with the closest match to QNAME. If the answer we have now DOES include a delegation, but it is not the direct parent of QNAME, search the cache for an NS RRset that matches more closely. If found, replace the delegation with that NS RRset.
+If no NS record has been found at this point, use the root hints, and send a new query for "./NS"; delegate the query to the resulting NS RRset.
+For each server in the NS RRset, check the cache for a matching address. (This must be done even if glue was returned from the authoritative data source, because the cache may have more accurate address data. It can be skipped if we used the root hints. For any name server which did not have address glue supplied, we have to start a new lookup to obtain it.)
+Pick a server address and send a it a query for QNAME/QTYPE. Wait for a reply. If a reply doesn't come soon enough, send the same query to the next address, and so on.
+A reply arrives from the delegated name server. There are several possible outcomes:
+Reply contains a complete positive answer. We validate and cache the answer, then send it to the client with AA=0.
+Reply contains a complete negative answer. We validate and and negatively cache the answer, then send it to the client with AA=0.
+Reply indicates a server error. We try again with the next server, until all have been tried.
+Reply contains a partial positive answer (i.e., QNAME/CNAME exists but the server is not authoritative for TARGET). We validate and cache the answer, then start a new lookup to find TARGET (this includes searching the authoritative data sources again).
+Reply contains a further delegation. We cache it as glue; if it was a secure delegation we also validate and cache the DS. We check the cache for better address data for the given name servers. If necessary, we start a lookup to find address data for the name servers. Then we go back to the delegation step, sending the current query to the delegated name server, repeating until a complete answer has been assembled.
+
+
+
+handle a query:
+  build delegation from cache
+  if there is policy to fetch n missing targets, send query to missing targets
+  select usable target
+    select all the server based on best rtt, smallest rtt plus rtt close to the smallest rtt
+
+infra_rtt_update

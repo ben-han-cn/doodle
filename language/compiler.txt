@@ -1,0 +1,42 @@
+https://github.com/murarth/ketos
+https://github.com/gluon-lang/gluon
+https://github.com/Geal/nom
+
+https://github.com/jcla1/gisp
+https://github.com/yuin/gopher-lua
+
+https://github.com/ETCDEVTeam/sputnikvm.git
+
+                            compiler                   assembler                       linker
+high level language source ---------> assembly source ----------> object file(binary) ----------> executable
+
+object file
+header ---- text segment ----- data segment ----- relocation information ----- symbol table ----- debug information
+
+linker 
+  handle relocation in each object file
+  merge segment
+
+
+loader
+  allocate memory ---> 
+        copy text and data segment ---> 
+            copy program arguments onto the stack ---> 
+                  clear register, set stack pointer ---> copy arguments off the stack and jump to main
+
+ELF loader need info from header
+  PT_LOAD segement, describes areas of the new program's running memory, code, data, BSS section
+  PT_INTERP identifies the run-time linker
+  PT_GNU_STACK indicates whether the program's stack should be made executable or not
+
+setup virtual memory for new process
+  loop through all of PT_LOAD segments in program file and maps them into process's address space, setting up the
+new program's memory layout.
+
+readelf -l test
+Type           Offset   VirtAddr   PhysAddr   FileSiz MemSiz  Flg Align
+LOAD           0x000000 0x08048000 0x08048000 0x00154 0x00154 R E 0x1000
+LOAD           0x000154 0x08049154 0x08049154 0x00004 0x00004 RW  0x1000
+
+load segment will be loaded into process memory space, the entry is sorted by virtual address.
+use pmap $Pid will get the same memory layout

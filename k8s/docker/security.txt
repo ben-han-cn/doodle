@@ -1,0 +1,26 @@
+namespace
+  isolation: pid, network, pic, user, filesystem, uts(hostname) ..
+cgroup
+  resource limitation
+capabilities
+  what root in container can do
+  CAP_CHOWN
+  ...
+mandatory access control ssytem
+  apparmor profile
+  Apparmor is a security framework that prevents applications from turning evil. 
+  For example: If I run Firefox and visit a bad site that tries to install 
+  malware that will delete my home folder, Apparmor has limits on Firefox though 
+  preventing it from doing anything I don't want (like accessing my music, 
+  documents, etc). This way even if your application is compromised, no harm 
+  can be done.
+seccomp(secure computing mode)
+  limit the syscall a container can make to host kernel
+
+
+docker security scan
+  binary-level scans of docker images and checks the software in them against
+  databases of known vulnerabilities.
+
+docker content trust
+  verify the integrity and the publisher of images user download

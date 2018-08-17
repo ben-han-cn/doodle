@@ -1,0 +1,107 @@
+//function call
+informer.Run
+	controller.Run
+		reflector.Run --> fetch data and push into queue
+		processLoop
+			pop Queue --> informer.HandleDeltas
+	processor.Run
+		listener.run  ---> pop event from nextCh ---> handler.OnUpdate/OnAdd/OnDelete
+		listener.pop  ---> buffer event, push into nextCh
+		
+
+informer.HandleDeltas ---> processor.distribute --> listener.Add
+
+
+//type and relationship
+sharedIndexInformer
+	Indexer
+	Controller
+	sharedProcessor
+
+Controller
+	Queue
+	Reflector
+
+sharedProcessor ---> multi processorListener
+
+
+//what is indexer?
+a way to reverse search for object, for different reverse search, we
+add different indexFunc with different name
+example:
+    for endpointer controller, we want to know which endpoints have ip 
+    
+//dns.svcLister == indexer
+func (dns *dnsControl) EpIndexReverse(ip string) (ep []*api.Endpoints) {
+    if dns.svcLister == nil {
+        return nil
+    }
+    os, err := dns.epLister.ByIndex(epIPIndex, ip)
+    if err != nil {
+        return nil
+    }
+    for _, o := range os {
+        e, ok := o.(*api.Endpoints)
+        if !ok {
+            continue
+        }
+        ep = append(ep, e)
+    }
+    return ep
+}
+
+dns.epLister, dns.epController = cache.NewIndexerInformer(
+            &cache.ListWatch{
+                ListFunc:  endpointsListFunc(dns.client, namespace, dns.selector),
+                WatchFunc: endpointsWatchFunc(dns.client, namespace, dns.selector),
+            },
+            &api.Endpoints{},
+            opts.resyncPeriod,
+            cache.ResourceEventHandlerFuncs{AddFunc: dns.Add, UpdateFunc: dns.Update, DeleteFunc: dns.Delete},
+            cache.Indexers{epNameNamespaceIndex: epNameNamespaceIndexFunc, epIPIndex: epIPIndexFunc})
+
+//get ip from endpoint
+//the returned string list including the final key we want to search for object
+func epIPIndexFunc(obj interface{}) ([]string, error) {
+    ep, ok := obj.(*api.Endpoints)
+    if !ok {
+        return nil, errors.New("obj was not an *api.Endpoints")
+    }
+    var idx []string
+    for _, eps := range ep.Subsets {
+        for _, addr := range eps.Addresses {
+            idx = append(idx, addr.IP)
+        }
+    }
+    return idx, nil
+}
+
+//indexer read store
+//reflector update store
+when object is saved into store, it will be identified by key, default keyfunc
+
+func MetaNamespaceKeyFunc(obj interface{}) (string, error) {
+    if key, ok := obj.(ExplicitKey); ok {
+        return string(key), nil 
+    }   
+    meta, err := meta.Accessor(obj)
+    if err != nil {
+        return "", fmt.Errorf("object has no meta: %v", err)
+    }   
+    if len(meta.GetNamespace()) > 0 { 
+        return meta.GetNamespace() + "/" + meta.GetName(), nil 
+    }   
+    return meta.GetName(), nil 
+}
+
+
+NewIndexerInformer 
+    --->  NewIndexer 
+          Config --> Process(func) which will upate the store in Indexer
+
+func NewIndexer(keyFunc KeyFunc, indexers Indexers) Indexer {
+    return &cache{
+        cacheStorage: NewThreadSafeStore(indexers, Indices{}),
+        keyFunc:      keyFunc,
+    }   
+}

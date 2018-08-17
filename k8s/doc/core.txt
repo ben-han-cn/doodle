@@ -1,0 +1,203 @@
+package k8s.io/api/core/v1
+
+ObjectMeta
+  Name string
+  GenerateName string
+  Namespace string
+  SelfLink string
+  UID types.UID
+  ResourceVersion string
+  Generation int64 
+  CreationTimestamp Time
+  DeletionTimestamp *Time
+  DeletionGracePeriodSeconds *int64
+  Labels map[string]string 
+  Annotations map[string]string
+  OwnerReferences []OwnerReference
+  Initializers *Initializers
+  Finalizers []string
+  ClusterName string
+
+TypeMeta
+  Kind string 
+  APIVersion string
+
+Container
+  Name string //unique in one pod
+  Image string 
+  Command []string
+  Args []string
+  WorkingDir string
+  Ports []ContainerPort
+  EnvFrom []EnvFromSource
+  Env []EnvVar
+  Resources ResourceRequirements
+  VolumneMounts []VolumneMount
+  VolumneDevices []VolumneDevice
+  LivenessProbe *Probe //when to restart a container or to a deployment whether a rolling update is succeessful
+  ReadinessProbe *Probe //to a service if a pod should receive traffic 
+  Lifecycle *Lifecycle
+  TerminationMessagePath string
+  TerminationMessagePolicy TerminationMessagePolicy
+  ImagePullPolicy PullPolicy
+  SecurityContext *SecurityContext
+  Stdin bool
+  StdinOnce bool
+  TTY bool
+
+PodSpec
+  Volumes []Volume
+  InitContainers []Container
+  Containers []Container
+  RestartPolicy RestartPolicy
+  TerminationGracePeriodSeconds *int64
+  ActiveDeadlineSeconds *int64
+  DNSPolicy DNSPolicy
+  NodeSelector map[string]string
+  ServiceAccountName string
+  DeprecatedServiceAccount string
+  AutomountServiceAccountToken *bool
+  NodeName string
+  HostNetwork bool //use host network namespace
+  HostPID bool //use host pid namespace
+  HostIPC bool //use host ipc namespace
+  ShareProcessNamespace *bool //share a single process namespace between all containers
+  SecurityContext *PodSecurityContext
+  ImagePullSecrects []LocalObjectReference
+  Hostname string
+  Subdomain string
+  Affinity *Affinity
+  SchedulerName string
+  Tolerations []Toleration
+  HostAliases []HostAlias
+  PriorityClassName string
+  Priority *int32
+  DNSConfig *PodDNSConfig
+
+Pod
+  TypeMeta
+  ObjectMeta
+  Spec PodSpec
+  Status PodStauts
+
+PodStauts
+  Phase PodPhase 
+  Conditions []PodCondition 
+  Message string 
+  Reason string 
+  NominatedNodeName string 
+  HostIP string 
+  PodIP string 
+  StartTime *metav1.Time 
+  InitContainerStatuses []ContainerStatus 
+  ContainerStatuses []ContainerStatus 
+  QOSClass PodQOSClass 
+
+PodPending PodPhase = "Pending"
+PodRunning PodPhase = "Running"
+PodSucceeded PodPhase = "Succeeded"
+PodFailed PodPhase = "Failed"
+PodUnknown PodPhase = "Unknown"
+
+ReplicationController
+  TypeMeta
+  ObjectMeta
+  Spec ReplicationControllerSpec
+  Status ReplicationControllerStatus
+  
+Service
+  TypeMeta
+  ObjectMeta
+  Spec ServiceSpec
+  Status ServiceStatus
+
+ServiceAccount
+  TypeMeta
+  ObjectMeta
+  Secrets []ObjectReference
+  ImagePullSecrets []LocalObjectReference
+  AutomountServiceAccountToken *bool
+  
+
+Node
+  TypeMeta
+  ObjectMeta
+  Spec NodeSpec
+  Status NodeStatus
+
+
+NodeStatus 
+  Capacity ResourceList 
+  Allocatable ResourceList 
+  Phase NodePhase 
+  Conditions []NodeCondition 
+  Addresses []NodeAddress 
+  DaemonEndpoints NodeDaemonEndpoints 
+  NodeInfo NodeSystemInfo 
+  Images []ContainerImage 
+  VolumesInUse []UniqueVolumeName 
+  VolumesAttached []AttachedVolume 
+
+NodePending NodePhase = "Pending"
+NodeRunning NodePhase = "Running"
+NodeTerminated NodePhase = "Terminated"
+
+
+ObjectReference 
+  Kind string 
+  Namespace string 
+  Name string 
+  UID types.UID
+  APIVersion string
+  ResourceVersion string
+
+
+ConfigMap
+  TypeMeta
+  ObjectMeta
+  Data map[string]string
+  BinaryData map[string][]byte
+
+resource status:
+phase: enumerate varaible, simple, high-level summary of resource status
+condition: state history, transition between status
+
+
+
+Spec:       desired state of the cluster == what we want
+Status:     the real state of the cluster = what we get now
+Metadata:   the general property of the resource
+
+Resource endpoint == resource interface
+create, update, patch, delete
+get, list, watch
+
+Subresources
+functions attach to resources, but have their own Schema and endpoints. 
+shared interface between resources.
+
+labels used by k8s
+annotations used by other tools 
+both are key/value meta data about resource, annotations is more flexiable
+
+
+controller
+1 watch resource api
+2 reconcile each resource desired state as declared in the Spec with the state 
+observed read from api
+3 reconciliation is done both in response to changes in cluster state, and 
+periodically for each observed object.
+4 when many events quickly occur that trigger a reconciliation for the same object, 
+reconciliation will process many of the events once instead of handling the individial 
+events.
+5 Controller may generate new object as part of a reconcile. the ownership is 
+recored both in ownersreference in the objectMeta and labels in the generated object. 
+OwnerReferences confirms the relationship to address cases where labels have been 
+modified or overlap.
+6 controller will update the resource state to notify use or other controller about the 
+resource status.
+7 each object is periodically reconciled even if no events are observed.
+8 some controllers are referred to operators. Operators are a specified type of controller
+that manage running a specific applicaiton such as redis.
+
+

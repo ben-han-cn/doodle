@@ -1,0 +1,21 @@
+overlay filesystem 
+    split kernel and other files)
+    shared layer
+
+control group (cgroup)
+    restrict resources
+    trake processes
+
+linux namespace
+    network/process/ipc/filesystem/host/user/group... isolation
+
+security
+    Seccomp
+    SELinux
+    
+volumes
+    data exclude from images
+
+network
+    bridge
+    overlay

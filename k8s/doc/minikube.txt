@@ -1,0 +1,13 @@
+architecture 
+
++ ----------------------------------------------------------
+|host
+|          +-------------------------------------------------
+|          | vm
+|kubectl   | etcd, kubelet     
+|          |
+|          | +-----------------------------------------------
+|          | |container runtime (k8s componenet containers)
+|          | | api server
+|          | | scheduler
+|          | | controller manager

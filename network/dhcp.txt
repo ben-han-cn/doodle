@@ -1,0 +1,333 @@
+{\rtf1\ansi\ansicpg936\cocoartf1404\cocoasubrtf470
+{\fonttbl\f0\fnil\fcharset134 PingFangSC-Regular;\f1\fnil\fcharset0 LucidaGrande;}
+{\colortbl;\red255\green255\blue255;\red64\green11\blue217;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\})}{\leveltext\leveltemplateid1\'02\'00);}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker (\{decimal\})}{\leveltext\leveltemplateid101\'03(\'00);}{\levelnumbers\'02;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid102\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid2}
+{\list\listtemplateid3\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\})}{\leveltext\leveltemplateid201\'02\'00);}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid3}
+{\list\listtemplateid4\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{diamond\}}{\leveltext\leveltemplateid301\'01\uc0\u9670 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid4}
+{\list\listtemplateid5\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid401\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid402\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid5}
+{\list\listtemplateid6\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid501\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid502\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid503\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li2160\lin2160 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid504\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li2880\lin2880 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid505\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li3600\lin3600 }{\listname ;}\listid6}
+{\list\listtemplateid7\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{diamond\}}{\leveltext\leveltemplateid601\'01\uc0\u9670 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid602\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listname ;}\listid7}
+{\list\listtemplateid8\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid701\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid702\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid703\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li2160\lin2160 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid704\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li2880\lin2880 }{\listname ;}\listid8}
+{\list\listtemplateid9\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{diamond\}}{\leveltext\leveltemplateid801\'01\uc0\u9670 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid9}
+{\list\listtemplateid10\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{diamond\}}{\leveltext\leveltemplateid901\'01\uc0\u9670 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid902\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid903\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li2160\lin2160 }{\listname ;}\listid10}
+{\list\listtemplateid11\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{diamond\}}{\leveltext\leveltemplateid1001\'01\uc0\u9670 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid11}
+{\list\listtemplateid12\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid1101\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1102\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1103\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li2160\lin2160 }{\listname ;}\listid12}
+{\list\listtemplateid13\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{diamond\}}{\leveltext\leveltemplateid1201\'01\uc0\u9670 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid13}
+{\list\listtemplateid14\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{square\}}{\leveltext\leveltemplateid1301\'01\uc0\u9642 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1302\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li1440\lin1440 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1303\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li2160\lin2160 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1304\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li2880\lin2880 }{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1305\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li3600\lin3600 }{\listname ;}\listid14}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}{\listoverride\listid3\listoverridecount0\ls3}{\listoverride\listid4\listoverridecount0\ls4}{\listoverride\listid5\listoverridecount0\ls5}{\listoverride\listid6\listoverridecount0\ls6}{\listoverride\listid7\listoverridecount0\ls7}{\listoverride\listid8\listoverridecount0\ls8}{\listoverride\listid9\listoverridecount0\ls9}{\listoverride\listid10\listoverridecount0\ls10}{\listoverride\listid11\listoverridecount0\ls11}{\listoverride\listid12\listoverridecount0\ls12}{\listoverride\listid13\listoverridecount0\ls13}{\listoverride\listid14\listoverridecount0\ls14}}
+\paperw11900\paperh16840\margl1440\margr1440\vieww38200\viewh19200\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs48 \cf0 \CocoaLigature0 1. DHCP Format \
+------------------------------------------\
+  op(1)\'a1\'a1| htype(1) | hlen(1) | hops(1)\
+------------------------------------------\
+        xid(4)\
+------------------------------------------\
+      secs(2)  |  flags(2)\
+------------------------------------------\
+        ciaddr(4)\
+------------------------------------------\
+        yiaddr(4)\
+------------------------------------------\
+        siaddr(4)\
+------------------------------------------\
+        giaddr(4)\
+------------------------------------------\
+        chaddr(16)\
+------------------------------------------\
+        sname(64)\
+------------------------------------------\
+        file(128)\
+------------------------------------------\
+        options(variable)\
+------------------------------------------\
+op: message op code, 1 BOOTREQUEST, 2 BOOTREPLY\
+htype: hardware address type, 1 Ethernet 10Mbps or HTYPE_DOCSIS, \
+												6 IEEE 802.2,  8 Hyperchannel\
+hlen: hardware address length  MAX_CHADDR_LEN = 16\
+hops: via relay agent number\
+xid: transaction id\'a3\'aca random number filled by client, used by client and server to associate message\expnd0\expndtw0\kerning0
+\CocoaLigature1  \
+\kerning1\expnd0\expndtw0 \CocoaLigature0 secs: filled by client, seconds since client began request address or renewal \expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+\kerning1\expnd0\expndtw0 \CocoaLigature0 flags: only leftmost bit is defined as the BROADCAST flag \
+ciaddr: client IP address\'a3\'aconly filled by client when BOUND\'a3\'acRENEW or REBINDING state\
+yiaddr: server allocate ip address to client, returned in OFFER and ACK\
+siaddr: \expnd0\expndtw0\kerning0
+\CocoaLigature1 IP address of next server to use in bootstrap\kerning1\expnd0\expndtw0 \CocoaLigature0 \'a3\'acreturned in OFFER and ACK\
+giaddr: relay agent IP\
+chaddr: client hardware address \
+sname: server host name\
+file: boot file name\'a3\'acfully qualified directory path name in OFFER \
+options: optional parameters filed and common options as below:\
+	1 Subnet Mask (RFC 2132)\
+	3 Router (RFC 2132)\
+	6 DNS Domain Server (RFC 2132)\
+	15 Client Domain Name (RFC 2132)\
+	50 Requested IP Address (RFC 2132)\
+	51 \expnd0\expndtw0\kerning0
+\CocoaLigature1 IP Address Lease Time (RFC 2132)\kerning1\expnd0\expndtw0 \CocoaLigature0 \
+	53 DHCP Message Type (1 DISCOVER 2 OFFER 3 REQUEST 4 DECLINE 5 ACK 6 NAK \
+											7 RELEASE 8 INFORM ) (RFC 2132)\
+	54 DHCP Server Id (RFC 2132)\
+	55 Parameter Request List (RFC 2132)\
+	58 DHCP Renewal(T1) Time (RFC 2132)\expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+	59 DHCP Rebinding (T2) Time (RFC 2132)\
+	60 Vendor Class Identifier (RFC 2132)\kerning1\expnd0\expndtw0 \CocoaLigature0 \
+	61 Client Id (RFC 2132)\
+	81 Client FQDN (RFC 4702)\
+	82 Relay Agent Information (RFC 3046)\
+	118 Subnet Selection Option (RFC 3011)\
+	125 Vendor Identifying Vendor Specific Information (RFC 3925)\
+\
+2. Workflow\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls1\ilvl0\cf0 \CocoaLigature1 	2.1 \CocoaLigature0 kea slave received message and unpack it\
+	2.2 classify packet, save query packet client class, which will used by select subnet if client class match \
+		white or black client class of subnet\CocoaLigature1 \
+	2.3 \CocoaLigature0 check packet\
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls2\ilvl1\cf0 \CocoaLigature1 	2.3.1 \CocoaLigature0 check message type, only support DISCOVER, REQUEST, RELEASE, DECLINE, INFORM\
+\ls2\ilvl1\CocoaLigature1 	2.3.2 \CocoaLigature0 check direct query, if query packet has not relay info, remote address and \
+		client ip address must not be zero for inform query\
+\ls2\ilvl1\CocoaLigature1 	2.3.3 \CocoaLigature0 check server Id, if it is present and must match server identifiers\CocoaLigature1 \
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls3\ilvl0\cf0  2.4 \CocoaLigature0 process query packet by message type\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls4\ilvl0\cf0 	2.4.1 discover \
+\pard\tx566\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 	2.4.1.1 sanity check\
+		server id is not expected, but need provide client id\
+	2.4.1.2 select subnet\
+		subnet must match client class and one of conditions as below, if don`t get subnet and send NAK to client\
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls5\ilvl1\cf0 	(1) option 82 and it in subnet \
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls5\ilvl1\cf0 \CocoaLigature1 	(2) \CocoaLigature0 option 118 and it in subnet\
+\ls5\ilvl1\CocoaLigature1 	(3) \CocoaLigature0 giaddr and it must match with the relay address specified for a subnet\
+\ls5\ilvl1\CocoaLigature1 	(4) \CocoaLigature0 giaddr and it in subnet\
+	(5) ciaddr and it in subnet, and query packet local address is not broadcast\
+	(6) query packet remote address and it in subnet, and query packet local address is not broadcast  \
+\ls5\ilvl1\CocoaLigature1 	(7) network interface name in query \CocoaLigature0 packet, and it match the network interface of subnet\
+\pard\tx566\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 	2.4.1.3 allocate lease\
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls6\ilvl1\cf0 \CocoaLigature1 	 \CocoaLigature0 (1) send query packet which marshal by protobuf to kea master by rpc module\
+\ls6\ilvl1\CocoaLigature1 	 (2) kea master receive query packet and select allocate engine by subnet id, engine will get lease as below:\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls6\ilvl2\cf0 	1) get old lease by client id or client hardware address\
+	2) get host by client hardware address, only can get host when config reservation address for \
+		the hardware address\
+	3) if host has old lease and its address equal host reserved address, renew lease and return\
+\ls6\ilvl2	4) if host no old lease, allocate new lease and return\
+	5) if no host, but has old lease, renew lease and return\
+	6) if no old lease, but has request address which in the subnet and the address is not reserved, \
+		allocate new lease and return\
+	7) otherwise, will allocate a address which it is not reserved, if the address never be allocated before,  \
+		create new lease, or it must be expired and renew it.\CocoaLigature0 \
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls6\ilvl1\cf0 \CocoaLigature1 	(3) rpc module \CocoaLigature0 receive result from kea master\
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls6\ilvl1\cf0 \CocoaLigature1 	(4) check allocated address, if it is broadcast or zero, \CocoaLigature0 send NAK to client\
+\ls6\ilvl1\CocoaLigature1 	(5) ping allocated address, if conflict,  send conflict packet to kea master for decline\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls6\ilvl2\cf0 	1) if has old lease, delete old lease and add new lease which state is Declined and clientId, mac is nil\
+	2) if no old lease, add new lease which state is Declined and clientId, mac is unset\
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls6\ilvl1\cf0 	(6) after declined conflict ip, allocate lease again,  at most retry 5 times and discard the request\
+	(7) if address valid, allocate subnet, if subnet id is shared subnet id, and config has shared subnet id,\
+\ls6\ilvl1		\CocoaLigature0 allocate shared subnet\CocoaLigature1 , or \CocoaLigature0 send NAK to client\CocoaLigature1 \
+\ls6\ilvl1	(8) generate OFFER response \
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls6\ilvl2\cf0 	1) init response\
+\pard\tx2380\tx2880\tx3401\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set network interface and network interface index\
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}init siaddr, ciaddr and set hops, hardware address, giaddr, local hardware address, \
+\pard\tx3100\tx3600\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li3600\fi-3600\pardirnatural\partightenfactor0
+\ls6\ilvl4\cf0 	remote hardware address, flags\
+\pard\tx2380\tx2880\tx3401\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set option 61 , option 82 \CocoaLigature0 , option 118 \CocoaLigature1 \
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls6\ilvl2\cf0 	2) set yiaddr\
+	3) append basic options\
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}option 51, option 58, option 59, option 1, option 3, option 6 option 15\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls6\ilvl2\cf0 	4) append requested options \
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}option 55\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls6\ilvl2\cf0 	5) append network interface data\
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set remote address by one of conditions as below:\
+\pard\tx3100\tx3600\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li3600\fi-3600\pardirnatural\partightenfactor0
+\ls6\ilvl4\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}giaddr if relay\
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}ciaddr\
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}broadcast if yiaddr and broadcast flag\
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}yiaddr \
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}packet source address\
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set remote \
+\pard\tx3100\tx3600\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li3600\fi-3600\pardirnatural\partightenfactor0
+\ls6\ilvl4\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}port 67 if relay,  or 68\
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set local address\
+\pard\tx3100\tx3600\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li3600\fi-3600\pardirnatural\partightenfactor0
+\ls6\ilvl4\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}packet destination address, if the address is broadcast, select a network interface address\
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set local port \
+\pard\tx3100\tx3600\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li3600\fi-3600\pardirnatural\partightenfactor0
+\ls6\ilvl4\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}packet destination port\
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls6\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set network interface and network interface index (duplicate set !!!)\
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}option 54 by local address\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 	(9) pack OFFER and send to client\
+	(10) if send NAK, need generate NAK response:\
+			1) init response the same with OFFER\
+			2) set message type NACK\
+			3) set yiaddr zero\
+			4) append network interface data is almost the same with OFFER but set remote address, \
+				if query not relay and ciaddr is zero, set remote address to broadcast address\CocoaLigature0 \
+  \CocoaLigature1 2.4.2 request\
+\pard\tx940\tx1440\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li1440\fi-1440\pardirnatural\partightenfactor0
+\ls7\ilvl1\cf0 	2.4.2.1 select subnet\
+\pard\tx566\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 			the same with discover\
+	  2.4.2.2 allocate lease\
+		almost the same with discover but:\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls8\ilvl2\cf0 	(1) kea master allocate address \
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls8\ilvl3\cf0 	1) request address must be provided and it must not be reserved address\
+	2) if host, request address must equal host reserved address\
+	3) request address must be in subnet which selected by subnet id\
+	4) if old lease, and its address equal request address, renew lease and return,  \
+\ls8\ilvl3		if not equal, delete old lease by lease address\
+	5) if no old lease, allocate lease by request address, if request address was allocated before, \
+		the old lease must be expire\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls8\ilvl2\cf0 	(2) no ping allocated address again\
+	(3) generate ACK response and must set ciaddr\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls9\ilvl0\cf0 	2.4.3 release\
+\pard\tx566\tx1133\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 		2.4.3.1 select subnet by ciaddr, if non-exist, log warning and return\
+		2.4.3.2 release lease by kea master\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls10\ilvl2\cf0 	(1) old lease must exist \
+	(2) old lease address must equal request address\
+	(3) delete old lease\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls11\ilvl0\cf0 	2.4.4 decline\
+\pard\tx566\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 		2.4.4.1 get option 50, if non-exist log error and return\
+		2.4.4.2 select subnet  by address which in option 50, if no subnet log warning and return\
+		2.4.4.3 decline lease by kea master\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls12\ilvl2\cf0 	(1) old lease must exist\
+	(2) old lease address must equal request address\
+	(3) delete old lease and add new lease which state is Declined and clientId, mac is nil, \
+		the way just mark the address is unavailable\
+\pard\tx220\tx720\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li720\fi-720\pardirnatural\partightenfactor0
+\ls13\ilvl0\cf0 2.4.5 inform\
+\pard\tx566\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \CocoaLigature0 		2.4.5.1 sanity check the same with discover\
+		2.4.5.2 select subnet by ciaddr, if non-exist, send NAK to client\
+		2.4.5.3 generate ACK response\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls14\ilvl2\cf0 	(1) init response the same with OFFER\
+\pard\tx1660\tx2160\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls14\ilvl2\cf0 \CocoaLigature1 	(2) append basic options\
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls14\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set ciaddr\
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}set option 1, option 3, option 6, option 15\
+\pard\tx1660\tx2160\tx2267\tx2834\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2160\fi-2160\pardirnatural\partightenfactor0
+\ls14\ilvl2\cf0 	(3) append request options by option 55 the same with discover\
+	(4) append network interface data almost the same with discover but: \
+\pard\tx2380\tx2880\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li2880\fi-2880\pardirnatural\partightenfactor0
+\ls14\ilvl3\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}set remote address by one of conditions as below:\
+\pard\tx3100\tx3600\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\li3600\fi-3600\pardirnatural\partightenfactor0
+\ls14\ilvl4\cf0 {\listtext	
+\f1 \uc0\u8259 
+\f0 	}ciaddr   \
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}giaddr if relay and set broadcast flag\
+{\listtext	
+\f1 \uc0\u8259 
+\f0 	}packet destination address\CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf0 \
+\
+
+\itap1\trowd \taflags1 \trgaph108\trleft-108 \tamart266 \tamarb266 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+\clvertalt \clshdrawnil \clwWidth293\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl133 \clpadb20 \clpadr133 \gaph\cellx4320
+\clvertalt \clshdrawnil \clwWidth1933\clftsWidth3 \clbrdrt\brdrnil \clbrdrl\brdrnil \clbrdrb\brdrnil \clbrdrr\brdrnil \clpadt20 \clpadl133 \clpadb20 \clpadr133 \gaph\cellx8640
+\pard\intbl\itap1\pardeftab720\sl300\qc\partightenfactor0
+\cf0 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \cell 
+\pard\intbl\itap1\pardeftab720\sl300\partightenfactor0
+\cf0 \cell \lastrow\row
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf2 \kerning1\expnd0\expndtw0 \CocoaLigature0 \
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+\
+}

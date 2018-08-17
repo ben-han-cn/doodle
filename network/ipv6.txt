@@ -1,0 +1,59 @@
+an address architecture and assignment plan
+support larger packet size
+security and autoconfiguation
+
+
+ipv6 header ---> 40 bytes
+
+version, traffic class, label flow, 
+payload length(exclude the header), next header(upper layer protocol), hop limit
+source address
+destination address
+
+next header could specify extension header which immediately following the 
+mandatory main IPv6 header, there can be zero, one, or several extension headers. 
+A field common in all extension headers is another Next Hop field, which indicates 
+whether another extension header is to follow, or the protocol of the data (payload) 
+like a TCP segment. Therefore, the last extension header will always specify which 
+protocol is encapsulated as the data or payload—again, similar to the Protocol field in IPv4.
+The intention of extension headers is to provide flexibility to the main IPv6 header for 
+future enhancements without having to redesign the entire protocol.
+
+
+ipv6 ask for MTU of minimal 1280 bytes, recommand 1500 bytes. ipv6 recommand use path
+discovery to avoid fragment. And only source of the pkt could fragment the packet, intermidate
+routine couldn't fragment the packet.
+
+checksum in ipv6 is removed, and link layer and transport layer has its own check sum.
+
+xx:xx:xx:xx:xx:xx:xx:xx (xx == 16bit 2 hex format characters)
+
+
+address types:
+unicast:
+  global unicast(314 rule) 48bits(global rouing prefix) + 16bites(subnet id) + 64bits(inteface id)
+  unique local unicast (private address in v4 which isn't routable)
+  link-local unicast (device on same local link)
+  unspecified address (all 0 address which couldn't be assigned to interface)
+  loop back address
+  
+(note: all 1 and 0 address in v6 is legal, and in v4, all 0 is reserved, and all 1 is broadcast
+address)
+
+anycast address == a unicast address assigned to several devices
+a packet send to anycast address is only delivered to one device
+
+multicast address == shared by a group of interfaces
+a packet send to multicast address is delivered to all the devices.
+multicast address has 
+  Permanent(assigned by IANA)/Nonpermanent
+  Scope(interface/link local/site local/organized local/global...)
+solicited-node multicast address is automatically generate from unicast address on a device, so 
+if a interface has a global and a link-local unicast address, it will has two solicited-node multicast
+address
+solicited-node multicast address is used to do:
+  Address resolution
+  Duplicate Address Detection(DAD)
+
+
+

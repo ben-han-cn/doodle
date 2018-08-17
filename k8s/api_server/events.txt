@@ -1,0 +1,19 @@
+create deployment: k run ghost --image=ghost:0.9
+(events all save into /registry/events with ttl 3600)
+  create obj:[*extensions.Deployment] into key:[/registry/deployments/default/ghost] with ttl 0
+  create obj:[*extensions.ReplicaSet] into key:[/registry/replicasets/default/ghost-6b8f77589d] with ttl 0
+  create obj:[*core.Pod] into key:[/registry/pods/default/ghost-6b8f77589d-wzcz6] with ttl 0
+  save event [ScalingReplicaSet:Scaled up replica set ghost-6b8f77589d to 1] from [:deployment-controller] 
+  save event [SuccessfulCreate:Created pod: ghost-6b8f77589d-wzcz6] from [:replicaset-controller] 
+  save event [Scheduled:Successfully assigned default/ghost-6b8f77589d-wzcz6 to node3] from [:default-scheduler] 
+  save event [Pulled:Container image "ghost:0.9" already present on machine] from [node3:kubelet] 
+  save event [Created:Created container] from [node3:kubelet] 
+  save event [Started:Started container] from [node3:kubelet] 
+
+delete deployment:  delete deployment ghost
+  delete obj with key:[/registry/deployments/default/ghost]
+  delete obj with key:[/registry/replicasets/default/ghost-6b8f77589d]
+  save event [Killing:Killing container with id docker://ghost:Need to kill Pod] from [node3:kubelet] 
+  delete obj with key:[/registry/pods/default/ghost-6b8f77589d-gznjv]
+
+

@@ -1,0 +1,36 @@
+http1.1
+req and response sequentially in one long connection, head-of-line blocking
+inefficent header
+
+
+http2
+binary encoding
+connection multiplexed, resource fetch in parallel
+  one tls connection shared by streams
+  stream composed of frames and is bi-directional
+    header frame
+    data frame
+    continuation frame
+    ...
+  stream could has priority and dependency
+  stream cloud be closed without affect others
+  stream has its own flow control
+server push
+header compression: 
+  keep already known table
+  repeated element just use pointer/reference
+
+client                            server
+            headers ->
+            <- headers 
+            <- continuation
+            <- data
+            <- headers 
+            <- continuation
+
+binary format:
+length
+type
+flags
+stream identifier
+frame payload

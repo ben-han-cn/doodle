@@ -1,0 +1,110 @@
+ruby
+  metasploit-framework: World's most used penetration testing software http://www.metasploit.com/
+  childprocess:         a simple and reliable solution for controlling external programs running in the background on any Ruby / OS combination.   https://github.com/jarib/childprocess 
+  concurrent-ruby:      Modern concurrency tools including agents, futures, promises, thread pools, supervisors, and more,  https://github.com/ruby-concurrency/concurrent-ruby
+  rubyXL:               reading files produced by MS Excel, making minor modifications to them and saving them to be opened again, https://github.com/weshatheleopard/rubyXL
+  roo:                  Roo provides an interface to spreadsheets of several sorts. https://github.com/roo-rb/roo.git
+  axlsx:                excel generator https://github.com/randym/axlsx.git
+  logstash              https://github.com/elastic/logstash
+  phobos(simplifying kafka for ruby apps) https://github.com/klarna/phobos
+
+
+
+c
+  postgresql cluster                https://github.com/citusdata/citus
+  monitor(cpu, ram, disk, network)  https://github.com/firehol/netdata
+  snabb(packet networking)          https://github.com/snabbco/snabb
+  grpc(rpc framework based on protobuf) https://github.com/grpc/grpc
+  go routine and channel in c       https://github.com/sustrik/libmill
+
+shell
+
+zshell                        https://github.com/robbyrussell/oh-my-zsh
+
+
+golang
+cache                         https://github.com/allegro/bigcache.git
+system info collector         https://github.com/shirou/gopsutil.git
+console gui                   https://github.com/jroimartin/gocui
+build cl                      https://github.com/spf13/cobra.git
+read updated file             https://github.com/hpcloud/tail
+another message queue         https://github.com/trivago/gollum
+linux network stack in go     https://github.com/hsheth2/gonet.git
+beats                         https://github.com/elastic/beats
+dhcp                          https://github.com/krolaw/dhcp4.git
+buntdb(embedded in memory db) https://github.com/tidwall/buntdb
+Prometheus(monitor syste)     https://github.com/prometheus/prometheus
+micro(editor)                 https://github.com/zyedidia/micro.git
+gopacket(packet analysis)     https://github.com/google/gopacket
+openshift(paas)               https://github.com/openshift/origin
+tsuru(paas)                   https://github.com/tsuru/tsuru
+go-wrk (a small heavy duty http/https benchmark tool written in go) https://github.com/adjust/go-wrk
+go-torch (Tool for stochastically profiling Go programs) https://github.com/uber/go-torch
+gonetmap (netmap go binding) https://github.com/jonsen/gonetmap
+zap(fast, structured, leveled logging)  https://github.com/uber-go/zap
+go-update(update golang application)    https://github.com/inconshreveable/go-update
+leadership                    https://github.com/docker/leadership
+psql-cluster(PostgreSQL cloud native High Availability and more) https://github.com/sorintlab/stolon
+CQRS(command query responsibility segregation) https://github.com/looplab/eventhorizon
+network simulation tool       https://github.com/tylertreat/comcast
+kt(a Kafka tool that likes JSON) https://github.com/fgeller/kt
+cayley(graph db)              https://github.com/cayleygraph/cayley
+sse(server-sent events)       https://github.com/manucorporat/sse
+perigord(golang ethereum dev tool) https://github.com/swarmdotmarket/perigord
+gokit(build micro-service)     https://github.com/go-kit/kit 
+noise(p2p network)            https://github.com/perlin-network/noise
+
+
+
+
+js
+online work           https://github.com/ckeditor/ckeditor-dev.git
+excel js              https://github.com/handsontable/handsontable.git
+another Excel JS      Read, manipulate and write spreadsheet data and styles to XLSX and JSON.
+yeoman workflow       https://github.com/yeoman/yeoman.git
+game engine           http://maxogden.github.io/voxel-engine/
+work flow             https://github.com/vigetlabs/gulp-starter
+questionnaire system  https://github.com/LiangCY/questionnaire
+
+
+python
+network ddos migration  https://github.com/cloudflare/bpftools.git
+domain phishing       https://github.com/elceef/dnstwist
+
+typescript
+d3 + react            https://github.com/szahn/D3-React-Bubblechart
+
+
+cpp 
+proxygen(A collection of C++ HTTP libraries including an easy to use HTTP server.) https://github.com/facebook/proxygen
+wangle  (A framework providing a set of common client/server abstractions for building services in a consistent, modular, and composable way.) https://github.com/facebook/wangle
+fatal   (A library for fast prototyping software in modern C++) https://github.com/facebook/fatal
+procxx (A simple process management library for C++ on UNIX platforms) https://github.com/skystrife/procxx
+nkvdb  (Time serial db)   https://github.com/lysevi/nkvdb.git
+actor framework           https://github.com/actor-framework/actor-framework.git
+curl for people           https://github.com/whoshuu/cpr
+front/service proxy       https://github.com/lyft/envoy.git
+single file lib           https://github.com/nothings/single_file_libs
+mcrouter(memcached management) https://github.com/facebook/mcrouter
+c++ lua binding           https://github.com/ThePhD/sol2
+c++ python binding        https://github.com/pybind/pybind11
+NuDB(A fast key/value insert-only database for SSD drives in C++11) https://github.com/vinniefalco/NuDB
+
+erlang
+DalmatinerDB(time serial db) https://github.com/dalmatinerdb/dalmatinerdb
+
+elixir
+distillery(elixir release tool) https://github.com/bitwalker/distillery
+
+
+lua
+hammerspoon(Hammerspoon is a desktop automation tool for OS X.)  http://www.hammerspoon.org/go/
+
+rust
+edgedns (A high performance DNS cache designed for Content Delivery Networks, with built-in security mechanisms to protect origins, clients and itself.) https://github.com/jedisct1/edgedns 
+leaf    (Open Machine Intelligence Framework for Hackers) https://github.com/autumnai/leaf
+parity  (ethereum node in rust) https://github.com/paritytech/parity
+
+
+javascript
+min(a smarter, faster web brower)    https://github.com/minbrowser/min

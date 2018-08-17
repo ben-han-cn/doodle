@@ -1,0 +1,79 @@
+data model 
+cluster -> keyspace -> table -> row -> row key|primary key + column(key, value, [timestamp, ttl])
+if primary key is composite, first column is partition key which used to distribute rows to node
+following column is cluster key which is used for sorting result
+
+type
+basetype:
+tinyint -> samllint -> int -> bigint -> varint
+float -> double -> decimal
+ascii -> text, varchar (utf8)
+timestamp == date + time 
+uuid, timeuuid
+boolean
+blob
+inet
+
+collection:
+set<other_type>
+list<other_type>(list could be access by index)
+map<key_type, value_type>
+
+
+secondary index
+index on a column that is not part of primary key
+
+
+design difference bifferent from RDBMS
+1 no joins
+2 no referential integrity (foreigner key restriction)
+3 denormalization
+4 query-first design
+5 design for optimal storage (query shouldn't expand node)
+6 sorting is a design decision
+
+
+design process
+list all the queries
+build logic model (one table for each query, partition key,cluster key column )
+build the physical model(key space, table name, physical type for column)
+
+
+replication
+row is smallest unit to share between node
+
+relation db
+1 Sharding and replication is hard which may impact the programming interface, move some logic 
+into the applicaiton.
+2 Distribute transaction is hard
+the key problem is to how to keep the relation which dominate the consistency of the system
+
+
+components:
+Memtable -- SSTable -- BloomFilter -- CommitLog
+
+
+write request -> any node(coordinate then) -> storage proxy -> nodes on charge of the key 
+coordinate wait for num of reply which is configured in consistency level
+
+1 avoid too many traffic across data center, so only one node is selected when multi nodes in
+one datacenter needs to notify, and it's the select node's job to notify its local peers.
+
+2 for node in charge of the request, commit log is written first, then push to MemTable. when MemTable 
+is full, it will be flushed to disk in SSTable format. When disk get too many SSTables, a compaction
+process runs
+
+
+memtab -> sstable from young to old -> index file -> hard driver
+
+
+proxy -> partitioner -> node
+gossip + failure detector
+replication, rings and tokens, consistent-hash
+underlaying storage == commit log + memtable + sstable + bloomfilter
+snitch //efficiently routing  read and write request
+hinted hand-off //describe the cluster topology
+replicate data consistency: read-repair and anti-entropy
+
+SEDA --- staged event driven architecture
+stage == event queue + event handler + thread pool

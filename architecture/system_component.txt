@@ -1,0 +1,18 @@
+signal system (message publish ans subscribe)
+concurrent system(thread or green thread based)
+data synchronize(state management)
+network protocol
+storage system
+
+
+raditional 4-tier system
+Presentation  ---- interface / interaction 
+Application   ---- stateless business logic 
+Persistence   ---- database
+State changes ---- events
+
+A service interface includes
+Synchronous request-response (REST, gRPC, etc) 
+Events the service produces
+Events the service consumes
+Bulk reads and writes (ETL)

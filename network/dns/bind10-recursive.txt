@@ -1,0 +1,180 @@
+AddressEntry
+  asiolink::IOAddress address_;
+  uint32_t        rtt_; 
+  time_t  dead_until_;
+  
+
+NameServerEntry
+  std::string name_;
+  vector<AddressEntry> address_;
+  time_t  expiration_;
+
+
+//one address of name server address_
+NameServerAddress
+  asiolink::IOAddress address_;
+  NameServerEntry& ns_;
+
+
+ZoneEntry
+  std::string name_;
+  HashTable<NameserverEntry> nameserver_table_;
+  
+
+NameserverAddressStore
+  HashTable<ZoneEntry> zone_hash_;
+  HashTable<NameserverEntry> nameserver_hash_;
+
+
+RunningQuery
+  ConstMessagePtr query_message_;
+  MessagePtr answer_message_;
+  std::pair<std::string, uint16_t> test_server_;
+  unsigned cname_count_;
+  int query_timeout_;
+  unsigned retries_;
+  bundy::nsas::NameserverAddressStore& nsas_;
+  std::string cur_zone_;
+
+
+  void doLookup() {
+    cur_zone_ = deepestDelegate(question.getName);
+    send()
+  }
+
+  void send() {
+    if (test_server_.second() != 0) {
+      send to test server
+    } else {
+      current_ns_address = nsas_.lookup(cur_zone_);
+      send to current ns address
+    }
+  }
+
+
+RecursiveQuery::resolve(const QuestionPtr& question) {
+  return (new RunningQuery())
+}
+      
+      
+  
+RecursiveQuery::handleRecursiveAnswer(const Message& incoming) {
+  ResponseClassifier::Category category = ResponseClassifier::classify(question_, incoming, cname_target, cname_count_);
+  bool found_ns = false;
+  switch (category) {
+  case ResponseClassifier::ANSWER:
+  case ResponseClassifier::ANSWERCNAME:
+    bundy::resolve::copyResponseMessage(incoming, answer_message_);
+    return (true);
+
+  case bundy::resolve::ResponseClassifier::CNAME:
+            // CNAME received.
+            // (unfinished) CNAME. We set our question_ to the CNAME
+            // target, then start over at the beginning (for now, that
+            // is, we reset our 'current servers' to the root servers).
+            if (cname_count_ >= RESOLVER_MAX_CNAME_CHAIN) {
+                makeSERVFAIL();
+                return (true);
+            }    
+            answer_message_->appendSection(Message::SECTION_ANSWER, incoming);
+            question_ = Question(cname_target, question_.getClass(), question_.getType());
+            doLookup();
+            return (false);
+
+        case bundy::resolve::ResponseClassifier::NXDOMAIN:
+        case bundy::resolve::ResponseClassifier::NXRRSET:
+            // Received NXDOMAIN or NXRRSET, just copy and return
+            bundy::resolve::copyResponseMessage(incoming, answer_message_);
+            return (true);
+            break;
+  
+
+        case bundy::resolve::ResponseClassifier::REFERRAL:
+            // Response is a referral
+            // Referral. For now we just take the first glue address
+            // we find and continue with that
+            // auth section should have at least one RRset
+            // and one of them should be an NS (otherwise
+            // classifier should have error'd) to a subdomain
+            for (RRsetIterator rrsi = incoming.beginSection(Message::SECTION_AUTHORITY);
+                 rrsi != incoming.endSection(Message::SECTION_AUTHORITY) && !found_ns;
+                 ++rrsi) {
+                ConstRRsetPtr rrs = *rrsi;
+                if (rrs->getType() == RRType::NS()) {
+                    NameComparisonResult compare(Name(cur_zone_).compare(rrs->getName()));
+                    if (compare.getRelation() == NameComparisonResult::SUPERDOMAIN) {
+                        // TODO: make cur_zone_ a Name instead of a string
+                        // (this requires a few API changes in related
+                        // libraries, so as not to need many conversions)
+                        cur_zone_ = rrs->getName().toText();
+                        LOG_DEBUG(bundy::resolve::logger, RESLIB_DBG_RESULTS, RESLIB_REFER_ZONE)
+                                  .arg(cur_zone_);
+                        found_ns = true;
+                        break;
+                    }
+                }
+            }
+
+            if (found_ns) {
+                // next resolver round
+                // we do NOT use doLookup() here, but send() (i.e. we
+                // skip the cache), since if we had the final answer
+                // instead of a delegation cached, we would have been
+                // there by now.
+                GlueHints glue_hints(cur_zone_, incoming);
+
+                // Ask the NSAS for an address, or glue.
+                // This will eventually result in either sendTo()
+                // or stop() being called by nsas_callback_
+                assert(!nsas_callback_out_);
+                nsas_callback_out_ = true;
+                nsas_.lookup(cur_zone_, question_.getClass(),
+                             nsas_callback_, ANY_OK, glue_hints);
+                return (false);
+            } else {
+                // Referral was received but did not contain an NS RRset.
+                bundy::resolve::copyResponseMessage(incoming, answer_message_);
+                return (true);
+            }
+            break;
+
+        case bundy::resolve::ResponseClassifier::TRUNCATED:
+            // Truncated packet.  If the protocol we used for the last one is
+            // UDP, re-query using TCP.  Otherwise regard it as an error.
+            if (protocol_ == IOFetch::UDP) {
+                send(IOFetch::TCP);
+                return (false);
+            }
+            goto SERVFAIL;
+
+        case bundy::resolve::ResponseClassifier::RCODE:
+            if (incoming.getRcode() == Rcode::FORMERR()) {
+                if (protocol_ == IOFetch::UDP && edns_) {
+                    send(IOFetch::UDP, false);
+                    return (false);
+                }
+            }
+            goto SERVFAIL;
+
+        default:
+SERVFAIL:
+            makeSERVFAIL();
+            return (true);
+        }
+
+        assert(false);
+        return (true);  // To keep the compiler happy
+    }
+}
+
+
+REFERRAL:
+  answer.empty() && !authorty.empty() && authorty[i].getType == NS
+
+NXRRSET
+  answer.empty() && !authorty.empty() && authorty[i].getType != NS
+
+CNAME:
+  last answer is cname
+ANSWERCNAME:
+  has cname but ending in an answer

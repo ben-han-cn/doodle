@@ -1,0 +1,107 @@
+domain model:
+  objects
+  behaviors & interactions
+  primary activity & essential terminology
+  the context boundary (module & interface)
+
+manage complexities, handel essential complexities and reduce incidential complexities
+
+elements of model
+entity:        more care about identity even with same other attirbutes
+value object:  only care about value, same value means same object
+service:       a set of functions acting on a related set of domain entities and value objects
+                 model a use case of the business
+
+lifecycle of domain object 
+creation                    --------   factory
+represented in memory       --------   aggregate (which enforce consistency and invariants)
+persistence                 --------   repository
+
+aggregate is a collection of domain objects that can be treated as a sigle unit, 
+it's the consistency boundary when part of it is updated, it's also the atomic unit of persistence.
+
+the three most important types of domain elements 
+  entities
+  value objects,
+  services
+and the three patterns used to manipulate them 
+  factories
+  aggregates
+  repositories 
+service is the collection of the ubiquitous language / domain specific use case
+which is the interaction between elements, and the name of these use case is the 
+service interface, and smaller use case could be composed into bigger case
+
+fp 
+  use function to model object, not state
+  prefer pure function
+  seprate fuction from state
+
+
+reactive:
+  resilience:     responsive in the face of failures
+  elasticity:     responsive under varying load
+  message driven: isolation through asynchronous message passing
+  
+
+event(something already happened, it's a notification):
+  uniquely identified as a type
+  self-contained as a behavior
+  obervable by consumers
+  time relevant
+
+
+UI -> event -> command -> business workflow -> events...
+
+context/boundry
+context map (interaction between boundary)
+
+core domain and supportive domain
+
+
+Ubiquitous Language is the set of concepts and vocabulary that is shared between 
+everyone on the team. And they should be written in the code.
+
+use different object type instead of one type with mutable state
+
+communication between context/boundary 
+  event serailization
+  low level depolyment architecture
+  avoid big data transfer
+  trust boundary and validation
+
+workflow
+api/interface database -> service -> domain
+onion architecture, all dependencies are point inwards, put the I/O at the edges
+
+
+model realworld things using nouns, it's also quite import to use
+verbs/functions
+
+Context:
+Each context represents some specialized knowledge in the solution. Within th context,
+share the same common language, and the design is coherent and unified. But just as in
+the real world, information taken out of context can be confusing or unusable.
+
+
+a software architecture including:
+system context  --> containers --> components --> modules/classes
+system context is the top level representing the entire system
+containers are deployable units such as a website, a web service, a database etc
+components a re major structural building blocks 
+classes/modules contains a set of low-level methods or functions
+
+
+communication between bounded context is through events
+events could be placed into queue like middle ware
+data put into events may similar to the objects defined inside bounded context, but they
+are not same, they are specifically designed to be serialized and shared as part of the 
+inter-context infrastructure, they are called Data transfer objects or DTOs.
+so the event and DTOs forms a kind of contract between bounded contexts. 
+domain event should be avoid within a bounded context
+
+Integrity of simple values
+Smart constructor to create valid values and reject invalid values.
+units of measure rather than plain number 
+enforce invariants using type system
+

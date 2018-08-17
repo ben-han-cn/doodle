@@ -1,0 +1,44 @@
+node has taint
+pod has toleration
+
+if toleration match taint, pod could be scheduled into the node
+taint:
+  key,value,effect
+
+effects:
+  PreferNoSchedule //if has other node, this node is avoid by scheduler
+  NoSchedule    // pod won't scheduled to the node
+  NoExecute //pod will be evicted from the node
+
+
+$ kubectl taint node node1.k8s node-type=production:NoSchedule
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: prod
+spec:
+ replicas: 5
+ template:
+ spec:
+ ...
+ tolerations:
+ - key: node-type
+   Operator: Equal
+   value: production
+   effect: NoSchedule
+//the toleration make the pod could be scheduled to node1.k8s
+
+//the following spec is more generic
+tolerations:
+-operator: Exists
+ effect: NoExecute
+-operator: Exists
+ effect: NoSchedule
+
+//untaint the node
+kubectl taint nodes node1.k8s key:NoSchedule-
+
+
+taints are a way to repel intolerant pods.
+node can have several taints
+pod can have several tolerations

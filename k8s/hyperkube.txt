@@ -1,0 +1,3 @@
+build/run.sh make cross KUBE_FASTBUILD=true ARCH=amd64
+cd cluster/images/hyperkube/
+make VERSION=$YOURCOOLTAG ARCH=amd64

@@ -1,0 +1,47 @@
+!$   // result of last command
+
+//add folder into the ld search path in runtime
+in /etc/ld.so.conf.d folder add another conf file, and add folder into that file
+ldconfig //will update the ld search cache 
+
+use ldd to search the dependency
+
+du --- object level
+df --- file system level, it ignore the underlaying storage which is hidden by 
+mount
+
+
+!! //last command: sudo !! (run the last command use sudo)
+
+
+ctrl + k //cut all the text from current pos 
+ctrl + u //cut all the text before current pos 
+ctrl + w //cut back one word
+ctrl + y //get the cut text back
+alt + . //get last parameter
+alt + f //move one word forward
+alt + b //move one word backward
+ctrl + l //clear the screen
+
+
+less +F file // ctrl + c,  shift + f
+
+ctrl + x + e //open the default editor, 
+sudo update-alternatives --config editor //change the default editor
+
+mtr //my trace route
+
+ctrl + r //search history
+
+
+//batch processes operation
+pgrep, pkill - look up or signal processes based on name and other attributes
+
+
+//{} will be result of find, with +, find result will be concat to one line, so grep 
+//call once, will ;, each find result will be run grep once, in this case + is prefered
+find . -name "*.go" -exec grep -wn 'main' {} +
+find . -name "*.go" -exec grep -wn 'main' {} \;
+
+//remove all containers
+docker rm -f $(docker ps -a -q)

@@ -1,0 +1,17 @@
+etcd:
+global configuration (high available)
+global lock (strong consistency)
+push update to client (watchable)
+
+
+etcd-v3: 
+1 support mvcc(multi version)
+2 transaction 
+3 lease vs ttl (lease will be refreshed during leader election)
+4 streaming watch  
+5 sychronization (supporting different sychronization object like
+  barrier, queues, mutex, election, rwmutex ...)
+
+
+export ETCDCTL_API=3
+etcdctl --endpoints="http://127.0.0.1:2379" get /registry/events/default --prefix -w json

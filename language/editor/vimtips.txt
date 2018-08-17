@@ -1,0 +1,2 @@
+d0               #delete all characters from current pos to the beginning of the current line
+:%s/^\s\+\d\+//  #delete leading number

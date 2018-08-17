@@ -1,0 +1,49 @@
+node ip: 172.17.8.101, 172.17.8.102, 172.17.8.103
+container network range: 172.33.0.0/16
+service network: 10.254.0.0/16
+
+etcdctl set /kube-centos/network/config < flannel.json
+flannel.json
+{
+"Network":"172.33.0.0/16",
+"SubnetLen":24,
+"Backend":{"Type":"host-gw"}
+}
+
+FLANNEL_ETCD_ENDPOINTS="http://172.17.8.101:2379"
+FLANNEL_ETCD_PREFIX="/kube-centos/network"
+FLANNEL_OPTIONS="-iface=eth1"
+
+flannel create subnet, this is done by flanneld process in each node
+etcdctl ls /kube-centos/network/subnets
+/kube-centos/network/subnets/172.33.72.0-24
+/kube-centos/network/subnets/172.33.97.0-24
+/kube-centos/network/subnets/172.33.102.0-24
+
+flannel create docker config file
+/run/flannel/docker [node1]
+DOCKER_OPT_BIP="--bip=172.33.102.1/24"
+DOCKER_OPT_IPMASQ="--ip-masq=true"
+DOCKER_OPT_MTU="--mtu=1500"
+DOCKER_NETWORK_OPTIONS=" --bip=172.33.102.1/24 --ip-masq=true --mtu=1500"
+
+/run/flannel/docker [node2]
+OCKER_OPT_BIP="--bip=172.33.97.1/24"
+DOCKER_OPT_IPMASQ="--ip-masq=true"
+DOCKER_OPT_MTU="--mtu=1500"
+DOCKER_NETWORK_OPTIONS=" --bip=172.33.97.1/24 --ip-masq=true --mtu=1500"
+
+
+
+flannel create route in each node
+[vagrant@node1 hack]$ ip route
+....
+172.33.72.0/24 dev docker0 proto kernel scope link src 172.33.72.1 
+172.33.97.0/24 via 172.17.8.102 dev eth1 
+172.33.102.0/24 via 172.17.8.103 dev eth1 
+
+[vagrant@node2 hack]$ ip route
+....
+172.33.72.0/24 via 172.17.8.101 dev eth1 
+172.33.97.0/24 dev docker0 proto kernel scope link src 172.33.97.1 
+172.33.102.0/24 via 172.17.8.103 dev eth1 

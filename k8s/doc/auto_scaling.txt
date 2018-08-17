@@ -1,0 +1,31 @@
+HPA(HorizontalPodAutoscaler) resource
+1 collect metrics of all the pods(from Heapster)
+2 calculate the number of pods required to bring the metric to the
+  specified target value
+3 update the replias field of scaled resource(deployment, replicaset..)
+
+scalable resource needs expose scale sub-resource. it enable autoscaler
+to do its work without knowing any details of the resource it's scaling.
+
+
+cl:
+$ kubectl autoscale deployment kubia --cpu-percent=30 --min=1 --max=5
+or yaml objecT:
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+ name: kubia
+ ...
+spec:
+ maxReplicas: 5
+ metrics:
+ - resource:
+    name: cpu
+    targetAverageUtilization: 30
+   type: Resource
+ minReplicas: 1
+ scaleTargetRef:
+  apiVersion: extensions/v1beta1
+  kind: Deployment
+  name: kubia 
+

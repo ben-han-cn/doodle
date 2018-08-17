@@ -1,0 +1,79 @@
+replicaset with several pods, all the pods share the same pvc, which means
+if pod is db applicaiton, and each pod wants different backend storage, pod
+with volumn won't work.
+
+pet(stateful application) vs cattle(stateless applicaiton)
+replicaset  vs statefulset
+
+name of pet is more predictable == statefulset name + index(0, 1, 2)
+
+serice for pet is headless, which expose the underlaying pods directly
+and all pets and dns name 
+example for service foo:
+  a-0.foo.default.svc.cluster.local
+  foo.default.svc.cluster.local
+
+replace old pet, will use same pod and host name as the disappared one.
+which make scaling up and down a statefulset much more predictable, since
+we know the the name of new pod and the name of pod which will be deleted. 
+
+create headless service
+apiVersion: v1
+kind: Service
+metadata:
+ name: kubia
+spec:
+ clusterIP: None
+ selector:
+  app: kubia
+ ports:
+ - name: http
+   port: 80
+
+create the stateful set:
+
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+ name: kubia
+spec:
+ serviceName: kubia
+ replicas: 2
+ template:
+  metadata:
+    labels:
+      app: kubia
+  spec:
+    containers:
+    - name: kubia
+      image: luksa/kubia-pet
+      ports:
+      - name: http
+        containerPort: 8080
+      volumeMounts:
+      - name: data
+        mountPath: /var/data
+
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      resources:
+        requests:
+          storage: 1Mi
+      accessModes:
+      - ReadWriteOnce 
+
+$ kubectl get pvc
+NAME         STATUS VOLUME CAPACITY ACCESSMODES AGE
+data-kubia-0 Bound  pv-c    0       37s
+data-kubia-1 Bound  pv-a    0       37s
+
+k8s use srv to expose the backend stateful pods
+k.d.s.c.l. 30 IN SRV 10 33 0 kubia-0.kubia.default.svc.cluster.local.
+k.d.s.c.l. 30 IN SRV 10 33 0 kubia-1.kubia.default.svc.cluster.local.
+kubia-0.kubia.default.svc.cluster.local. 30 IN A 172.17.0.4
+kubia-1.kubia.default.svc.cluster.local. 30 IN A 172.17.0.6
+
+for stateful pod, we have to delete the pod manually, when it has problem or the node
+its resides has failed, since k8s has to make sure only one pod with same name exists.

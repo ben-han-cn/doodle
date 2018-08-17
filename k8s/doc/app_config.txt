@@ -1,0 +1,114 @@
+sensitive configure
+passing cmd-line arguments to containers
+set custom environment variables for each container
+mounting configuration files into containers through a special type of volume
+
+Docker
+ENTRYPOINT defines the executable invoked when the container is started.
+CMD specifies the arguments that get passed to the ENTRYPOINT.
+
+ENTRYPOINT ["node", "app.js"] //exec form
+ENTRYPOINT node app.js //shell format 
+shell form will run node using shell
+  /bin/sh -c node app.js
+
+pod yaml:
+spec:
+ containers:
+ - image: luksa/fortune:args
+ args: ["2"]
+
+spec:
+ containers:
+ - image: luksa/fortune:env
+ env:
+ - name: INTERVAL
+   value: "30"
+
+
+$ kubectl create configmap my-config
+ --from-file=foo.json
+ --from-file=bar=foobar.conf
+ --from-file=config-opts/
+ --from-literal=some=thing 
+
+foo.json                 -> content of foo.json
+bar                      -> content of foobar.conf
+some                     -> thing
+files under config.opts  -> their contents
+
+//put configmap key as env variables
+spec:
+ containers:
+ - image: luksa/fortune:args
+ env:
+ - name: INTERVAL
+   valueFrom:
+     configMapKeyRef:
+      name: my-config
+      key: bar
+
+
+//put configmap key related file into volumn
+spec:
+ containers:
+ - image: nginx:alpine
+   name: web-server
+   volumeMounts:
+   - name: config
+     mountPath: /etc/nginx/conf.d
+     readOnly: true
+ volumes:
+ - name: config
+   configMap:
+    name: my-config
+    items:
+    - key: foo.json
+      path: vanguard.conf
+
+configmap -> volumn is using sysmbol link
+
+
+
+
+secret
+Every pod has a secret volume attached to it automatically. 
+The Secret contains three entries—ca.crt, namespace, and token which represent 
+everything you need to securely talk to the Kubernetes API server from within 
+your pods
+/var/run/secrets/kubernetes.io/serviceaccount which is mounted from secret default-token
+
+$ openssl genrsa -out https.key 2048
+$ openssl req -new -x509 -key https.key -out https.cert -days 3650 -subj CN=www.kubia-example.com
+
+$ kubectl create secret generic fortune-https --from-file=https.key --from-file=https.cert --from-file=foo
+
+spec:
+ containers:
+ - image: nginx:alpine
+   name: web-server
+   volumeMounts:
+   - name: html
+     mountPath: /usr/share/nginx/html
+     readOnly: true
+   - name: config
+     mountPath: /etc/nginx/conf.d
+     readOnly: true
+   - name: certs
+     mountPath: /etc/nginx/certs/
+     readOnly: true 
+
+  volumes:
+  - name: html
+    emptyDir: {}
+  - name: config
+    configMap:
+      name: fortune-config
+      items:
+      - key: my-nginx-config.conf
+        path: https.conf
+   - name: certs
+     secret:
+     secretName: fortune-https 
+
+unlike configmap, secret is mounted using tmpfs(resides in memory)

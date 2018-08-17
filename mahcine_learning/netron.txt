@@ -1,0 +1,26 @@
+Perceprons
+Take several binary inputs and produces a single binary output.
+A method for weighing evident to make decision.
+          0  if w * x + b <= 0
+output =  
+          1  if w * x + b > 0
+
+x -> input
+w -> weight
+b -> bias
+
+learning = automatically tune the weight and biases of a network of 
+arificial neurons.
+
+small change in weight(or bias) to cause only a small corresponding
+changes in the output from the network. this property will make learning
+possible.
+
+Sigmoid neurons
+same structure with Perceprons, except 
+input is in range(0, 1)
+output is generate use another equation
+
+sigmoid neurons use a different equation to calcuate the output, the equation
+have the property that samll change in x and w, will has small affect on 
+the output.

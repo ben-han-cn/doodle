@@ -1,0 +1,47 @@
+customer resource data(CRD)
+  no version, validation
+
+
+Custom API servers(via kube-aggregator)
+  full power and flexibility of k8s
+  require etcd to store data
+
+
+generators:
+  client-gen:       gen rest client
+  conversion-gen:   migration for break api change
+  deepcopy-gen:     structure deep copy
+  defaulter-gen:    generate default
+  go-to-protobuf:   from struct to proto definition
+  informer-gen:     offer a event based interface to act on changes of resources on the server
+  lister-gen:       offer a read-only caching layer for Get and List request
+  openapi-gen:
+  codec-gen:
+
+
+github.com/kubernetes/code-generator
+github.com/kubernetes/gengo
+
+annotate types.go with some metadata and use the tools to generate code
+
+
+types.go
+
+type Alert struct {
+  metav1.TypeMeta
+  metav1.ObjectMeta
+
+  Spec AlertSpec
+  Status AlertStatus
+}
+
+type AlertSpec struct {
+}
+
+type AlertStatus struct {
+}
+
+
+annotate == tag, tag has two kinds
+global tags: in pkg/doc.go 
+local tags: above a type

@@ -1,0 +1,111 @@
+Vagrant::Config.run do |config|
+    config.vm.box = "precise64" 
+    config.vm.forward_port 80, 8080 
+    config.vm.provision "shell", path: "provision.sh"
+end
+
+sudo apt-get install -y build-essential
+
+git config --global user.email "ben.han.cn@gmail.com"
+git config --global user.name "ben-han-cn"
+git config --global alias.ci commit
+git config --global alias.co checkout
+git config --global alias.st status
+git config --global alias.br branch
+git config --global core.editor vim
+
+mkdir -p ~/.vim/autoload ~/.vim/bundle && \
+curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim
+
+
+gem source -r http://rubygems.org/
+gem source -a https://ruby.taobao.org/
+
+
+#bash
+export MARKPATH=$HOME/.marks
+function j { 
+    cd -P $MARKPATH/$1 2>/dev/null || echo "No such mark: $1"
+}
+function mark { 
+    mkdir -p $MARKPATH; ln -s $(pwd) $MARKPATH/$1
+}
+function unmark { 
+    rm -i $MARKPATH/$1 
+}
+function marks {
+    ls -l $MARKPATH | sed 's/  / /g' | cut -d' ' -f9- | sed 's/ -/\t-/g' && echo
+}
+
+function delbr {
+    git co master; git br -D $1; git push origin :$1 
+}
+
+function cleanbr {
+    git fetch -p && git branch -vv | awk '/: gone]/{print $1}' | xargs git branch -d
+}
+
+function cgp {
+    mkdir "$1"; cd "$1";git init --bare --shared=group;cd ..;mv "$1" "$1".git
+}
+
+function synctime {
+    ntpdate ntp.ubuntu.com
+}
+
+export PS1='s1\$ '
+
+
+sudo apt-get install virtualbox
+sudo apt-get install vagrant
+vagrant plugin install vagrant-disksize //used to expand disk size
+
+golang net/x
+https://github.com/golang/net.git
+
+
+protobuf
+git clone https://github.com/google/protobuf.git
+go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+
+curl https://sh.rustup.rs -sSf | sh
+cargo install rustfmt
+git clone --depth=1 https://github.com/rust-lang/rust.vim.git ~/.vim/bundle/rust.vim
+
+adduser --ingroup xxx ben
+//add user go sudo group
+sudo usermod -a -G sudo ben
+%sudo   ALL=(ALL:ALL) NOPASSWD:ALL
+//set user default group
+sudo usermod -g sudo ben
+
+//cassandr
+sudo apt-get install -y default-jdk
+echo "deb http://www.apache.org/dist/cassandra/debian 311x main" | sudo tee -a /etc/apt/sources.list.d/cassandra.sources.list
+curl https://www.apache.org/dist/cassandra/KEYS | sudo apt-key add -
+sudo apt-key adv --keyserver pool.sks-keyservers.net --recv-key A278B781FE4B2BDA
+sudo apt-get update
+sudo apt-get install cassandra
+sudo systemctl enable/start/stop cassandra.service
+
+// add new disk
+sudo fdisk /dev/vdb n w
+sudo mkfs.ext4 /dev/vdb
+sudo mkdir /linkchain && sudo mount /dev/vdb /linkchain
+
+
+au BufWrite *.rs :Autoformat
+
+pip install ansible
+ansible-playbook -s nginx.yml -i inventory.host
+
+
+docker rm `docker ps --no-trunc -aq`
+docker images -q --filter dangling=true | xargs docker rmi
+
+
+//install exlixir
+wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && sudo dpkg -i erlang-solutions_1.0_all.deb
+sudo apt-get update
+sudo apt-get install -y esl-erlang
+sudo apt-get install -y elixir

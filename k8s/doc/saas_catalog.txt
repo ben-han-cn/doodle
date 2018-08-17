@@ -1,0 +1,23 @@
+service catalog
+ClusterServiceBroker  ----> Services they could provide descirbed by ClusterServiceClass
+user want service ----> create ServiceInstance + ServiceBinding ----> bind service to their pods
+
+
+register the broker, url will specify the service endpoint
+apiVersion: servicecatalog.k8s.io/v1alpha1
+kind: ClusterServiceBroker
+metadata:
+ name: database-broker
+spec:
+ url: http://database-osbapi.myorganization.org
+
+the broker server needs to implement the interface:
+Retrieving the list of services with GET /v2/catalog
+Provisioning a service instance (PUT /v2/service_instances/:id)
+Updating a service instance (PATCH /v2/service_instances/:id)
+Binding a service instance (PUT /v2/service_instances/:id/service_bindings/:binding_id)
+Unbinding an instance (DELETE /v2/service_instances/:id/service_bindings/:binding_id)
+Deprovisioning a service instance (DELETE /v2/service_instances/:id)
+
+Service Catalog in k8 will get all the service the broker provides through the
+first interface, and then it will create all the ClusterServiceClass resource for each of them

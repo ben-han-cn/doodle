@@ -1,0 +1,57 @@
+pubsub
+
+Phoenix.PubSub.PG2
+  supervisor
+    supervisor(Phoenix.PubSub.LocalSupervisor, [server, pool_size, dispatch_rules])
+    worker(Phoenix.PubSub.PG2Server, [server, pool_size])
+
+
+Phoenix.PubSub.Redis
+  supervisor
+    supervisor(Phoenix.PubSub.LocalSupervisor, [server_name, pool_size, dispatch_rules])
+    worker(Phoenix.PubSub.RedisServer, [server_opts])
+
+dispatch_rules = :broadcast, :direct_broadcast point to server(PG2Server, RedisServer)
+
+
+Phoenix.PubSub.LocalSupervisor
+  create the ets, add subscribe, unsubscribe, point to Phoenix.PubSub.Local
+  according to pool size create serval Phoenix.PubSub.GC, Phoenix.PubSub.Local
+
+
+Server(PG2, Redis)
+  broadcast, direct_broadcast
+  all PG2 server will join the process group
+  when do broadcast
+    use pg2 to get all the pids of pg2 servers
+    if pid is belongs to this machine -> Local.broadcast
+    else send :forward_to_local to the pid
+
+Phoenix.PubSub.Local
+  use ets to store all the pid and associated topic
+  subscribe (pid, topic)
+    pid -> hash % pool_size -> {local, gc}
+    :ets.insert(gc, {pid, topic}) // gc
+    :ets.insert(local, {topic, {pid, opts[:fastlane]}}) 
+
+  broadcast
+    find all pids with topic
+    send(pid, msg)
+    if fastlane is specified, it will be module, its function which named fastlane will be called
+  
+
+Phoenix.PubSub.GC
+  monitor all pid subscribe
+  when pid is done remove related record from ets
+
+
+same function call different interface
+  first param is the ets (ets name has same name with the application)
+  function look up is in ets
+  defp call(server, kind, args) do
+    [{^kind, module, head}] = :ets.lookup(server, kind)
+    apply(module, kind, head ++ args)
+  end 
+
+
+  

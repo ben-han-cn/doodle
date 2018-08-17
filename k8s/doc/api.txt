@@ -1,0 +1,65 @@
+k8s.io/client-go
+  kubernetes 
+  rest
+  dynamic
+  pkg/api/...
+
+factory 
+builder //-> visit
+helper
+
+factory: resource_type -> REST API path
+builder: change parameter to resource
+helper: 
+
+client-go
+
+path convension
+
+api-group/version/namespaces/namespace/resource
+api/v1/namespaces/default/pods            == core group
+apis/batch/v1/namespaces/default/jobs     == group batch
+apis/example.com/v1/namespaces/default/database == group example.com, database is CRD(custom resource definition)
+
+
+CRD(custom resource) to extend k8s
+yaml to declear resource -> let k8s to create and manage it
+
+#declare the resource
+apiVersion: "etcd.database.coreos.com/v1beta2"
+kind: "EtcdCluster"
+metadata:
+  name: "example-etcd-cluster"
+spec:
+  size: 3
+  version: "3.2.11"
+
+@resource manifests
+  kubectl create -f my-cluster.yaml
+  kubectl edit etcd.database.coreos.com my-cluster
+  kubectl delete etcd.database.coreos.com my-cluster
+  
+controller act on the resource metadata
+  create, update, delete
+control loop
+  observe: watch for desired state, triggered by kubernetes evnets
+  analysis: calculate changes
+  act: add, update or remove resource
+
+developing CRD
+define CRD properties
+run code generation tool to expose CRD to clients
+develop customed controller
+  register the CRD
+  implement Add(), Update(), Delete()
+  start warching the CRD
+
+operator pattern
+
+
+apiVersion: apps/v1beta2 
+apiVersion: v1
+apiVersion including:
+  API group                 ---- apps
+  the actual api version    ---- v1
+core api group is by default, it won't need to be specified

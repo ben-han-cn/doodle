@@ -1,0 +1,9 @@
+clap:
+  https://github.com/kbknapp/clap-rs
+  command arg parse & config file process
+
+serde
+  serialization
+
+parking_lot
+  synchronization primitive

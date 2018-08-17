@@ -1,0 +1,67 @@
+volume:
+On-disk files in container are ephemeral
+  volume keep the state out of the container.
+state needs to be shared between containers in same pod.
+
+emptydir:
+  stay in node
+  could be save into mem or disk
+
+
+1 apiVersion: v1
+kind: Pod
+...
+spec:
+  ...
+  volumnes:
+  - name: cache-volume
+    emptyDir: {}
+
+  - name: quick-cache-volume
+    emptyDir: 
+      medium: Memory
+
+
+hostpath is samiliar with emptydir, except it could have initial data
+but it couple the node with the pod, therefore it's not recommand
+
+2 cloud volume
+
+3 NFS
+  allows a existing NFS share to be mounted into pod, unlike emptyDir, which is
+erased when pod is removed, the contents of an nfs volume are preserved.
+
+4 Persistent volumn claim(PVC)
+  adminstrator/operator provides PV (abstraction about physical storage)
+  user write PVC to consume the storage, some details will be hide from end user
+
+
+
+pod:
+  volumeMounts:
+    /foo
+    volumes:l
+    - PVC
+        claminName    ----->     Persistent Volume Claim
+                                    size
+                                    selector
+                                    storage class name 
+
+if storage class name is provided, it means dynamic provision
+otherwise its static provision 
+
+Persistent Volumn: staitc storage 
+  capacity
+  labels
+  plugins to connect to physical storage
+  access mode
+  retain policy
+    retained //data is keeped and couldn't be reused by other pvc
+    recycled //data is cleared and could be used by other pvc
+    deleted // pv and storage all will be deleted from k8s
+
+Storage Class:  dynamic storage 
+
+
+two pods could share the same pvc
+pvc is bind to pv which is done by controller, the bind is exclusive

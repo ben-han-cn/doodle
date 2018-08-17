@@ -1,0 +1,67 @@
+coroutines:
+  * async def ---> define coroutine functions
+  * call a coroutine function doesn't execute it, but rather returns
+  a coroutine object
+  * execute a coroutine object
+    1 put await in front of it
+    2 schedule it with ensure_future() or create_task()
+
+
+task is subclass of future, which wrap the coroutine and will be
+scheduled by event loop. task/future will get result, once it finished.
+
+class Task(futures.Future):  
+    def __init__(self, coro, loop=None):
+        super().__init__(loop=loop)
+        ...
+        self._loop.call_soon(self._step)
+    def _step(self):
+            ...
+        try:
+            ...
+            result = next(self._coro)
+        except StopIteration as exc:
+            self.set_result(exc.value)
+        except BaseException as exc:
+            self.set_exception(exc)
+            raise
+        else:
+            ...
+            self._loop.call_soon(self._step)
+
+
+1 The event loop is running in a thread
+2 It gets tasks from the queue
+3 Each task calls the next step of a coroutine
+4 If coroutine calls another coroutine (await <coroutine_name>), the current coroutine gets suspended and context switch occurs. Context of the current coroutine (variables, state) is saved and context of a called coroutine is loaded
+5 If coroutine comes across a blocking code (I/O, sleep), the current coroutine gets suspended and control is passed back to the event loop
+6 Event loop gets next tasks from the queue 2, …n
+7 Then the event loop goes back to task 1 from where it left off
+
+
+import asyncio  
+import time  
+from datetime import datetime
+
+async def factorial(name, number):  
+    f = 1
+    for i in range(2, number+1):
+        print('Task {}: Compute factorial({})'.format(name, i))
+        await asyncio.sleep(1)
+        f *= i
+    print('Task {}: factorial({}) is {}\n'.format(name, number, f))
+
+start = time.time()  
+loop = asyncio.get_event_loop()
+tasks = [  
+    asyncio.ensure_future(factorial("A", 3)),
+    asyncio.ensure_future(factorial("B", 4)),
+]
+loop.run_until_complete(asyncio.wait(tasks))  
+loop.close()
+end = time.time()  
+print("Total time: {}".format(end - start))
+
+//call sync funciton in event loop
+loop.call_soon(functools.partial(callable, arg1, arg2))
+

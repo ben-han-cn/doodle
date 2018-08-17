@@ -1,0 +1,87 @@
+types:
+
+according to implementation:
+mutation:
+    modify the objects they admit
+validating:
+    couldn't modify the object
+
+only admmision controller reject the request, the entire
+request is rejected immediately and an error is returned 
+to the end-user.
+
+
+according to loading mechanisam:
+
+staitc:
+    compiled into the k8s api server
+
+
+extensible admission webhooks
+    developed out of k8s tree and configured at runtime
+    facilitates dynamic action response
+
+
+built-in controller:
+1 AlwaysPullImages
+2 ResourceQuota
+3 DenyEscalatingExec: 
+    Forbids executing commands on an "escalated" container. This 
+    includes pods that run as privileged, have access to the host 
+    IPC namespace, and have access to the host PID namespace. 
+    Without this admission controller, a regular user can escalate 
+    privileges over the Kubernetes node just spawning a terminal on 
+    these containers.
+
+4 NodeRestriction: 
+    Limits the node and pod objects a kubelet can modify. Using this 
+    controller, a Kubernetes node will only be able to modify the API 
+    representation of itself and the pods bound to this node.
+
+5 PodSecurityPolicy: 
+    This admission controller acts on creation and modification of 
+    the pod and determines if it should be admitted based on the requested 
+    Security Context and the available Pod Security Policies. The PodSecurityPolicy 
+    objects define a set of conditions and security context that a pod must declare 
+    in order to be accepted into the cluster
+
+6 ValidatingAdmissionWebhooks 
+    Calls any external service that is implementing your custom security 
+    policies to decide if a pod should be accepted in your cluster. 
+
+7 PodPreset
+    PodPresets api resource which used to inject additional runtime info into pod
+    at creation time. The information include secret, volumn, mounts, and environment
+    variable, PodPreset is the admission controller, which modify the pod object 
+    by applies all the pod presets match the pod, after modificatio, it will annotate 
+    the pod object to notify that the pod is modified by pod preset
+
+
+k8s security context:
+when declare pod/deployment, several security-related parameters is grouped in a Security context, which including:
+Privileged:
+    process inside a privileged container get almost same privileges as those
+    outside of a container
+Use/Group ID
+    securityContext:
+    runAsUser: 1000  //user id
+    fsGroup: 2000    //gid for files
+SELinux
+Capacities:
+    securityContext:
+      capabilities:
+        drop:
+          - NET_RAW
+          - CHOWN
+AppArmor and Seccomp
+AllowPrivilegeEscalation
+ReadOnlyRootFilesystem
+    whether a container will be able to write into the root filesystem. It is common 
+    that the containers only need to write on mounted volumes that persist the state, 
+    as their root filesystem is supposed to be immutable.
+
+tools:
+kubebench automate do a security accessment of your kubernetes cluster
+
+
+

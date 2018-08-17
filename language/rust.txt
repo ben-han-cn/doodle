@@ -1,0 +1,211 @@
+borrow check
+generic/trait
+error handling --> Option/Either
+
+safety
+avoid multiple mutable alias(reference) to the same data
+
+rust zero-cost abstraction
+most struct(the abstraction is based) is resides in stack and with 
+move syntax, there is no memory allocation involved
+most abstraction is just add another shell wrap the original struct, 
+the real memory which is resides in heap is pointed by several wrappers, 
+and rust lifetime system make sure the shared memory management won't 
+mess it up
+
+tutorial
+? macro == if Result is OK, extract the value else return the err
+let i = match h() {
+  ok(i) => i,
+  err => return err,
+};
+==
+let i = h()? //the return type of current function must be Result
+
+>= (bind in monad)  == map
+
+Option<T>.and_then(self, f:F) -> Option<U> where F: FnOnce(T) -> Option<U>
+Option<T>.or_else(self, f:F) -> Option<U> where F: FnOnce() -> Option<T>
+Option<T>.ok_or<E>(self, err:E) -> Result<T, E>
+Option<T>.except(self, msg: &str) -> T //if self is none, this will panic
+
+
+use std::marker::PhantomData;
+trait LengthUnit: Copy {
+    fn name() -> String;          // unit name, singular
+    fn num_in_base_unit() -> i64; // number of nanometers in unit
+}
+
+#[derive(Debug, Clone, Copy, Eq, Ord)]
+struct Length<T: LengthUnit> {
+    nm: i64,
+    unit: PhantomData<T>
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)] 
+struct Meter; 
+
+impl LengthUnit for Meter {
+    #[inline(always)]
+    fn name() -> String { "meter".to_string() }
+    #[inline(always)]
+    fn num_in_base_unit() -> i64 { 1_000_000_000 } // billion nanometers in a meter
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+struct Millimeter; // unit-like struct
+
+impl LengthUnit for Millimeter {
+    #[inline(always)]
+    fn name() -> String { "millimeter".to_string() }
+    #[inline(always)]
+    fn num_in_base_unit() -> i64 { 1_000_000 } // million nanometers in a millimeter
+}
+
+use std::fmt;
+
+impl<T> fmt::Display for Length<T> where T: LengthUnit {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let num_val = (self.nm as f64) / (T::num_in_base_unit() as f64);
+        let name_plural_s = match num_val {
+            1_f64 => "",
+            _ => "s"
+        };
+        write!(f,
+               "{} {}{}",
+               num_val,
+               T::name(),
+               name_plural_s)
+    }
+}
+
+impl<T> From<i64> for Length<T> where T: LengthUnit {
+    fn from(n: i64) -> Self {
+        Length {
+            nm: n * T::num_in_base_unit(),
+            unit: PhantomData<T>
+        }
+    }
+}
+
+impl<T> From<Length<T>> for i64 where T: LengthUnit {
+    fn from(l: Length) -> i64 {
+         ((l.nm as f64) / (T::num_in_base_unit() as f64)) as i64
+    }
+}
+
+macro_rules! meter {
+    ($num:expr) => (Length::<Meter>::from($num));
+}
+macro_rules! millimeter {
+    ($num:expr) => (Length::<Millimeter>::from($num));
+}
+
+fn main() {
+  let l1 = meters!(1);
+  let l2 = millimeters!(1);
+  println!("l1 = {}", l1);
+  println!("l2 = {}", l2);
+}
+
+
+interface convention
+owned -> borrowed:  as_ref(), as_mut(), borrow(), borrow_mut(), as_*()
+borrowed -> owned:  to_*()
+owned -> owned:     into_*()
+borrowed/owned -> owned:  from_*() 
+try_*()   --> return Result or Option
+with_*()  --> different constructor from new
+
+Deref/DerefMut     used to derefencing
+From/Into          type conversion
+
+
+use Rc to handle, reference shared by different module, in a single thread
+applicaiton.
+let playlist = Rc::new(Playlist::new());
+
+
+interior mutability: Granting mutable an inner value of a type with an immutable reference
+Cell
+RefCell
+
+
+macro (kind of syntax extension)
+  token stream , AST nodes
+
+macro_rules! $name {
+    $rule0 ;
+    $rule1 ;
+    // …
+    $ruleN ;
+}
+
+rule: ($pattern) => {$expansion}
+
+capture:
+item: an item, like a function, struct, module, etc.
+block: a block (i.e. a block of statements and/or an expression, surrounded by braces)
+stmt: a statement
+pat: a pattern
+expr: an expression
+ty: a type
+ident: an identifier
+path: a path (e.g. foo, ::std::mem::replace, transmute::<_, int>, …)
+meta: a meta item; the things that go inside #[...] and #![...] attributes
+tt: a single token tree
+
+repetitions:
+$ ( ... ) sep rep ------> sep is optional 
+   $($element:expr) , *  //match the repetition
+   { let mut v = Vec::new();
+     $(v.push(format!("{}", $element));)*
+     v
+   }
+
+
+extension base type:
+pub trait BytesExt {
+    ///Copy a number of bytes to the vector.
+    fn push_bytes(&mut self, bytes: &[u8]);
+}
+
+impl BytesExt for Vec<u8> {
+    fn push_bytes(&mut self, bytes: &[u8]) {
+        self.write_all(bytes).unwrap();
+    }   
+}
+
+
+design of rust program
+make most use of reference to avoid memory copy and malloc
+reference safety is guaranteed by rust lifetime system
+generic programming based on template/compile time 
+
+trait + generic programming
+
+trait IntoReader {
+    type OutReader: Reader;
+    
+    fn into_reader(self) -> Self::OutReader;
+}
+
+impl Response {
+    pub fn set_body<I>(&mut self, data: I)
+    where I: IntoReader, I::OutReader: Send {
+        self.body = Box::new(data.into_reader());
+    }
+}
+
+send == T could be passed to another thread safely (rc is not)
+sync == &T could be updated by several thread without data race
+
+rust support redeclare new varaible with same name but different
+type and mutability
+
+let mut n = 1;
+print!("{}", n);
+let n = 3.14;
+print!(" {}", n);
+
+value of a block is the value of its last expression, empty tuple () == void

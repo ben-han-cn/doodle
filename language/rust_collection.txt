@@ -1,0 +1,22 @@
+let a = [1, 2, 3];          //[1; 10]
+let va = vec![1, 2, 3]      //vec![1; 10]
+
+vec:
+let mut x = vec!["This", "is", "a", "sentence"];
+x.insert(1, "line");
+x.insert(2, "contains");
+x.remove(3);
+x.push("about Rust");
+x.pop();
+for i in 0..x.len() { print!("{} ", x[i]); }
+
+
+heterogeneous data structures: tuple, struct, tuple-struct
+
+let data = (10000, 12.3, 'q')
+struct Data {
+    integer: i32,
+    fractional: f32,
+    character: char,
+}
+struct Data(i32, f32, char);

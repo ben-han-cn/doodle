@@ -1,0 +1,16 @@
+machine learning == figuring out an equation to solve a specific problem based on some example data
+
+deep learning: a technique for implementing machine learning
+deep neural networks(DNN) is one kind of deep learning, DNN is where the code structures you write are arranged in layers that loosely mimic the human brain, learning patterns of patterns.
+
+features/attributes
+unbiased tranning data
+
+supervised learning: learn from labelled data set and the system is told what
+the expected output label is
+
+unsupervised learning: learn from unlabelled data set
+
+reinforcement learning: program learns by playing the game millions of times, we
+reward the program when it makes a good move, when it loses we give no reward or 
+nagative reward.

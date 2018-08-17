@@ -1,0 +1,8 @@
+knative: (https://github.com/knative/)
+    Kubernetes-based platform to build, deploy, and manage modern serverless workloads.
+
+life: (https://github.com/perlin-network/life)
+    A secure WebAssembly VM catered for decentralized applications.
+
+exposed (https://github.com/thesyncim/exposed)
+High performance RPC framework

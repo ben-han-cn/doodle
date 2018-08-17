@@ -1,0 +1,121 @@
+The primitive types are:
+
+  Ecto type               | Elixir type             | Literal syntax in query
+  :---------------------- | :---------------------- | :---------------------
+  `:id`                   | `integer`               | 1, 2, 3
+  `:binary_id`            | `binary`                | `<<int, int, int, ...>>`
+  `:integer`              | `integer`               | 1, 2, 3
+  `:float`                | `float`                 | 1.0, 2.0, 3.0
+  `:boolean`              | `boolean`               | true, false
+  `:string`               | UTF-8 encoded `string`  | "hello"
+  `:binary`               | `binary`                | `<<int, int, int, ...>>`
+  `{:array, inner_type}`  | `list`                  | `[value, value, value, ...]`
+  `:map`                  | `map`                   |
+  `{:map, inner_type}`    | `map`                   |
+  `:decimal`              | [`Decimal`](https://github.com/ericmj/decimal) |
+  `:date`                 | `Date`
+  `:time`                 | `Time`
+  `:naive_datetime`       | `NaiveDateTime`
+  `:utc_datetime`         | `DateTime`
+
+config.ex
+config :ecto_test, ecto_repos: [EctoTest.Repo]
+config :ecto_test, EctoTest.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  username: "zdns",
+  password: "zdns",
+  database: "zdns",
+  hostname: "localhost",
+  pool_size: 10,
+  migration_primary_key: [id: :uuid, type: :binary_id]
+
+
+defmodule EctoTest do
+  defmodule Repo do
+    use Ecto.Repo, otp_app: :ecto_test
+    def init(_, opts) do
+      {:ok, opts}
+    end 
+  end 
+
+  defmodule Order do
+    use Ecto.Schema
+    import Ecto.Changeset
+    alias EctoTest.Order
+
+
+    schema "orders" do
+      field :market_id, :integer
+      field :locked, :decimal
+      field :type, :string 
+
+      timestamps()
+    end 
+
+    def changeset(%Order{} = order, attrs) do
+          order
+          |> cast(attrs, [:market_id, :type, :locked])  
+          |> validate_required([:market_id, :type, :locked])
+    end 
+  end 
+end
+
+defmodule EctoTest.Application do
+  use Application
+
+  def start(_type, _args) do
+    import Supervisor.Spec
+    children = [supervisor(EctoTest.Repo, [])]
+    opts = [strategy: :one_for_one, name: EctoTest.Supervisor]
+    Supervisor.start_link(children, opts)
+  end 
+end
+
+
+mix ecto.gen.migration add_orders_table -r EctoTest.Repo
+mix ecto.migrate -r EctoTest.Repo
+
+
+EctoTest.Repo.insert(%EctoTest.Order{market_id: 10, locked: 20.0, type: "ben"}, []) 
+{:ok, uuid} = Ecto.UUID.cast("1561d812-4913-4b2a-b7a7-cfe16949c018")
+from(o in EctoTest.Order, where: o.id == ^uuid) |> EctoTest.Repo.update_all(set: [type: "nana"])
+
+MIX_ENV=test mix ecto.reset
+
+
+Schema --> create struct ---> add __changeset__ funciton into struct
+__changeset__ return fields, but in this case data has all the information
+def change(%{__struct__: struct} = data, changes) when is_map(changes) or is_list(changes) do
+  types = struct.__changeset__
+  {changes, errors, valid?} = get_changed(data, types, %{}, changes, [], true)
+  %Changeset{valid?: valid?, data: data, changes: changes,
+             errors: errors, types: types}
+end  
+
+
+defp get_changed(data, types, old_changes, new_changes, errors, valid?) do
+    Enum.reduce(new_changes, {old_changes, errors, valid?}, fn
+      {key, value}, {changes, errors, valid?} ->
+        put_change(data, changes, errors, valid?, key, value, Map.get(types, key))
+    end)
+end
+
+defp put_change(data, changes, errors, valid?, key, value, _type) do
+  cond do
+    Map.get(data, key) != value ->
+      {Map.put(changes, key, value), errors, valid?}
+    Map.has_key?(changes, key) ->
+      {Map.delete(changes, key), errors, valid?}
+    true ->
+      {changes, errors, valid?}
+  end
+end
+
+changeset will include the data(model), changes
+Ecto.Changeset.change(model, changes) --> changeset
+model is a schema, changes which has different value with model will be add to changeset
+
+cast(model, params, permit_field) -> changeset
+permit_field should valid in model
+params with same key in permit_field will compared value in model, any different is add to changeset,
+most important is that value type is checked.

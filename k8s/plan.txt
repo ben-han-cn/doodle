@@ -1,0 +1,7 @@
+aug: platform learning
+sep: self deployment automation
+oct - nov: 
+    core dns requirement analysis
+    vanguard replacement
+dec:
+    network solotion analysis + ipam support

@@ -1,0 +1,19 @@
+It is by apply abstraction, then, that we are able to contruct, analyze and
+manage large, complex computer systems, which would be overwhelming if viewed
+in their entirely at detailed leve. At each level of abstraction, we view the
+system in terms of components, called abstract tools, whose internal composition
+we ignore. This allow us to concentrate on how each component interacts with other
+components at the same level and how the collection as a whole forms a higher-level
+componenet. Thus we are able to comprehend the part of the system that is relevant 
+to the task at hand rather than being lost in a sea of details.
+
+Algorithm has the central role in computer science:
+limitations of algorithm
+execution of algorithm
+communication of algorithm
+representation of algorithm
+discovery of algorithm
+analysis of algorithm
+application of algorithm
+
+

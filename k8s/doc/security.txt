@@ -1,0 +1,130 @@
+authentication plugin +
+  the first return --> username, userid, and group
+
+
+users:
+  humans
+  pods(applicaiton that running inside it) ----> service accounts.
+
+user belongs to group, and they are used to grant permissions.
+groups are strings.
+system:unauthenticated 
+system:authenticated
+system:serviceaccounts
+system:serviceaccounts:<namespace>
+
+every pod associated with a ServiceAccount ---> reprsents the identity of the app
+ServiceAccount --> username == system:serviceaccount:<namespace>:<service account name>
+username -> authorization plugin to check the action to be performed is allowed.
+
+$ kubectl create serviceaccount foo
+
+create a pod use the ServiceAccount
+apiVersion: v1
+kind: Pod
+metadata:
+ name: curl-custom-sa
+spec:
+ serviceAccountName: foo 
+
+
+RBAC(role based access control)
+resources to configure the plugin:
+  Roles / ClusterRole
+  RoleBinding / ClusterRoleBinding
+Role and RoleBinding is namespaced, and ClusterRole/ClusterRoleBinding aren't
+
+create a role:
+1 resource file 
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+ namespace: foo
+ name: service-reader
+rules:
+ - apiGroups: [""]
+   verbs: ["get", "list"]
+   resources: ["services"] 
+
+2 command line
+create role & rolebinding
+$ kubectl create role service-reader --verb=get --verb=list --resource=services -n bar
+$ kubectl create rolebinding test --role=service-reader --serviceaccount=foo:default -n foo
+
+$ kubectl create clusterrole pv-reader --verb=get,list --resource=persistentvolumes
+$ kubectl create rolebinding pv-test --clusterrole=pv-reader --serviceaccount=foo:default -n foo 
+this won't work, for cluster level resource, ClusterRoleBinding is the only way.
+$ kubectl delete rolebinding pv-test
+$ kubectl create clusterrolebinding pv-test --clusterrole=pv-reader --serviceaccount=foo:default
+
+clusterRole ---> rolebinding == make serviceaccount in specified namespace could access the resource
+clusterRole ---> clusterrolebinding == make serviceaccount could access the resource in every namespace
+
+
+default system role and rolebinding
+1 view ClusterRole, allowing read-only access
+2 edit clusterrole, allowing modify resource except role or rolebinding
+3 admin clusterrole, full control of a namespace except the namespaces resource itself
+4 cluster-admin clusterrole, complete control of a k8s clsuter
+
+
+
+network security
+
+1 pod use node's network 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-xxx
+spec:
+  hostNetwork: true //use host node's network space
+
+2 host port 
+two pod with same host port can't be scheduled into one node
+apiVersion: v1
+kind: Pod
+metadata:
+ name: kubia-hostport
+spec:
+ containers:
+ - image: luksa/kubia
+   name: kubia
+   ports:
+   - containerPort: 8080
+     hostPort: 9000
+     protocol: TCP
+it's primarily used for exposing system service
+
+
+2 pod security context
+securityContext could be specified in pod or container level. which is used to 
+limit the user name, privilege related setting
+
+PodSecurityPolicy is the cluster-level resource which used for global security related
+features users can or cann't use in their pods. PodSecurityPolicy admission control plugin
+validate the pod definition when api server get the pod creation request.
+
+PodSecurityPolicy could be used by RBAC to be used for sepcified user/group
+kubectl create clusterrolebinding psp-bob --clusterrole=psp-privileged --user=bob
+
+3 network policy
+CNI plugin must support NetworkPolicy 
+ingress: limit incoming traffic
+egress:  limit outcoming traffic
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+ name: postgres-netpolicy
+spec:
+ podSelector:
+  matchLabels:
+    app: database
+ ingress:
+ - from:
+   - podSelector:
+      matchLabels:
+        app: webserver
+   ports:
+   - port: 5432 
+only pod with label webserver could connec to database pods only through port 5432

@@ -1,0 +1,30 @@
+low level:
+stack frame manipulate
+  how paremeter is passed and in which order
+  who clean the parameter
+  stack protection
+function name mangling
+parameter passing by reference or by value
+ABI
+function inline
+lexcial and dyanmic scope
+
+high level:
+varaiable length parameter
+how to return multiple value
+default value for parameter
+position & key based parameter
+method vs procedure
+constrained base polymorphsm vs interface
+
+functional programming support:
+higher order function
+anonymous function
+pattern matching/precondition (erlang/haskell) 
+curry(multipile parameters == one parameter return another function)
+context(function state) == closure
+parameter based polymorphsm
+multiple parameter based polymorphsm 
+constant is polymorphic, the type of return value is decided at runtime
+
+cross language function invoking (compiler linking?)

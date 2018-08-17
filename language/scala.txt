@@ -1,0 +1,25 @@
+implicit is not a thing, there are several distinct ideas, all of them
+use same keyword implicit:
+1 implicit parameter
+2 implicit val and implicit def taking only implicit parameters
+3 implicit def taking one parameter - implicit conversion
+4 implicit class
+
+implicit parameter:
+mark varaible as special
+call function with implicit parameter without pass the parameter explicitly
+the compile will help to search the implicit parameter in scope
+
+
+(polymorphism:
+ 1 subtype
+    inheritance, interface
+ 2 parametric 
+    template, abstract inner type
+ 3 ad-hoc
+    function based
+    dispatch based on parameter)
+
+functional programming make too long parameter list a normal case, implicit
+is a way to let compile to info the parameter for programmig to void typing
+too many biloplate

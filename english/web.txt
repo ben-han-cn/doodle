@@ -1,0 +1,6 @@
+In general, only static languages are amenable to AOT compilation into 
+native machine code because machine languages typically need to know the 
+type of data, and in dynamic languages the type is not fixed ahead of time. 
+Consequently, dynamic languages are typically interpreted or JIT compiled.
+
+

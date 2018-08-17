@@ -1,0 +1,43 @@
+modify an existing resource
+
+kubectl edit                   opens the object's manifest in default editor. after make the 
+                               changes, the object is updated
+                               kubectl edit deployment kubia
+
+kubectl patch                  modify individual properties of an object
+                               kubectl patch deployment kubia -p ''
+
+kubectl apply                  modify the object by applying property values from a full yaml/json 
+                               file. if the object specified doesn't existyet, it's created.
+                               the file needs to contain the full definition of the resource.
+                               kubectl apply -f kubia-deployment-v2.ymal
+
+krubectl replace               replace the object with a new one from a yaml/json file, in contrast                                to apply command, this command requires the object exists, otherwise                                it returns error
+                        
+kubectl set image              change the container image defined in a pod. rc template, deployment,                               domainset, join or replicaset
+                               kubectl set image deployment kubia nodejs=luksa/kubia:v2
+
+
+execute cmd in a container inside a pod
+$ kubectl exec fortune-configmap-volume -c web-server cat /etc/nginx/conf.d/my-nginx-config.conf
+$ kubectl exec fortune-configmap-volume -c web-server -- nginx -s reload
+
+
+configmaps -- cm
+daemonsets -- ds
+deployments -- deploy
+endpoints   -- ep
+events      -- ev
+igresses    -- ing
+namespaces  -- ns
+nodes       -- no
+persistentvolumes  -- pv
+persistentvolumnclaims -- pvc
+pods      -- po
+replicasets -- rs
+replicationcontrollers -- rc
+resourcequotas -- quota
+services -- svc
+serviceaccounts -- sa
+
+

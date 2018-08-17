@@ -1,0 +1,111 @@
+1 Delete old pods then add new pods
+  push new docker image with new version v1
+  update the template of the replication set 
+  kill old pods
+  replication set will create new pods with new version docker image
+
+2 after start new pods then delete old ones
+  create new replication set to start new pods
+  change service label selector to make it switch to new pods
+  delete old replication set which will delete old pods
+
+3 rolling update to replace one by one
+  create new replication set to start new pods
+  slowly scaling down the old replication set and scaling up the new replication set
+
+
+roll automatically
+use one yaml file to create two resource, '---' is used to seperate
+
+apiVersion: v1
+kind: ReplicationController
+metadata:
+ name: kubia-v1
+spec:
+ replicas: 3
+ template:
+ metadata:
+ name: kubia
+ labels:
+  app: kubia
+ spec:
+ containers:
+ - image: luksa/kubia:v1
+ name: nodejs
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: kubia
+spec:
+ type: LoadBalancer
+ selector:
+ app: kubia
+ ports:
+ - port: 80
+ targetPort: 8080
+
+$ kubectl rolling-update kubia-v1 kubia-v2 --image=luksa/kubia:v2
+//what rolling-update really do is
+//update all v1 pods labels add deployment=757d16a0f02f6a5c387f2b5edb62b155
+//update add v2 pods labels add deployment=3ddd307978b502a5b975ed4045ae4964-orig
+then create new ReplicationController kubia-v2
+then scaling kubia-v2 from 0 to 3, scaling kubia-v1 down from 3 to 0
+use different deployment to select different pods
+
+this method is obselete now, because, the method is more imperative rather than a  
+declare way which is the basic principle of k8s
+
+
+deployment is the way to management deploy and update
+
+deployment --> ReplicaSet --> Pods...
+deployment is quit similar with ReplicaSet
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+ name: kubia
+spec:
+ replicas: 3
+ type: RollingUpdate //Recreate
+ template:
+  metadata:
+    name: kubia
+    labels:
+      app: kubia
+  spec:
+    containers:
+    - image: luksa/kubia:v1
+      name: nodejs
+
+$ kubectl create -f kubia-deployment-v1.yaml --record
+deployment will create replicaset, the name replicaset will be name of the deveopment + 
+hash of the pod template, in this case kubia-1506449474
+
+//update the image
+$ kubectl set image deployment kubia nodejs=luksa/kubia:v2
+deployment will create new replicaset, and do the automatically scaling the two replicaset
+automatically. after the update, the two replicaset are both kept
+$ kubectl set image deployment kubia nodejs=luksa/kubia:v3
+//roll back
+$ kubectl rollout undo deployment kubia
+$ kubectl rollout history deployment kubia //check the history
+deployments "kubia":
+REVISION CHANGE-CAUSE
+2        kubectl set image deployment kubia nodejs=luksa/kubia:v2
+3        kubectl set image deployment kubia nodejs=luksa/kubia:v3
+
+//rollback to specified version
+$ kubectl rollout undo deployment kubia --to-revision=1
+
+actually, deployment is a replicaset manager, which keep a sequence of replicaset, and scaling
+up and down between them.
+
+//pause then resume the rollout, which could be used to only run a single new pod
+$ kubectl rollout pause deployment kubia
+$ kubectl rollout resume deployment kubia
+
+minReadySeconds specifiy how long a newly created pod should be ready before the pod is 
+treated as available. A pod is ready when readiness probes of all its containers return a
+success. if a new pod isn't ready before the minReadySeconds, the rollout of deployment will
+be blocked.

@@ -1,0 +1,15 @@
+functional linux:
+    bootloader
+    linux kernel
+    root file system
+
+root file system:
+    init/inittab ---> GNU c lib (libc.so.x) and dynamic linker (ld-linux.so.x)
+    bash --> libtermcap.so.x, libdl.so.x , libc.so.x, ld-linux.so.x
+    other cmds in bin/sbin
+    (note, libtermcap is obsoleted by ncurses)
+    
+base daemon(optional):
+    syslog
+    cron
+    ssh
