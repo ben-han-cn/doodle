@@ -1,5 +1,8 @@
-role ---> what can be done
+RABC (role based access control)
+  can _(who, subject) _(verb) _(object, resource)?
 
+
+role ---> what can be done
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -91,3 +94,12 @@ spec:
 
 authority check:
 k2 auth can-i list pods -n default --as=system:serviceaccount:default:default
+
+role binding could binding role to:
+user, group, service account
+
+general purpose default cluster roles:
+cluster-admin ----> super user
+admin, edit, view ----> namespaced user roles
+
+

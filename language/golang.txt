@@ -26,8 +26,15 @@ func (b *putBuffer) release() {
 //go race check
 go test -race
 
+
+//all go routine stack
+buf := make([]byte, 1<<16)
+runtime.Stack(buf, true)
+fmt.Printf("--->:%s\n", string(buf))
+
 golang resourceleak:
 1 ticker:
     ticker := time.NewTicker(memoryCheckInterval)
     defer ticker.Stop()
     
+

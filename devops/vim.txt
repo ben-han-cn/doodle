@@ -12,3 +12,5 @@ g/pattern/norm! @q  #apply the macro  to line match the pattern
 
 ctrl - n  #next match word
 ctrl - p  #prev match word
+
+/\ctarget #case insensitive search

@@ -1,0 +1,133 @@
+k8s.io/kubernetes/cmd/kubelet/app/server.go -> startKubelet(991)
+
+k.Run(podCfg.Updates())
+if enableServer
+    k.ListenAndServe
+
+if ReadOnlyPort > 0
+    k.ListenAndServeReadOnly
+
+
+
+k8s.io/kubernetes/pkg/kubelet/kubelet.go
+Run:
+    go kl.volumeManager.Run(kl.sourcesReady, wait.NeverStop)
+    kl.syncNodeStatus
+    kl.updateRuntimeUp
+    kl.syncNetworkUtil
+    kl.podKiller
+    kl.dnsConfigurer.CheckLimitsForResolvConf()
+
+    kl.statusManager.Start()
+    kl.probeManager.Start()
+    kl.pleg.Start()
+    kl.syncLoop(updates, kl)
+
+
+syncLoop
+    syncLoopIteration
+        case u, open := <-configCh:
+            case kubetypes.ADD:
+                handler.HandlePodAdditions(u.Pods)
+
+
+HandlePodAdditions(pods []*v1.Pod)
+    sort.Sort(sliceutils.PodsByCreationTime(pods))
+    for _, pod := range pods {
+        kl.podManager.AddPod(pod)
+    }
+    mirrorPod, _ := kl.podManager.GetMirrorPodByPod(pod)
+    kl.dispatchWork(pod, kubetypes.SyncPodCreate, mirrorPod, start)
+    kl.probeManager.AddPod(pod)
+
+dispatchWork
+    kl.podWorkers.UpdatePod(&UpdatePodOptions{
+         Pod:        pod,
+         MirrorPod:  mirrorPod,
+         UpdateType: syncType,
+         OnCompleteFunc: func(err error) {
+             if err != nil {
+                 metrics.PodWorkerLatency.WithLabelValues(syncType.String())\
+                            .Observe(metrics.SinceInMicroseconds(start))
+             }
+         },
+     })
+
+k8s.io/kubernetes/pkg/kubelet/pod_workers.go 
+UpdatePod(options *UpdatePodOptions) 
+    go func() {
+        defer runtime.HandleCrash()
+        p.managePodLoop(podUpdates)
+    }()
+    podUpdates <- *options
+
+
+managePodLoop
+    workers.syncPod --> kubelet.syncPod (kubelet.go)
+
+syncPod
+    apiPodStatus := kl.generateAPIPodStatus(pod, podStatus)
+    pcm := kl.containerManager.NewPodContainerManager()
+    if pod is static { //same as daemon set
+        kl.podManager.CreateMirrorPod(pod)
+    }
+    kl.makePodDataDirs(pod)
+    kl.volumeManager.WaitForAttachAndMount(pod)
+    kl.containerRuntime.SyncPod
+
+
+k8s.io/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager.go
+SyncPod
+    Compute sandbox and container changes.
+    Kill the pod if the sandbox has changed.
+    kill any running containers in this pod which are not to keep.
+    Create a sandbox for the pod if necessary.
+        createPodSandbox
+    start the init container
+        m.startContainer
+    start containers in podContainerChanges.ContainersToStart.
+
+kuberuntime_sandbox.go       
+createPodSandbox
+    m.runtimeService.RunPodSandbox(podSandboxConfig)
+
+
+k8s.io/kubernetes/pkg/kubelet/dockershim/docker_sandbox.go
+RunPodSandbox
+    ensureSandboxImageExists
+    CreateContainer
+    StartContainer
+    rewriteResolvFile
+    ds.network.SetUpPod ---> CNI plugin
+        
+
+func (m *kubeGenericRuntimeManager) startContainer
+    //pull the image
+    m.imagePuller.EnsureImageExists(pod, container, pullSecrets)
+    //create the container
+    kubecontainer.GenerateContainerRef(pod, container)
+    m.runtimeService.CreateContainer
+    //start the container
+    m.runtimeService.StartContainer
+    //run the post start lifecycle hooks (if applicable)
+    m.runner.Run(kubeContainerID, pod, container, container.Lifecycle.PostStart)
+
+
+CreateContainer:
+    k8s.io/kubernetes/pkg/kubelet/apis/cri/runtime --> protobuf rpc
+
+    
+
+
+NewMainKubelet:
+    ds, err := dockershim.NewDockerService
+    klet.criHandler = ds
+    server := dockerremote.NewDockerServer(remoteRuntimeEndpoint, ds)
+    server.Start() ---> ds(service).Start() --> create grpc client and start shim service
+
+
+dockershrim:
+    func (ds *dockerService) Start() error 
+        ds.streamingServer.Start()
+        ds.containerManager.Start()
+    

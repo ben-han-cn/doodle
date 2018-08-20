@@ -42,3 +42,5 @@ kubectl taint nodes node1.k8s key:NoSchedule-
 taints are a way to repel intolerant pods.
 node can have several taints
 pod can have several tolerations
+if node has several taints, and the pod has to meet every taint to be
+scheduled to that node

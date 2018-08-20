@@ -1,0 +1,37 @@
+base chain:
+    INPUT
+    FORWARD
+    OUTPUT
+
+-s source address
+-d destination address
+-p protocol
+-j action
+-P default policy for a chain
+-D delete a rule for a chain by index from 1
+-R replace a rule for a chain
+-F remove all rules for sepecified chain
+-L list chain rule
+-A append/add rule to end of chain
+-i nic
+-I Insert one or more rules in the selected chain as the given rule number.
+-m Specifies a match to use, that is, an extension module that tests for a specific property.
+
+iptables -A INPUT -j ACCEPT -p tcp --destination-port 80 -i eth0
+
+final(last) rule is the catch all rule
+iptables -A INPUT -j DROP -p tcp -i eth0
+
+
+iptables-save > /root/iptables-bakcup-`date +%F`
+iptables-restore < /root/iptables-bakcup-2014-04-14
+
+
+-I INPUT 1 -m start --state RELATED,ESTABLISHED -j ACCEPT
+-I OUTPUT 1 -m start --state RELATED,ESTABLISHED -j ACCEPT
+
+iptables -A INPUT -p tcp -syn -m multiport --dport 80,443 -m connlimit --connlimit-above 20 -j REJECT \
+    --reject-with-tcp-reset
+
+
+masquerade == source NAT

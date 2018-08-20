@@ -1,0 +1,11 @@
+dockershim:
+    kubelet <--CRI--> dockershim <---> docker <--> containerd ---> runc --> container
+
+cri-containerd
+    kubelet <--CRI--> cri-containerd <--> containerd --> runc --> container
+
+
+OCI(open container initiative) --> which runc compiant
+    image format
+    runtime
+    
