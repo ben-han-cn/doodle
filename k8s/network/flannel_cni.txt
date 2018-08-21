@@ -1,0 +1,74 @@
+flannel delegate code to bridge
+ 
+func cmdAdd(args *skel.CmdArgs) error {
+     if !hasKey(n.Delegate, "type") {
+         n.Delegate["type"] = "bridge"
+     }
+ 
+     if !hasKey(n.Delegate, "ipMasq") {
+         // if flannel is not doing ipmasq, we should
+         ipmasq := !*fenv.ipmasq
+         n.Delegate["ipMasq"] = ipmasq
+     }
+ 
+     if !hasKey(n.Delegate, "mtu") {
+         mtu := fenv.mtu
+         n.Delegate["mtu"] = mtu
+     }
+ 
+     if n.Delegate["type"].(string) == "bridge" {
+         if !hasKey(n.Delegate, "isGateway") {
+             n.Delegate["isGateway"] = true
+         }
+     }
+     if n.CNIVersion != "" {
+         n.Delegate["cniVersion"] = n.CNIVersion
+     }
+ 
+     n.Delegate["ipam"] = map[string]interface{}{
+         "type":   "host-local",
+         "subnet": fenv.sn.String(),
+         "routes": []types.Route{
+             types.Route{
+                 Dst: *fenv.nw,
+             },
+         },
+     }
+ 
+     return delegateAdd(args.ContainerID, n.DataDir, n.Delegate)
+}
+
+bridge.go
+func cmdAdd(args *skel.CmdArgs) error {
+    br, brInterface, err := setupBridge(n)
+    hostInterface, containerInterface, err := setupVeth(netns, br, args.IfName, n.MTU, n.HairpinMode)
+    //run ipam
+    ipam.ExecAdd(n.IPAM.Type, args.StdinData)
+    result, err := current.NewResultFromResult(r)
+    gwsV4, gwsV6, err := calcGateways(result, n)
+    ipam.ConfigureIface(args.IfName, result)
+    ip.SetHWAddrByIP()
+    ip.SetupIPMasq() ---> iptable
+
+
+ipam/host-local/main.go
+//if request specified ip, it will check the ip could be allocated or not
+//otherwise it will use the passed subnet range to allocate one address
+func cmdAdd(args *skel.CmdArgs) error {
+    ipamConf, confVersion, err := allocator.LoadIPAMConfig(args.StdinData, args.Args)
+    store, err := disk.New(ipamConf.Name, ipamConf.DataDir)
+    for idx, rangeset := range ipamConf.Ranges {
+        allocator := allocator.NewIPAllocator(&rangeset, store, idx)
+        ipConf, err := allocator.Get(args.ContainerID, requestedIP)
+        result.IPs = append(result.IPs, ipConf)
+    }
+    result.Routes = ipamConf.Routes
+}
+
+store will store all allocated ip in /var/lib/cni/networks/cbro
+10.42.0.2  10.42.0.3  10.42.0.4  10.42.0.7  last_reserved_ip.0
+use allocated ip address as file, and in each file it will save
+the pause container id in each pod 
+
+except host-local ipam support dhcp, which will use dhcp protocol 
+to acquire ip address

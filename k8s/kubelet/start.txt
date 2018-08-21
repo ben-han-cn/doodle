@@ -117,8 +117,6 @@ CreateContainer:
     k8s.io/kubernetes/pkg/kubelet/apis/cri/runtime --> protobuf rpc
 
     
-
-
 NewMainKubelet:
     ds, err := dockershim.NewDockerService
     klet.criHandler = ds

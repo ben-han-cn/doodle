@@ -9,3 +9,5 @@ OCI(open container initiative) --> which runc compiant
     image format
     runtime
     
+
+pod sandbox == infrastructure container ---> initalize env (namespace, network..)

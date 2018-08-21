@@ -1,0 +1,64 @@
+type CNI interface {
+    AddNetworkList(net *NetworkConfigList, rt *RuntimeConf) (types.Result, error)
+    DelNetworkList(net *NetworkConfigList, rt *RuntimeConf) error
+
+    AddNetwork(net *NetworkConfig, rt *RuntimeConf) (types.Result, error)
+    DelNetwork(net *NetworkConfig, rt *RuntimeConf) error
+}
+
+kubelet dockershim 
+    cni plugin
+        based on confpath("/etc/cni/net.d"), binpath("/opt/cni/bin") --> cniNetwork
+        type cniNetworkPlugin struct {
+            defaultNetwork *cniNetwork
+        }
+
+
+        type cniNetwork struct {
+            name          string
+            NetworkConfig *libcni.NetworkConfigList
+            CNIConfig     libcni.CNI
+        }
+
+        rt, err := plugin.buildCNIRuntimeConf(podName, podNamespace, podSandboxID, podNetnsPath)
+        CNIConfig.AddNetworkList(NetworkConfig, rt)
+
+
+buildCNIRuntimeConf(podName, podNamespace, podSandboxID, podNetnsPath)
+    rt := &libcni.RuntimeConf{
+        ContainerID: podSandboxID.ID,
+        NetNS:       podNetnsPath,
+        IfName:      network.DefaultInterfaceName,
+        Args: [][2]string{
+            {"IgnoreUnknown", "1"},
+            {"K8S_POD_NAMESPACE", podNs},
+            {"K8S_POD_NAME", podName},
+            {"K8S_POD_INFRA_CONTAINER_ID", podSandboxID.ID},
+        },  
+    }
+    rt.CapabilityArgs = map[string]interface{}{
+        "portMappings": portMappingsParam,
+    }
+
+
+
+//github.com/containernetworking/cni/libcni
+CNIConfig.AddNetworkList: iterator all the plugins in config file, revoke ADD
+    for _, net := range list.Plugins {
+        pluginPath, err := invoke.FindInPath(net.Network.Type, c.Path)
+        if err != nil {
+            return nil, err
+        }
+
+        newConf, err := buildOneConfig(list, net, prevResult, rt)
+        if err != nil {
+            return nil, err
+        }
+
+        prevResult, err = invoke.ExecPluginWithResult(pluginPath, newConf.Bytes, c.args("ADD", rt))
+        if err != nil {
+            return nil, err
+        }
+    }
+
+    return prevResult, nil
