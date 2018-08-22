@@ -1,0 +1,10 @@
+pod which is directly created and managed by kubelet is static pod.
+k8s api server has no idea about it. but kubelet will create mirror
+pod for each static pod, in this way, k8s dashboard could display 
+static pod, but api server couldn't manage mirror pod.
+
+
+select a folder ---> /etc/kubernetes/manifests
+set parameter to kubelet ---> --pod-manifest-path=/etc/kubernetes/manifests 
+                              --sync-frequency 30s
+restart kubelet

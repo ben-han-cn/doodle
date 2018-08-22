@@ -1,0 +1,94 @@
+ConfigMap:
+ bind configuration artifacts to Pods' containers and system components at runtime. 
+
+configmap could be created use 
+    1 file and its content (file base name as key)
+    2 literal key value pair
+
+kubectl create configmap game-data --from-file folder/
+kubectl create configmap game-data --from-file xxx/f1 -from-file xxx/f2.json
+
+which is same as:
+apiVersion: v1
+kind: ConfigMap
+metadata: 
+    name: xxx
+    namespace: default
+data:
+  f1: |
+    enemies=aliens
+    lives=3
+    ...
+  f2.json: |
+    {
+      "name":"cbr0",
+      "cniVersion":"0.3.1",
+      "plugins":[
+        {
+          "type":"flannel",
+          "delegate":{
+            "forceAddress":true,
+            "isDefaultGateway":true
+          }
+        },
+        {
+          "type":"portmap",
+          "capabilities":{
+            "portMappings":true
+          }
+        }
+      ]
+    }
+    ...
+
+
+kubectl create configmap literal-data --from-literal key1=value1 --from-literal key2=value2
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: kube-flannel-cfg
+    namespace: defalt
+data:
+  key1: value1
+  key2: value2
+
+use the configmap
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: kube-flannel
+  namespace: "kube-system"
+spec:
+  template:
+    metadata:
+      labels:
+        tier: node
+        k8s-app: flannel
+    spec:
+      containers:
+      - name: kube-flannel
+        image: xxxxxxx
+        env:
+        - name: CNI_NETWORK_CONFIG
+          valueFrom:
+            configMapKeyRef:
+              name: kube-flannel-cfg
+              key: f2.json
+        volumeMounts:
+          - name: flannel-cfg
+            mountPath: /etc/kube-flannel/
+    volumes:
+      - name: flannel-cfg
+        configMap:
+            name: kube-flannel-cfg
+
+
+this will cause:
+$ docker exec 218ce8751d1a ls /etc/kube-flannel
+f1
+f2.json
+
+using configMapKeyRef ---> content of f2.json will set as the 
+value of env CNI_NETWORK_CONFIG
+
+note: mountPath shouldn't be /etc, k8s will report read only rootfs

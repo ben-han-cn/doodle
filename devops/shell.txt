@@ -45,3 +45,12 @@ find . -name "*.go" -exec grep -wn 'main' {} \;
 
 //remove all containers
 docker rm -f $(docker ps -a -q)
+
+
+sudo adduser --ingroup ty zheng
+// add user to supplementary group
+sudo usermod -a -G other zheng
+// primary group assigned to the users
+sudo usermod -g other zheng
+// remove user from other groups except primary group
+sudo usermod -G "" zheng

@@ -86,7 +86,7 @@ EOF
 
 docker build -t image_name:v1 .
 
-docker container run --rm -d --name web1 -p 8080:8080 test:latest
+docker container run --rm -d --name web1 -p 8080:8080/udp test:latest
 docker run --rm -it --name counter-test -v /home/vagrant/workspace/code/go/src/counterservice:/counterservice alpine
 //host path should be full path
 
