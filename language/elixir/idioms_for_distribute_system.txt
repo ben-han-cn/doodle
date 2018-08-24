@@ -1,0 +1,10 @@
+1 isolation
+2 concurrency 
+3 failure detection
+4 fault identification
+5 live code upgrade
+6 stable storage
+
+
+explicit instead of implicit state
+transformation instead of mutation

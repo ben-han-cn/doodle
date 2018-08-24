@@ -1,0 +1,8 @@
+pvc ---> storage class --> GlusterFS provisioner --> 
+    Heketi (REST interface)
+
+Heketi
+    create logical volumes on the LVM system as brick
+    configure a GlusterFS volume with those bricks
+    
+    dynamically create pv to satisfy pvc request

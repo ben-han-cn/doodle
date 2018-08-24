@@ -56,10 +56,6 @@ function synctime {
 export PS1='s1\$ '
 
 
-sudo apt-get install virtualbox
-sudo apt-get install vagrant
-vagrant plugin install vagrant-disksize //used to expand disk size
-
 golang net/x
 https://github.com/golang/net.git
 

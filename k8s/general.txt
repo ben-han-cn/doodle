@@ -29,3 +29,16 @@ pod:
 
 
     relative to vm
+
+
+k8s philosophy:
+1 Declarative over imperative
+    tell what to do instead of how
+2 No hidden api and event driven
+    user ---> create pod request to api server --> update etcd
+    scheduler monitor the pod create event ---> select node ---> update the pod object
+    kubelet monitor the pod update event ---> run the pod scheduled to it 
+    it means all the componenet whether its built-in or third parity use the same mechanism
+3 work load protability
+    same deployment could be runned into any k8s cluster, no matter it's private or public,
+    Any node or hardware binding is very bad pratcice

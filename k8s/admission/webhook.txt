@@ -1,0 +1,11 @@
+Kubernetes submits an AdmissionReview to your webhook, containing
+    an AdmissionRequest, which has
+        a UID
+        a Raw Extension carrying full json payload for an object, such as a Pod
+        And other stuff that you may or may not use
+Based on this information you apply your logic and you return a new AdmissionReview
+The AdmissionReview contains an
+    AdmissionResponse which has
+        the original UID from the AdmissionRequest
+        A Patch (if applicable)
+        The Allowed field which is either true or false

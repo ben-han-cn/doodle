@@ -1,8 +1,8 @@
-funciton, operator
-control flow
+data manipulate:
+    eager --> stream --> concurreny/parallelism
 
-variable -> data, type
-constants
-literal
 
-package
+stream pipeline:
+    producer --> consumer/producer --> consumer/producer --> ... --> consumer
+    demand driven(consumer tell producer its capacity)
+

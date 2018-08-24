@@ -1,0 +1,19 @@
+Docker images are stored as series of read-only layers. When we start a container, 
+Docker takes the read-only image and adds a read-write layer on top. If the running 
+container modifies an existing file, the file is copied out of the underlying read-only 
+layer and into the top-most read-write layer where the changes are applied. The version 
+in the read-write layer hides the underlying file, but does not destroy it — it still 
+exists in the underlying layer. When a Docker container is deleted, relaunching the image 
+will start a fresh container without any of the changes made in the previously running 
+container — those changes are lost. 
+Docker calls this combination of read-only layers with a read-write layer on top 
+a Union File System.
+
+In order to be able to save (persist) data and also to share data between containers Docker 
+came up with the concept of volumes. Quite simply, volumes are directories (or files) that 
+are outside of the default Union File System and exist as normal directories and files on 
+the host filesystem.
+
+When lanch container useing -v to share file between host and container, docker doesn't create
+volumn, it just mount the host directory into the container. Instead, normal volumn is resides
+in host path /var/lib/dockder/volumens/....

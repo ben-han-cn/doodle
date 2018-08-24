@@ -1,0 +1,21 @@
+Ceph (software defined storage)
+Unified storage which support blocks, files and object storage from 
+a single system.
+
+No metadata lookup or controller node through CRUSH
+
+CRUSH(Controlled replication under scalable hashing)
+    computes on demand where the data should be written to or read from
+    Infrastructure awereness 
+    Self-managing and self healing
+
+components:
+OSD -- object storage device
+MON -- monitor
+MDS -- metadata server used by ceph fs
+|
+RADOS -- reliable autonomic distributed object store
+|
+librados
+|
+RBD (block device) , RGW (gateway interface), CephFS
