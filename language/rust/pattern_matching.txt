@@ -1,0 +1,86 @@
+pattern mainly used in:
+    variable binding  //let pattern = expression 
+                        fn print_coor(&(x, y): &(i32, i32)) {
+                        }
+
+    match statement   // match value {
+                            pattern1 => express1,
+                            pattern2 => express2,
+                            pattern3 => express3,
+                         }
+
+
+
+let &mut x = &mut 10;   // with pattern matching, type of x is integer 
+*x = 10;                // compile error: type `{integer}` cannot be dereferenced
+
+let x: &mut i32 = &mut 10;
+*x = 20; 
+
+let mut x = 10; // with or without mut, x's type is integer
+                // mut only make x modifiable, more like a compile syntex check
+
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+let Point{x, y} = Point{x:1, y:2}; // x==1, y==2
+let Point{x:x1, y:y1} = Point{x:1, y:2}; // x1==1, y1==2
+let Point{x, ..} = Point{x:1, y:2}; // x1==1, y1==2
+let (x, .., z) = (2, 3, 4, 5); //x == 2, z == 5
+
+
+//refutable patten match, which the matching might fail
+if let Some(color) = favorate_color {
+    ...
+}
+while let Some(top) = stack.pop() {
+    ...
+}
+for (index, value) in v.iter().enumberate() {
+    ...
+}
+
+//irrefutable pattan match
+let x = some_option_value;
+
+//the following match will fail
+let Some(x) = some_option_value; 
+if let x = 10 {
+    ...
+}
+
+
+//multi patterns
+let x = 1;
+match x {
+    1 | 2 => println!(),
+    3 => xxx,
+    _ -> xxx,
+}
+//match range
+match x {
+    1 ... 5 => xxx, //'a' ... 'j'
+    _ => xxxx,
+}
+
+
+
+let robot_name = Some(String::from("xxx"));
+match robot_name {
+    Some(name) => xxxx, //move ownership to name
+    Some(&name) => xxxx, //compile error, expect reference but get String
+    Some(ref name) => xxxx, //create a reference to matching variable
+    Some(ref mut name) => xxxx, //create a mut reference to matching variable
+}
+
+let msg = Message::Hello{id : 5};
+match msg {
+    Message::Hello{id: val@3...7} => {},
+    Message::Hello{id: 10...12} => {},
+    Message::Hello{id} => {
+        println!("found id: {}", id)
+    },
+}
