@@ -20,3 +20,45 @@ struct Data {
     character: char,
 }
 struct Data(i32, f32, char);
+
+
+let mut v = Vec::<usize>::new();
+let mut v = Vec::<usize>::with_capacity(1000);
+v.push(i);
+v.pop();
+v.remove(0);
+v.insert(1, 100);
+
+queue:
+let mut q = std::collections::VecDeque::<usize>::new();
+q.push_back(19);
+q.pop_front();
+q.push_front(20);
+q.pop_back();
+
+
+let mut h = std::collections::BinaryHeap::<i32>::new();
+h.push(10);
+h.push(20);
+let end = h.pop().unwrap();
+
+//unordered set
+let mut s = std::collections::HashSet::<i32>::new();
+//ordered set
+let mut s = std::collections::BTreeSet::<i32>::new();
+s.insert(10);
+s.contains(s);
+
+//unordered map
+let mut m = std::collections::HashMap::<_, _>::new();
+//ordered map
+let mut m = std::collections::BTreeMap::<_, _>::new();
+m.insert(key, value);
+for (k, v) in m.iter() {
+}
+
+s.insert(10);
+s.contains(s);
+
+
+

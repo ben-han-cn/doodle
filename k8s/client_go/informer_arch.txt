@@ -105,3 +105,15 @@ func NewIndexer(keyFunc KeyFunc, indexers Indexers) Indexer {
         keyFunc:      keyFunc,
     }   
 }
+
+//store is used as a local data source, informer will update it, and it
+//should only be read by client own code, after some logic check use clientset
+//to update the related resource
+
+n := store.GetByKey(namespace + "/" + nodeName)
+copy := n.DeepCopyObject().(*v1.Node)
+copy.Annotations["reboot-now"] = "true"
+client.Core().Nodes().Update(copy)
+
+//since store is read only in client code, all the modification to the object get
+//from it should be copied before update

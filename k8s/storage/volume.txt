@@ -35,8 +35,6 @@ erased when pod is removed, the contents of an nfs volume are preserved.
   adminstrator/operator provides PV (abstraction about physical storage)
   user write PVC to consume the storage, some details will be hide from end user
 
-
-
 pod:
   volumeMounts:
     /foo
@@ -62,6 +60,11 @@ Persistent Volumn: staitc storage
 
 Storage Class:  dynamic storage 
 
-
 two pods could share the same pvc
 pvc is bind to pv which is done by controller, the bind is exclusive
+
+
+local disk:
+1 disk preparation
+2 open source lv provisioner 
+https://github.com/kubernetes-incubator/external-storage/tree/master/local-volume

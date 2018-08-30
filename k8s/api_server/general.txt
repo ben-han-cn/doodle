@@ -19,8 +19,7 @@ jobs/resources is sub resource of jobs
 multi-version object:
 different url to get one object
 conversion between version is automatically
-only one stroage version ---> encoding(protobuf/json) ---> etcd 
-
+only one storage version ---> encoding(protobuf/json) ---> etcd 
 
 discovery:
 host/apis/
@@ -109,3 +108,26 @@ etcd data:
     /registry/services/endpoints/default/kubernetes
  pods:
     /registry/pods/default/counter
+
+
+
+lifetime of request
+authentication --> RBAC/authorization --> Admission control --> Validation
+
+speciallize request
+/logs ---> opened connection
+/Proxy, /exec, /attach --> http2/websocket + multi-plexed streaming protocol
+watch
+
+resource version is used to avoid conflict update
+
+CRD(custom resource definitions) Control loop
+for crd in AllCustomResourceDefinitions:
+    if !RegisteredPath(crd):
+        registrPath
+
+for path in AllRegisteredPaths:
+    if !CustomResourceExists(path):
+        markPathInvalid(path)
+        delete custom resource data
+        delete path

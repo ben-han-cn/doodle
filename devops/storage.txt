@@ -1,0 +1,36 @@
+lvm (logical volumen management)
+physical volumn
+volume group  ---> logical device
+logical volumn ---> equivalent to partition, but could span several hard driver
+
+device/driver ---> /dev/sda
+partition     ---> /dev/sda1, /dev/sda2, one partition one file system
+
+sudo lvmdiskscan
+sudo pvcreate /dev/sda /dev/sdb --> create physical volume
+sudo pvs
+sudo vgcreate LVMVolGroup /dev/sda /dev/sdb --> create volume group
+sudo vgs
+//create logical volumn
+sudo lvcreate -L 10G -n projects LVMVolGroup
+sudo lvcreate -L 5G -n www LVMVolGroup
+sudo lvcreate -L 20G -n db LVMVolGroup
+sudo lvcreate -l 100%FREE -n workspace LVMVolGroup
+
+//format -- create file system
+sudo mkfs.ext4 /dev/LVMVolGroup/projects
+sudo mkfs.ext4 /dev/LVMVolGroup/www
+sudo mkfs.ext4 /dev/LVMVolGroup/db
+sudo mkfs.ext4 /dev/LVMVolGroup/workspace
+
+//mount make it useable
+sudo mount /dev/LVMVolGroup/projects /mnt/projects
+sudo mount /dev/LVMVolGroup/www /mnt/www
+sudo mount /dev/LVMVolGroup/db /mnt/db
+sudo mount /dev/LVMVolGroup/workspace /mnt/workspace
+
+//save into /etc/fstab
+/dev/LVMVolGroup/projects /mnt/projects ext4 defaults,nofail 0 0
+/dev/LVMVolGroup/www /mnt/www ext4 defaults,nofail 0 0
+/dev/LVMVolGroup/db /mnt/db ext4 defaults,nofail 0 0
+/dev/LVMVolGroup/workspace /mnt/workspace ext4 defaults,nofail 0 0

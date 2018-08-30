@@ -5,3 +5,14 @@ oct - nov:
     vanguard replacement
 dec:
     network solotion analysis + ipam support
+
+
+
+
+cloud dns:
+    low ttl/dynamic --- support more backend, file, etcd, database
+    srv     --- sevice description including ip and port
+    orchestration integration --- service descovery
+    metric and healthy check
+    plugin support, easy extension without affect the core business
+    

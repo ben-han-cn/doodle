@@ -1,0 +1,40 @@
+direct schedule
+    set the nodeName directly
+
+
+scheduler:
+    predicates == whether a pod fits into a particular node
+    priorities == choose one node if several nodes fit the pod
+
+
+schedule(pod): string (node name)
+    nodes := getAllHealtyNodes()
+    viableNodes := []
+    for node in nodes:
+        for predicate in predicates:
+            if predicate(node, pod):
+                viableNodes.append(node)
+
+    scoredNodes := PriorityQueue<score, Node[]>
+    priorties := GetPriorityFunctions()
+    for node in viableNodes:
+        score = CalculateCombinedPriority(node, pod, priorities)
+        scoredNodes[score].push(node)
+
+    bestScore := scoredNodes.top().score
+    selectedNodes := []
+    while scoredNodes.top().score == bestScore:
+        selectedNodes.append(scoreNodes.pop())
+    
+    node := selectAtRandom(selectedNodes)
+    return node.Name
+
+schedule conflicts/delay:
+    during the lag time between pod scheduler decision is made(t1) and the 
+containers of pod is actually runned in node(t2), env maybe modified and the
+schedule decision became inappropriate even some hard-constraint is violated.
+    When the node notices that it has been asked to run a pod no longer passes
+the predicates for the pod and node, the pod is marked as failed, if the pods
+has been created by a ReplicaSet, this failed pod doesn't count as an active
+member of ReplicaSet and thus a new pod will be create and scheduled onto a
+different node where it fits.

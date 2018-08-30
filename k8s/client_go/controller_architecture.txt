@@ -93,3 +93,8 @@ codec-gen
 4 never modify resources in the cache
 5 define conversions between external versions
 
+
+queue is useful in following scenario:
+    rate limiting
+    collapse multiple object updates into a single one in case update is too frequent
+    wait for cache synced before processing events

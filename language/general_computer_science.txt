@@ -16,4 +16,14 @@ discovery of algorithm
 analysis of algorithm
 application of algorithm
 
+language performance:
+interpeter  ---> native code 
+    AOT, JIT
+static      ---> dynamic type system 
+    type could be infered by compiler, or has to be checked at runtime
 
+function dispatch
+memory allocation, pointer redirection
+abstract, concrete type and type parameter
+type and memory management
+macro and function inline
