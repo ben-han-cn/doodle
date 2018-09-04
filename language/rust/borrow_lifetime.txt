@@ -1,0 +1,92 @@
+clone ---> aribitrary duplication for a type T to crate a new same T.
+copy  ---> value that can be safely duplicated via memcpy. 
+
+lifetime in 
+1 funciton argument //the lifetime of a object
+2 return value      //returned value should live less than 'a
+3 struct field      //struct instance should live less than 'a
+
+funciton 
+fn xx(...) -> &T {
+}
+for lifetime check, the return value will refer to
+1 argument
+2 static object
+to accomplish its job without analyzing the body of the function, compiler
+needs to know, the returned lifetime is refer to which kind.
+
+//this is valid, since compiler knows return value could only refer to 
+//the argument, and it same with fn f<'a>(x: &'a u8) -> &'a u8
+fn f(x: &u8) -> &u8;
+
+
+//without lifetime specifier, compiler has no idea which argument reference 
+//is returned
+fn f<'a>(n: i32, x: &Vec<u8>, y: &Vec<u8>) -> &u8 {
+ if n == 0 { return &x[0]; }
+ if n < 0 { &x[1] } else { &x[2] }
+}
+
+
+//the following code is valid, because in most case the returned value is
+//refer to current object --> self, so it same with
+//fn f<'a>(&'a self, y: &u8) -> (&'a u8, &'a f64, bool, &'a Vec<String>)
+trait Tr {
+    fn f(&self, y: &u8) -> (&u8, &f64, bool, &Vec<String>);
+}
+
+
+//'a, 'b is independent lifetime, so the compile will report error
+//that return lifetime is mismatched
+fn f<'a, 'b>(x: &'a i32, y: &'b i32) -> (&'b i32, bool, &'a i32) {
+  (x, true, y)
+}
+
+
+
+//lifetime in return value, since it refer to argument, so it shouldn't
+//live longer than the argument it referred to
+//so the following code will report error, since variable result has longer
+//lifetime than v2
+let v1 = vec![11u8, 22];
+let result;
+{
+ let v2 = vec![33u8];
+ fn func<'a>(_x1: &Vec<u8>, _x2: &'a Vec<u8>) -> &'a Vec<u8> {
+ _x2
+ }
+ result = func(&v1, &v2);
+}
+print!("{:?}", *result);
+
+
+
+lifetime subtyping
+struct Context<'a> (&'a str);
+//context will live longer than parser
+struct Parser<'a, 'b:'a> {
+    context: &'a Context<'b>,
+}
+
+impl<'a, 'b> Parser<'a, 'b> {
+    //returned slice is refer to context
+    fn parse(&self) -> Result<(), &'b str> {
+        Err(&self.context.0[1..])
+    }   
+}
+
+fn parse_context(ctx: Context) -> Result<(), &str> {
+    Parser{context: &ctx}.parse()
+} 
+
+
+lifetime bounds
+struct MyRef<'a, T>(&'a T) ---> T may live longer enough
+T may a struct contains reference, compiler have to make sure
+lifetime in T should longer than a
+
+struct MyRef<'a, T: 'a>(&'a T) 
+T: 'a ---> T can be any type, but if it contains any reference, the lifetime
+of reference >= 'a //samilar with 'b: 'a --> 'b >= 'a
+
+trait object should be a reference, its default lifetime is static

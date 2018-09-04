@@ -1,0 +1,26 @@
+ML --- meta language, first implementation is Lisp
+funtional -- function is first-class value
+strong typed
+type inference
+automatic memory management
+
+
+
+value and types
+variables
+operator
+expression
+scope
+function
+program flow
+
+
+data type 
+    sum
+    product
+    variant
+    type parameter --> kind
+    recursive data type
+    
+pattern matching
+

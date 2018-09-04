@@ -1,8 +1,35 @@
-base chain:
+mainly working on ip and transport layer:
+ip layer:
+    routing packets between hosts
+    fragment and reassemble datagram
+    connectless, unreliable
+
+netfilter(packet filtering framework) --- kernel
+iptable interactive with netfilter to implement firewall functionality
+
+netfilter define several hooks which could be registered and will be
+fired during different stage when handling a packet
+    pre-routing
+    input
+    forward
+    output
+    post-routing
+
+
+base chain(relate to hooks in netfilter):
+    PREROUTING
     INPUT
     FORWARD
     OUTPUT
+    POSTROUTING
 
+rules is saved in chain
+chain is organized in table
+chain is the revoked by netfilter, table is a logic way to organize chain.
+same type chain in different table is register under the same hook in netfilter 
+one after another 
+
+-t select table
 -s source address
 -d destination address
 -p protocol
@@ -33,5 +60,7 @@ iptables-restore < /root/iptables-bakcup-2014-04-14
 iptables -A INPUT -p tcp -syn -m multiport --dport 80,443 -m connlimit --connlimit-above 20 -j REJECT \
     --reject-with-tcp-reset
 
-
 masquerade == source NAT
+//external ip address is unknown or dynamic
+//change the sender address to eth1 address
+iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE

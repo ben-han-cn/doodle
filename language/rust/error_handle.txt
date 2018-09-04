@@ -1,0 +1,54 @@
+define error struct to specify different error condition
+implement std::error::Error, which could be put into std::result::Result
+
+add error.rs file into crate, in errors.rs
+
+error_chain! {
+        errors {
+                /// Missing state at block with given descriptor.
+                StateUnavailable(b: String) {
+                        description("State missing at given block."),
+                        display("State unavailable at block {}", b), 
+                }   
+
+                /// I/O terminated unexpectedly
+                IoTerminated {
+                        description("I/O terminated unexpectedly."),
+                        display("I/O terminated unexpectedly."),
+                } 
+        }
+}
+
+
+the macro will generate code:
+
+use std::error::Error as StdError;
+use std::sync::Arc;
+
+#[derive(Debug)]
+pub struct Error(pub ErrorKind,
+                 pub Option<Box<StdError + Send>>,
+                 pub Option<Arc<error_chain::Backtrace>>);
+
+impl Error {
+    pub fn kind(&self) -> &ErrorKind { ... }
+    pub fn into_kind(self) -> ErrorKind { ... }
+    pub fn iter(&self) -> error_chain::ErrorChainIter { ... }
+    pub fn backtrace(&self) -> Option<&error_chain::Backtrace> { ... }
+}
+
+impl StdError for Error { ... }
+impl Display for Error { ... }
+
+#[derive(Debug)]
+pub enum ErrorKind {
+    Msg(String),
+    StateUnavailable(String),
+    IoTerminated(),
+}
+
+//ErrorKind has into method to convert to Error
+use super::error::*;
+fn foo() -> Result<()> {
+    Err(ErrorKind::IoTerminated.into())
+}

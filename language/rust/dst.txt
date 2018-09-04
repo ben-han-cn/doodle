@@ -1,0 +1,14 @@
+dst --- dynamic size type or unsized type, like str 
+
+rust needs to know how much memory to allocate for any value of
+a paritcular type, and all value of a type must use the same amount
+of memory.
+
+trait itself is dst, since it can refer to any type.
+Sized is the trait to determine whether or not a type's size is known at
+compile time.
+A generic function 
+    fn generic<T>(t: T) is treated as 
+    fn generic<T: Sized>(t: T)
+to relex the restriction
+    fn generic<T: ?Sized>(t: &T)

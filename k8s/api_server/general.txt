@@ -131,3 +131,8 @@ for path in AllRegisteredPaths:
         markPathInvalid(path)
         delete custom resource data
         delete path
+
+
+
+authentication --- x509
+client certificats include the user name(CN) and group (O,organize)

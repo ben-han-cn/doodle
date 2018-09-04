@@ -54,6 +54,3 @@ address
 solicited-node multicast address is used to do:
   Address resolution
   Duplicate Address Detection(DAD)
-
-
-

@@ -1,0 +1,12 @@
+kube-proxy is the process to manipulate each node's iptable
+for service with cluster ip 10.104.154.139
+$sudo iptables-save |grep KUBE | grep `service-name`
+.....
+
+any pkt come from the pod CIDR destined for the service clusterip
+on service port will be redirect, randomly, to one of the downstream
+pods (end points) select by the label.
+
+
+headless service has no clusterip, in this case, kube-proxy will 
+do nothing. and the service is exposed through DNS
