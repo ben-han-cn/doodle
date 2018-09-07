@@ -1,0 +1,17 @@
+deployment -> replicaset -> pod
+
+object.metadata.ownerReferences 
+    blockOwnerDeleteion: true
+    controller: true
+    kind: Deployment/ReplicaSet
+    name: xxxx
+    uid: xxxx
+
+when delete object there are three propatation policy
+1 forground:
+    owner will delete until all its children is deleted
+2 backgroud:
+    owner will be delete immediately, gc will delete its children
+3 orphan:
+    owner is deleted immediately, set ownerReferences of children 
+to nil, to make them orphaned.

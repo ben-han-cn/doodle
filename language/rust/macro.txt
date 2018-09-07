@@ -1,0 +1,40 @@
+macro (kind of syntax extension)
+declarative macros
+
+macro_rules! $name {
+    $rule0 ;
+    $rule1 ;
+    // …
+    $ruleN ;
+}
+
+rule: ($pattern) => {$expansion}
+
+capture:
+item: an item, like a function, struct, module, etc.
+block: a block (i.e. a block of statements and/or an expression, surrounded by braces)
+stmt: a statement
+pat: a pattern
+expr: an expression
+ty: a type
+ident: an identifier
+path: a path (e.g. foo, ::std::mem::replace, transmute::<_, int>, …)
+meta: a meta item; the things that go inside #[...] and #![...] attributes
+tt: a single token tree
+
+repetitions:
+$ ( ... ) sep rep ------> sep is optional 
+
+#[macro_export]
+macro_rules! vec {
+  ($($x:expr),*) => { 
+     {
+        let mut v = Vec::new();
+        $(v.push($x);)*
+        v
+    }
+  };
+}
+
+
+procedural macro to implement derive

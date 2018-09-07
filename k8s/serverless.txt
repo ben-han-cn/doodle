@@ -1,0 +1,5 @@
+serverless
+    dev doesn't manage server host or processes
+    platform should auto-scale and auto-provision based on load
+    charged based on precise usage
+    implict high availability

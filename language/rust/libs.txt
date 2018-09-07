@@ -2,6 +2,12 @@ clap:
   https://github.com/kbknapp/clap-rs
   command arg parse & config file process
 
+positional argument 
+flag    ---> no value is specified   -v, -h
+option  ---> has value       -c config   //takes_value(true)
+
+
+
 serde
   serialization
 
