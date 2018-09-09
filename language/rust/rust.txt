@@ -164,9 +164,6 @@ impl Response {
     }
 }
 
-send == T could be passed to another thread safely (rc is not)
-sync == &T could be updated by several thread without data race
-
 rust support redeclare new varaible with same name but different
 type and mutability
 
@@ -179,3 +176,11 @@ value of a block is the value of its last expression, empty tuple () == void
 
 remove field from struct
 let old = std::mem::replace(&mut response.headers, Headers::new());
+
+
+rust auto-dereference rule:
+rust will deref as many times as possible -> (... &&T -> &T -> T)
+rust will reference at max once (T -> &T)
+
+PartialEq ---> a == b --> b == a, a == b && b == c ---> a == c
+Eq --> a == a, f32: PartialEq not Eq

@@ -1,0 +1,8 @@
+module is default created in different file 
+mod create nested module
+std::cmp::min == self::std::cmp::min (self is current module)
+so use absolute path ::std::cmp::min
+use pull symbol into current module
+mod get compiled by referenced by lib.rs or main.rs
+when compile a mod, it inherit all the other module imported by
+main.rs or lib.rs. 

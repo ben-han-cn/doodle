@@ -1,0 +1,17 @@
+intel 64 and IA-32 architectures
+
+instructions
+    opcode, addressing modes, data types
+    instruction type and formats
+    register, codition codes
+
+memory
+    address space, addressability, alignment
+    virtual memory management
+
+call, interrupt/exception handling
+access control, priority/privilege
+i/o:memory-mapped vs instr.
+task/thread management
+power and thermal management
+multi-threading, multiprocessor support

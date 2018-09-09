@@ -54,3 +54,11 @@ sudo usermod -a -G other zheng
 sudo usermod -g other zheng
 // remove user from other groups except primary group
 sudo usermod -G "" zheng
+
+
+bash has different editor mode
+set -o vi // set to vi mode, and use escape to into vim mode
+$, ^, b, w
+
+set -o emacs // set to emacs mode
+ctrl + a, ctrl + e

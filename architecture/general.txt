@@ -1,0 +1,57 @@
+role of architect
+look backward (examine the old code)
+    understand tradeoffs and designs, upsides/downsides, past
+    workloads.
+look forward (listen to the dreamer)
+    be the dreamer and create new design, listen to the dreamer
+    push the state of art, evaluate new design choice
+look up (nature of the problems)
+    understand important problems and their nature
+    develop architectures and ideas to solve important problems
+look down (predict the future of technology)
+    understand the capabilities of the underlaying technology
+    predict and adapt to the future of technology
+
+
+
+problem
+algorithm
+program/language
+runtime system
+ISA (instruction set architecuture)
+Microarchitecutre
+Logic
+Device
+Electrons
+
+ISA: specifies how the programmer sees instructions to be executed
+Microarchitecutre: how the underlaying implmentation actually executes the instrction
+ISA == interface
+Microarchitecutre == implementation
+    pipeline
+    out-of-order
+    separate instruction and data caches
+
+
+Hamming distance ---> the difference between two equal-length string 
+    ---> error detection and correction
+
+
+Levels of transformation create abstraction
+Abstraction: A higher level only needs to know about the interface to the lower level,
+not how the lower level is implemented.
+
+
+memory controller will schedule the memory requirement/operation, 
+one application has more buffer hit rate than another
+
+basic concept:
+
+computing system
+    compution  ---> communication ---> storage
+
+von neumann
+    unified memory for data and instruciton
+    sequectional execution model
+
+dataflow model: instruction is fetched and executed in data flow order

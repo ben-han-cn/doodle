@@ -1,0 +1,39 @@
+T: Send, passing by-value a vaule of type T into another thread won't lead to
+data race.
+T: Sync == &T :Send
+
+Normally, when move a variable to other thread, we think it should be safe
+
+use std::rc::Rc;
+use std::sync::Mutex;
+use std::thread;
+
+fn main() {
+    let counter = Rc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Rc::clone(&counter);
+        let handle = thread::spawn(move || {
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+
+but counter in each thread, has shared data which is reference count, and the
+increasement of the reference count isn't thread safe, so rc itself isn't send
+Instread Arc is sendable.
+
+
+Send and Sync are marker trait, make type Send or Sync just is a marker and notifier.
+Compiler will buy it, and it's the programer to make sure the type is really sendable
+or syncable.
