@@ -186,6 +186,16 @@ spec:
           command:
           - ls
           - /var/ready 
+        initialDelaySeconds: 15
+        timeoutSeconds: 1
+        periodSeconds: 15
+
+1 Readiness probe fails.
+2 Kubernetes stops routing traffic to the pod.
+3 Liveness probe fails.
+4 Kubernetes restarts the failed container*.
+5 Readiness probe succeeds.
+6 Kubernetes starts routing traffic to the pod again.
 
 
 6 headless service

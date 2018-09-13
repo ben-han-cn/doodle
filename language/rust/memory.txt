@@ -1,0 +1,46 @@
+Rc, Arc, Box will allocate object in heap
+Box: Send        ==>  unique ptr
+Rc               ==>  shared_ptr
+Arc: Send + Sync ==> shared_ptr 
+
+
+mpsc == multi producer single consumer
+
+Sender: Send 
+SyncSender: Send
+Receiver: Send
+
+use std::sync::mpsc::channel;
+use std::thread;
+
+//pub fn channel<T>() -> (Sender<T>, Receiver<T>)
+//unlimited memory channel
+let (sender, receiver) = channel(); 
+
+for i in 0..10 {
+    thread::spawn(move|| {
+        sender.send(expensive_computation()).unwrap();
+    });
+}
+
+for i in 0..10 {
+    println!("{:?}", receiver.recv().unwrap());
+}
+
+
+//limited memory buffer channel, similar with go
+let (sender, receiver) = sync_channel(1);
+// this returns immediately
+sender.send(1).unwrap();
+thread::spawn(move|| {
+    // this will block until the previous message has been received
+    sender.send(2).unwrap();
+});
+assert_eq!(receiver.recv().unwrap(), 1);
+assert_eq!(receiver.recv().unwrap(), 2);
+
+
+note: pub fn spawn<F, T>(f: F) -> JoinHandle<T> 
+JoinHandle when dropped, the child thread will be detached.
+call (join -> Result<T>) on JoinHandle could get the thread execution 
+result, when thread panic error will be embed in the result

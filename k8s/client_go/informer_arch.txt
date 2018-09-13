@@ -11,6 +11,14 @@ informer.Run
 
 informer.HandleDeltas ---> processor.distribute --> listener.Add
 
+queue = DelataFifo(threadSafeMap)
+    reflector update queue, queue only use threadSafeMap as a history storage
+    controller has same reference to threadSafeMap, and controller update threadSafeMap
+
+reflector
+    use version 0 to get all the resource first, then start to watch
+    which means queue will be replace with the current data, then start to watch new event
+
 
 //type and relationship
 sharedIndexInformer

@@ -1,0 +1,27 @@
+a computer is a device that reads, modifies and writes sequences of numbers.
+
+basic component:
+1 ALU(arithmetic logic unit) 
+    data input
+    code input
+    result output
+
+2 Storage
+    register are arrayed in a storage structure called register file
+    memory
+
+3 Bus
+
+Instruction:
+    Arithmetic instruction
+    Memory access instruction
+        absolute addressing
+        register-relative addressing
+    branch instruction
+        processor status word(PSW) register
+
+pipeline:
+    each instruction execution time isn't changed
+    but they will overlapped, make the programm execution time shrinked 
+    dramatically
+    a x stage pipeline yield a x times speed up

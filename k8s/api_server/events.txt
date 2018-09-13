@@ -15,5 +15,3 @@ delete deployment:  delete deployment ghost
   delete obj with key:[/registry/replicasets/default/ghost-6b8f77589d]
   save event [Killing:Killing container with id docker://ghost:Need to kill Pod] from [node3:kubelet] 
   delete obj with key:[/registry/pods/default/ghost-6b8f77589d-gznjv]
-
-

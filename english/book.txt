@@ -42,3 +42,5 @@ in a democracy must have access to information. As more information
 is stored and disseminated via computer technology, does access to this technology
 become a right of every individual?
 
+The preceding example probably sounds simple, but it conveys the basic manner in which 
+computers operate.

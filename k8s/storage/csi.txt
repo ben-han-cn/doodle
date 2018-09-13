@@ -1,0 +1,14 @@
+master: controller plugin //could run anywhere
+node:   node plugin       //resides on each node
+To make CSI more generic, implemention could merge controller and node
+into same plugin to support CO which doesn't have a master/node architecture 
+
+
+interface:
+identity service: implemented by both controller and node plugin
+controller service: implemented by controller plugin
+node service: implemented by node plugin
+
+
+procedure:
+CreateVolume, ControllerPublishVolume, NodePublishVolume

@@ -42,3 +42,14 @@ k8s philosophy:
 3 work load protability
     same deployment could be runned into any k8s cluster, no matter it's private or public,
     Any node or hardware binding is very bad pratcice
+
+
+k8s.io
+    api
+        contain the schema of the API that are served by the Kubernetes apiserver
+    apimachinery
+        scheme, typing, encoding, decoding and conversion
+    client-go
+        Go clients for talking to a kubernetes cluster.
+    kubernetes
+        core folder to build all the componenets

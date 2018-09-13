@@ -8,6 +8,8 @@
 qq                  #start to record and save it to q
 :9,$norm! @q        #apply the macro from 9 to the end of file
 g/pattern/norm! @q  #apply the macro  to line match the pattern
+@q                  #apply the macro 
+10@q                #apply the macro 10 times
 
 
 ctrl - n  #next match word
