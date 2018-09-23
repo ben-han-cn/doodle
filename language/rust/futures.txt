@@ -207,3 +207,16 @@ impl Future for MyFuture {
 // cpupool execute the poll of future in a thread pool, and use channel to connect 
 // the backgroud future with a channel pull future returned to current thread, cpupool
 // is suitable for future which poll needs lots of cpu resource
+
+// notifications happen at the task level and not the future level. When a task is 
+// notified, it will poll its top-level future, which may result in any or all of the 
+// child futures (if present) being polled. 
+
+
+//future --> create task --> poll function call 
+    1 if poll return not ready, it will block current thread, it's future's 
+    responsibility to notify itself.
+    2 in poll, current return the task related to this future
+    3 if in the poll, furture notify current task, even poll return not ready, the
+    task won't be parked which blocking the thread, and poll will be invoked again.
+    

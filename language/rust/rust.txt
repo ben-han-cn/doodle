@@ -22,10 +22,11 @@ let i = match h() {
 ==
 let i = h()? //the return type of current function must be Result
 
->= (bind in monad)  == map
+>= (bind in monad)  == and_then
 
+Option<T>.map(self, f:F) -> Option<U> where F: FnOnce(T) -> U
 Option<T>.and_then(self, f:F) -> Option<U> where F: FnOnce(T) -> Option<U>
-Option<T>.or_else(self, f:F) -> Option<U> where F: FnOnce() -> Option<T>
+Option<T>.or_else(self, f:F) -> Option<T> where F: FnOnce() -> Option<T>
 Option<T>.ok_or<E>(self, err:E) -> Result<T, E>
 Option<T>.except(self, msg: &str) -> T //if self is none, this will panic
 
