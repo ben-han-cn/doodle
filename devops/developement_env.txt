@@ -13,6 +13,7 @@ git config --global alias.co checkout
 git config --global alias.st status
 git config --global alias.br branch
 git config --global core.editor vim
+git --no-pager log > log.txt
 
 mkdir -p ~/.vim/autoload ~/.vim/bundle && \
 curl -LSso ~/.vim/autoload/pathogen.vim https://tpo.pe/pathogen.vim

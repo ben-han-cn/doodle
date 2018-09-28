@@ -1,3 +1,36 @@
+general:
+trait is the basic way to abstract behavior
+
+trait object ==> obj ptr + vtable
+normally, there is only one vtable
+
+different from c++, vtable is create in trait object when
+call dynamically dispatched function instead of stored
+in each instance.
+
+$ rustc --explain E0225
+You attempted to use multiple types as bounds for a closure or trait object.
+Rust does not currently support this. A simple example that causes this error:
+
+fn main() {
+    let _: Box<std::io::Read+std::io::Write>;
+}
+
+Builtin traits are an exception to this rule: it's possible to have bounds of
+one non-builtin type, plus any number of builtin types. For example, the
+following compiles correctly:
+
+fn main() {
+    let _: Box<std::io::Read+Copy+Sync>;
+}
+
+One way to work around this is to crate a new trait with these traits as super
+trait
+trait MyTrait: Any + From<String> + PartialOrd {}
+Box<MyTrait>
+
+
+
 impl PartialOrd for Person {
     fn partial_cmp(&self, other: &Person) -> Option<Ordering> {
         Some(self.cmp(other))
