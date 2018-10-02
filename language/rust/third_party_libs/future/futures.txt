@@ -219,4 +219,3 @@ impl Future for MyFuture {
     2 in poll, current return the task related to this future
     3 if in the poll, furture notify current task, even poll return not ready, the
     task won't be parked which blocking the thread, and poll will be invoked again.
-    

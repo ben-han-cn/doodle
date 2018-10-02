@@ -1,0 +1,75 @@
+To avoid data alias, rust allow only one mutable reference to 
+any object, and immutable reference is immutable for any of its 
+attributes.
+
+But some object like mutex is inherent shared mutable, since each
+owner (reference) could lock and unlock the mutex, and lock option 
+will inevitably modify its inner attribute. Another example is clone 
+for Rc<T> object
+
+UnsafeCell, Cell, RefCell is rust provoid tool to implement the 
+interior mutability, they are samiliar with const point in c++, point
+self couldn't be modified, but the data pointer pointed could be changed. 
+
+//shared copyable object 
+use std::cell::Cell;
+let c = Cell::new(5);
+let new = c.update(|x| x + 1);
+
+
+//shared noncopyable object
+#[derive(Clone, Debug)]
+struct PathAndHash {
+    path: PathBuf,
+    curr_hash: RefCell<Option<Digest>>,
+}
+
+fn update_and_check(&self) -> io::Result<bool> {
+        match fs::read(&self.path) {
+            Ok(contents) => {
+                let curr_hash = Some(digest::digest(&digest::SHA256, &contents[..]));
+                let changed = { 
+                    let prev_hash = self.curr_hash.borrow();
+                    let prev_hash_bytes = prev_hash.as_ref().map(Digest::as_ref);
+                    let curr_hash_bytes = curr_hash.as_ref().map(Digest::as_ref);
+                    prev_hash_bytes != curr_hash_bytes
+                };  
+                if changed {
+                    self.curr_hash.replace(curr_hash);
+                }   
+                Ok(changed)
+            }, 
+            ...
+        }
+}
+
+
+//most lower layer 
+#[derive(Debug, Default)]
+pub struct LazyCell<T> {
+    inner: UnsafeCell<Option<T>>,
+}
+
+impl<T> LazyCell<T> {
+    /// Creates a new, empty, `LazyCell`.
+    pub fn new() -> LazyCell<T> {
+        LazyCell { inner: UnsafeCell::new(None) }
+    }
+
+    pub fn fill(&self, value: T) -> Result<(), T> {
+        let slot = unsafe { &mut *self.inner.get() };
+        if slot.is_some() {
+            return Err(value);
+        }
+        *slot = Some(value);
+        Ok(())
+    }
+
+    pub fn borrow(&self) -> Option<&T> {
+        unsafe { &*self.inner.get() }.as_ref()
+    }
+
+    pub fn borrow_mut(&mut self) -> Option<&mut T> {
+        unsafe { &mut *self.inner.get() }.as_mut()
+    }
+}

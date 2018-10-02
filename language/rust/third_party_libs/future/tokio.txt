@@ -1,0 +1,58 @@
+runtime
+    reactor ---> run in a backgroud thread
+    executor ---> thread pool to run futures, each worker in thread pool has a timer
+
+tokio::run == 
+    runtime = Runtime::new()
+    runtime.spawn()
+    runtime.shutdown()
+
+runtime.spawn -> 
+    threadpool.spawn ->
+        sender.spawn ->
+            prepare_for_spawn()
+            pool.submit()
+
+
+//spawn will submit the task to DefaultExecutor in current thread, 
+//this function should be invoked in one scheduled future
+//each thread in thread pool use thread local data to store DefaultExecutor
+//each thread(worker) when started will call do_run to set the DefaultExecutor to 
+//threadpool executor which created in runtime new, and threadpool executor will
+//decide whether run the task in current thread or external thread
+tokio::spawn -->  
+    executor::spawn --> 
+        ::tokio_executor::spawn(f) --> 
+            DefaultExecutor::current().spawn()
+
+
+tokio and futures share same Spawn structure, poll spawn if return not_ready will 
+block current thread.
+
+
+reactor
+Establishing a TCP connection usually cannot be completed immediately.
+[`TcpStream::connect`] does not block the current thread. Instead, it
+returns a [future][connect-future] that resolves once the TCP connection has
+been established. The connect future itself has no way of knowing when the
+TCP connection has been established.
+
+Before returning the future, [`TcpStream::connect`] registers the socket
+with a reactor. This registration process, handled by [`Registration`], is
+what links the [`TcpStream`] with the [`Reactor`] instance. At this point,
+the reactor starts listening for connection events from the operating system
+for that socket.
+
+Once the connect future is passed to [`tokio::run`], it is spawned onto a
+thread pool. The thread pool waits until it is notified that the connection
+has completed.
+
+When the TCP connection is established, the reactor receives an event from
+the operating system. It then notifies the thread pool, telling it that the
+connect future can complete. At this point, the thread pool will schedule
+the task to run on one of its worker threads. This results in the `and_then`
+closure to get executed.
+
+
+
+

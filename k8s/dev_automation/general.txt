@@ -1,0 +1,2 @@
+            git hook                        modify params                 jsonnet
+app repo ----------------> Jekins pipeline  --------------> k8s tempaltes ---------> k8s manifests

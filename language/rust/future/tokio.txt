@@ -1,3 +1,0 @@
-try_ready!
-
-poll_recv_from
