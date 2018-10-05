@@ -30,7 +30,29 @@ trait MyTrait: Any + From<String> + PartialOrd {}
 Box<MyTrait>
 
 
+object safety ---> which trait could be put into a trait object
+pub struct TraitObject {
+    pub data: *mut (),
+    pub vtable: *mut (),
+}
+trait object is noramlly used as a way to do dynamic dispatch
 
+1 concrete type is erased
+2 different vtable is generated for each concrete type
+3 method in trait is all object safety then the trait is object safety, then it 
+could be put into trait object. The following method isn't object safe
+    1 use Self as paramter or return value
+        fn foo(&self) -> Self; 
+        let y = x.foo(); //concrete type is erased, type of y is unknown
+    2 has generic method
+        fn generic_method<A>(&self, value: A); //vtable is very hard to generate
+    3 method without self paremter
+        fn foo() -> u8 //no self, no vtable
+
+
+
+
+built-in trait:
 impl PartialOrd for Person {
     fn partial_cmp(&self, other: &Person) -> Option<Ordering> {
         Some(self.cmp(other))

@@ -61,4 +61,7 @@ s.insert(10);
 s.contains(s);
 
 
-
+iterator:
+    by reference              vec.iter()
+    by mutable reference      vec.iter_mut()
+    by value                  vec.into_iter()

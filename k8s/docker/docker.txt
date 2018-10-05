@@ -7,9 +7,14 @@ image spec
 runtime spec
 
 Dockerfile
-ENTRYPOINT defines the executable invoked when the container is started.
-CMD specifies the arguments that get passed to the ENTRYPOINT.
+CMD 
+    the default value for, docker run, so it will be overwrite 
+    if command parameter is specified.
 
+ENTRYPOINT 
+    defines the executable invoked when the container is started.
+    if command parameter is specified, they be append to entry point
+    
 ENTRYPOINT ["node", "app.js"] //exec form
 ENTRYPOINT node app.js //shell format 
 shell form will run node using shell
