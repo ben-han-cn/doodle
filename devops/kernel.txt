@@ -7,3 +7,7 @@ make modules_install
 sudo make install
 sudo update-initramfs -c -k 4.17-rc2
 sudo update-grub
+
+
+sync #write all the dirty cache into disk
+echo 3 > /proc/sys/vm/drop_caches #clean all the caches, page + dentry + inode cache

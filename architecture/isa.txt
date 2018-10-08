@@ -15,3 +15,24 @@ i/o:memory-mapped vs instr.
 task/thread management
 power and thermal management
 multi-threading, multiprocessor support
+
+ISA(instruction set architecture) is the abstraction
+CPU exposed to programmer
+
+A particular processor's hardware implementation of an ISA
+is generally referred to as the processor's microarchitecture.
+Sometimes microarchitecture change is invisible to programmer, 
+superscalar is one example. But some microarchitecture change 
+leads to ISA extension, like FPU and MMX (which is used to process
+vector).
+
+microcode engine
+    microcode ROM which store microcode progrmas, and an execution
+unit, the job of microcode program is to translate a particular 
+instruction into a series of machine instructions. By decoding instructions
+this way, all programs are effectively running in emulation by underlaying
+hardware.
+
+RISC(reduced instruction set computing) simpfied the ISA, when ISA is
+simple enough, that they could be decode directly by hardware to remove the
+microcode engine.

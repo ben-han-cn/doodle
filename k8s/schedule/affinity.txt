@@ -60,9 +60,6 @@ spec:
           app: backend 
 
 
-topologyKey doesn't have special meaning, it just means which node's label will be
-checked againtst
-
 for affinity, 
   requiredDuringSchedulingIgnoredDuringExecution //hard requirement
   preferredDuringSchedulingIgnoredDuringExecution //optional 
@@ -75,3 +72,16 @@ anti-affinity: avoid pod resides in same node, possibly they will affect each ot
       labelSelector:
         matchLabels:
           app: frontend 
+
+how affinity and anti-affinity work:
+1 labelSelector is used to find target pods
+2 get the nodes which target pods resides
+3 according to topologyKey to schedule
+    kubernetes.io/hostname                      //same host
+    failure-domain.beta.kubernetes.io/zone      //same zone
+    failure-domain.beta.kubernetes.io/region    //same region
+    rack                                        //same rack
+    (the first three label is defined by kubernetes, the last one is customized,
+     for affinity, it means scheduler will prefer nodes with the same value of the label 
+     key in target nodes, for anti-affinity scheduler perfer nodes with different label 
+     value of the label key specified in topologyKey)

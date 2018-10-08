@@ -41,3 +41,7 @@ services -- svc
 serviceaccounts -- sa
 
 
+$echo "source <(kubectl completion bash)" >> ~/.bashrc
+$source ~/.bashrc
+
+https://github.com/c-bata/kube-prompt

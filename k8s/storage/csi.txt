@@ -12,3 +12,13 @@ node service: implemented by node plugin
 
 procedure:
 CreateVolume, ControllerPublishVolume, NodePublishVolume
+
+
+kubelet ---unix socket--> CSI volumn dirvier
+socket path == /var/lib/kubelet/plugins/[SanitizedCSIDriverName]/csi.sock
+
+
+admin create StorageClass point to external provisioner.
+user crate PVC reference the StorageClass
+external provisioner watch the PVC and issue the CreateVolumn call against
+the CSI volumn dirver.

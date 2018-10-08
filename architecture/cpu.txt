@@ -5,6 +5,8 @@ basic component:
     data input
     code input
     result output
+(ALU is in charge of two kind of operation: arithmetic and logic, logic operation
+including and/or/bit shift/bit rotate)
 
 2 Storage
     register are arrayed in a storage structure called register file
@@ -25,3 +27,18 @@ pipeline:
     but they will overlapped, make the programm execution time shrinked 
     dramatically
     a x stage pipeline yield a x times speed up
+
+
+Superscalar == more than one ALU but share register file
+
+
+data category for ALU:
+1 integer
+  floating point
+2 scalar
+  vector
+therefore, there are four type of input for ALU:
+    integer scalar, floating scalar, integer vector, floating point vector
+
+EU(execution unit) is a general component, modern cpu use different EU to do different things, 
+ALU, LSU(load-store unit), BEU(branch execution unit)
