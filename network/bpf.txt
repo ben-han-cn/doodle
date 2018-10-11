@@ -23,12 +23,15 @@ userspace programs use this syscall to create/access maps that BPF programs are 
 
 BPF used in two aspect:
 1 kernel trace:
-  kprobe, pref event
-
+  Kprobes, pref event
+  Uprobes, USDT(user-level statically define tracing)
+  (Kprobes, Uprobes is dynamic, Tracepoints is static)
+    
 2 network packet management
-  XDP, tc
+  XDP, tc(traffic control)
 
 3 security
+  LSM(linux security module) hook
 
 XDP:
 Framework for running BPF programs in driver’s RX path

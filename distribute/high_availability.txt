@@ -1,0 +1,18 @@
+1 active-passive
+active serve all the read and write
+active sync data to passive
+when active crash, redirect traffic to passive
+virtual ip address could be used to automate the traffic redirect.
+
+2 Sharding
+distribute work load to different host based on key schema
+each host own part of the cluster data, and some host as the 
+backup for this part data.
+meta server to control the traffic base on key
+
+3 consensus replication (raft)
+leader handle all the write
+leader sync data to majority follower
+when leader crash, new leader will be selected.
+client can interact with any node, and write will be forward to leader
+muliti-raft == raft + sharding

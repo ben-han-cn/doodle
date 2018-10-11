@@ -1,0 +1,41 @@
+program ---> compiler ---> machine code
+    program = variable + function
+    function = self written funciton 
+               third party function 
+               language std/built-in function
+               language runtime (which isn't direct invoked by program)
+               low level function(system call)
+    (some language built-in function is a wrapper of system call)
+
+
+program ---> interpreter
+    high level language is the machine code
+    interpreter is the machin to run the high level language
+    interpreter run the high level code using its own built-in function
+    these built-in function is compiled to machine code
+    
+
+dynamic type language is normally run by interpreter, since it will be
+very hard to writer a compiler for them.
+
+
+program(more than one kind) ---> compiler ---> byte code ---> vm
+    high level language is translate to low level code 
+    low level code is high level than machine code
+    byte code could hidden all the environment dependency
+        OS
+        hardware
+    which make the high level code portable
+    compiler is much easier to implement compared with the pure compiler
+    vm is much easier to implement than a interpreter and more efficient
+
+JIT == interpreter generate machine code for hot code to eliminate the 
+       decode phase when run the high level language.
+    for dynamic language, function call for different type which go through different
+    code path, it's very tricky to generate the machine code. Interpreter needs to 
+    generate different version of the same code based on different type it observes.
+        when the assumption that JIT makes based on observation is incorrect. The optimized
+    code will be bailed out and go back to baseline version.
+
+
+compiler ----> vm ----> interpreter

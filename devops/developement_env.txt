@@ -62,8 +62,14 @@ https://github.com/golang/net.git
 
 
 protobuf
-git clone https://github.com/google/protobuf.git
-go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+apt-get install -y protobuf-compiler
+go get -u github.com/golang/protobuf/{proto,protoc-gen-go} //for go
+cargo install --version 2.0.2 protobuf-codegen             //for rust
+
+protoc --rust_out . xxxx.proto
+protoc --go_out=. *.proto //put .proto file in right folder which will be used ad package name
+
+
 
 curl https://sh.rustup.rs -sSf | sh
 cargo install rustfmt

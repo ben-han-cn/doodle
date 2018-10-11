@@ -1,0 +1,14 @@
+OpenAPI is a specification for describing REST APIs. 
+With OpenAPI, you have set of JSON objects, with a specific schema 
+that defines their naming, order, and contents. 
+This JSON file (often expressed in YAML instead of JSON) describes 
+each part of your API. By describing your API in a standard format, 
+publishing tools can programmatically ingest the information about 
+your API and display each component in a stylized, interactive display.
+
+
+Swagger editor(http://editor.swagger.io/) is the GUI tool to write the
+api specification
+
+Swagger also offer a variaty of libraries (https://swagger.io/swagger-codegen/) 
+which could be add to programming code to generate specification document.

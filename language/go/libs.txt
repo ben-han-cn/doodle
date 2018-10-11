@@ -1,3 +1,7 @@
 log         github.com/sirupsen/logrus
 metric      github.com/prometheus/client_golang
 cli         https://github.com/spf13/cobra
+
+godep      https://github.com/tools/godep
+           godep save ./...
+           godep restore

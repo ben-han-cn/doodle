@@ -3,7 +3,14 @@ convert
 default
 
 core api:
-/api/v1/resource 
+/api/v1/namespace/resource/name
+
+/api/v1/namespaces/{namespace}/pods
+/api/v1/namespaces/{namespace}/pods/{podname}
+
+/api/v1/nodes
+/api/v1/nodes/{nodename}
+
 other api:
 /apis/<api group>/version/resource
 
@@ -131,7 +138,6 @@ for path in AllRegisteredPaths:
         markPathInvalid(path)
         delete custom resource data
         delete path
-
 
 
 authentication --- x509

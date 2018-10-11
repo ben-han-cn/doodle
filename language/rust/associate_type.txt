@@ -1,0 +1,106 @@
+pub trait SimpleConnection {
+    fn batch_execute(&self, query: &str) -> QueryResult<()>;
+}
+
+pub trait Connection: SimpleConnection + Sized + Send {
+    type Backend: Backend;
+    type TransactionManager: TransactionManager<Self>;
+
+    fn establish(database_url: &str) -> ConnectionResult<Self>;
+
+    fn transaction<T, E, F>(&self, f: F) -> Result<T, E>
+        where
+            F: FnOnce() -> Result<T, E>,
+            E: From<Error>,
+            {
+                let transaction_manager = self.transaction_manager();
+                try!(transaction_manager.begin_transaction(self));
+                match f() {
+                    Ok(value) => {
+                        try!(transaction_manager.commit_transaction(self));
+                        Ok(value)
+                    }
+                    Err(e) => {
+                        try!(transaction_manager.rollback_transaction(self));
+                        Err(e)
+                    }
+                }
+            }
+
+    fn execute(&self, query: &str) -> QueryResult<usize>;
+
+    fn query_by_index<T, U>(&self, source: T) -> QueryResult<Vec<U>>
+        where
+            T: AsQuery,
+            T::Query: QueryFragment<Self::Backend> + QueryId,
+            Self::Backend: HasSqlType<T::SqlType>,
+            U: Queryable<T::SqlType, Self::Backend>;
+
+    fn query_by_name<T, U>(&self, source: &T) -> QueryResult<Vec<U>>
+        where
+            T: QueryFragment<Self::Backend> + QueryId,
+            U: QueryableByName<Self::Backend>;
+
+    fn execute_returning_count<T>(&self, source: &T) -> QueryResult<usize>
+        where
+            T: QueryFragment<Self::Backend> + QueryId;
+
+    fn transaction_manager(&self) -> &Self::TransactionManager;
+}
+
+pub trait TransactionManager<Conn: Connection> {
+    fn begin_transaction(&self, conn: &Conn) -> QueryResult<()>;
+    fn rollback_transaction(&self, conn: &Conn) -> QueryResult<()>;
+    fn commit_transaction(&self, conn: &Conn) -> QueryResult<()>;
+    fn get_transaction_depth(&self) -> u32;
+}
+
+
+pub trait Backend
+where
+Self: Sized,
+Self: HasSqlType<sql_types::SmallInt>,
+Self: HasSqlType<sql_types::Integer>,
+Self: HasSqlType<sql_types::BigInt>,
+Self: HasSqlType<sql_types::Float>,
+Self: HasSqlType<sql_types::Double>,
+Self: HasSqlType<sql_types::VarChar>,
+Self: HasSqlType<sql_types::Text>,
+Self: HasSqlType<sql_types::Binary>,
+Self: HasSqlType<sql_types::Date>,
+Self: HasSqlType<sql_types::Time>,
+Self: HasSqlType<sql_types::Timestamp>,
+{
+    type QueryBuilder: QueryBuilder<Self>;
+    type BindCollector: BindCollector<Self>;
+    type RawValue: ?Sized;
+    type ByteOrder: ByteOrder;
+}
+
+
+#[derive(Hash, PartialEq, Eq)]
+pub enum StatementCacheKey<DB: Backend> {
+    Type(TypeId),
+    Sql {
+        sql: String,
+        bind_types: Vec<DB::TypeMetadata>,
+    },  
+}
+
+
+//for any type, it could add to different type
+pub trait Add<RHS = Self> {
+    type Output;
+    fn add(self, rhs: RHS) -> Self::Output;
+}
+
+
+//generic trait like generate struct, they aren't type, but a kind to 
+//crate new type, like Add, a struct can impl several Add<T1>, Add<T2>
+//to support add to different type, it's also a way to support method
+//overload which isn't directly supported by rust
+
+
+//associate type is a way to express the relationship between a group of
+//types, in one specific implementation, when one type is fixed, other 
+//relative type is fixed too, associated type could also add  
