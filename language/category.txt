@@ -1,0 +1,2 @@
+product ==> product type (tuple, struct)
+coproduct ==> sum type (union, enum)

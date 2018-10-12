@@ -68,3 +68,14 @@ local disk:
 1 disk preparation
 2 open source lv provisioner 
 https://github.com/kubernetes-incubator/external-storage/tree/master/local-volume
+
+
+AccessModes
+    ReadWriteOnce(RWO) rw only mount by one node
+    ReadOnlyMany(ROX)  read only by only nodes
+    ReadWriteMany(RWX) rw by many nodes
+
+PersistentVolumeReclaimPolicy
+    Retain: adminstrator needs to clean data manually
+    Recycle: rm -rf /thevolum/*
+    Delete: delete the volume, use by cloud provider
