@@ -1,0 +1,49 @@
+Keeping up with new technology
+    T-shaped: 
+        a broad understanding of the technology landscape
+        depth or expertise in one or two areas
+Finding Focus
+Schedule individual learning
+
+Evaluating tradeoffs
+    A given framework, language, or library is just a tool. The
+challenge for archtest is knowing when to pick up which tool.
+    Sometimes the best way to understand a technology's limitation
+is to build one to throw away.
+    Guard against the natural tendency to frame every problem in a
+manner that leads to your preferred technology.
+    
+Evaluation Criteria:
+    documentation
+    community
+    committer diversity
+    codebase
+    testability
+    update history
+    maturity
+    stability
+    estensibility
+    support
+    traning
+    hiring
+    security
+    license
+
+Maintaining technologies
+Quality Atributes
+    Readability/Maintainability
+    Scalability
+    Reliability
+    Security
+    Deployability
+    Simplicity
+    Usability
+    Compatibility
+    Fault tolerance
+    Modularity
+    Testablity
+    Auditability
+
+Evolutionary Archtecture
+
+          

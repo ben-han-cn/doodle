@@ -1,0 +1,42 @@
+A B = C
+there are many ways to solve the problem:
+1 Cij = (Row of Ai) . (Col of Bj)
+2 col of Ci = A * (Col of Bi) = linear combination of cols of A
+3 row of Ci = (Row of Ai) * B = linear combination of rows of B
+4 C = sum of [(clos of A) x (rows of B)]
+
+ 2 7    1 6      2             7
+[3 8] [ 0 0] = [ 3 ] [1 6] + [ 8 ][0 0]
+ 4 9             4             9
+
+    2  12      0  0
+= [ 3  18 ] + [0  0]
+    4  24      0  0
+
+    2  12  
+= [ 3  18 ]
+    4  24  
+
+
+5 block mulitple
+
+  A1  A2     B1  B2      A1B1 + A2B3    A1B2 + A2B4
+[        ] [        ] = [                          ]
+  A3  A4     B3  B4      A3B1 + A4B2    A3B2 + A4B4
+
+
+
+
+inverse
+A-1 A = I
+
+if there is a vector x which isn't zero could get AX = 0, then A 
+couldn't be inversed, because each side we add A-1 then we get X = 0
+
+
+Gauses-Jordan
+[A | I] -> [I | A-1]
+(argument matrix)
+
+E [A | I] -> [I | E]
+since E A = I so E == A-1

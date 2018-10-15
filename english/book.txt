@@ -20,7 +20,7 @@ in a measurable way.
 The term abstraction, referes to the distinction between the external properties of an 
 entity and the details of the entity's internal composition.
 
-It it by applying abstraction, then, that we are able to contruct, analyze, and manage
+It is by applying abstraction, then, that we are able to contruct, analyze, and manage
 large, complex computer systems, which would be overwhelming if viewed in their entirely
 at a detailed level.
 
@@ -44,3 +44,5 @@ become a right of every individual?
 
 The preceding example probably sounds simple, but it conveys the basic manner in which 
 computers operate.
+
+Katas originated in martial arts training, but the idea has spread beyond the dojo

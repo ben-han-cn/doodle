@@ -77,3 +77,11 @@ kubia-1.kubia.default.svc.cluster.local. 30 IN A 172.17.0.6
 
 for stateful pod, we have to delete the pod manually, when it has problem or the node
 its resides has failed, since k8s has to make sure only one pod with same name exists.
+
+
+1. Ordered operations with ordinal index
+2. Stable,unique name across restarts
+3. Stable, persistent storage 
+    pod -> pvc -> pv (when pod rescheduled to another node, same pvc and pv is 
+    automatically rebined, which will make sure the pod get the old state) 
+4. Mandatory headless service(no single IP) for integrations.
