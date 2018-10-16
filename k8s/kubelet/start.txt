@@ -76,6 +76,7 @@ syncPod
     kl.containerRuntime.SyncPod
 
 
+//sandbox == pod
 k8s.io/kubernetes/pkg/kubelet/kuberuntime/kuberuntime_manager.go
 SyncPod
     Compute sandbox and container changes.
@@ -128,4 +129,3 @@ dockershrim:
     func (ds *dockerService) Start() error 
         ds.streamingServer.Start()
         ds.containerManager.Start()
-    

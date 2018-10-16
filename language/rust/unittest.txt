@@ -1,0 +1,7 @@
+property(specification) based testing
+
+quickcheck
+    https://github.com/BurntSushi/quickcheck
+
+proptest
+    https://github.com/AltSysrq/proptest 

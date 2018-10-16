@@ -1,6 +1,119 @@
-clientset
-informers
-listers
+The controller:
+    has a reference to the DeltaFIFO queue;
+    has a reference to the downstream store;
+    has a reference to the ListerWatcher (the upstream source in our case);
+    has a process loop, 
+        get delta form DeltaFIFO and put it to downstream store
+        call the hook in event handler
+    creates a Reflector.
+
+The reflector:
+    has a reference to the same DeltaFIFO queue (called store internally);
+    has a reference to the same ListerWatcher;
+    lists and watches the ListerWatcher;
+    is responsible for producing the FIFO queue’s input;
+    is responsible for calling the Resync method on the FIFO queue every resyncPeriod ns.
+
+The DeltaFIFO queue:
+    has a reference to the downstream store;
+    has a queue of Deltas for objects that were listed and watched by the Reflector.
+        Deltas = []Delta = [](option[add, delete, update, sync], object)
+
+    type DeltaFIFO struct {
+        items map[string]Deltas
+        queue []string
+        keyFunc KeyFunc
+        knownObjects KeyListerGetter
+    }
+    queue is keep the event order for each object
+    Deltas keep the event order for one object
+    design issue:
+        from the code, deltafifo needs KeyListerGetter to get the latest event
+        but, DeltaFIFO dosen't has any logic to sync state with the underlay store
+        it's the controller who calls Pop function of DeltaFIFO to do the synchronization.
+        
+    
+how reflector fill DeltaFIFO:
+1 get the initial state, use ResourceVersion = "0" to get all the resources
+    func (f *DeltaFIFO) Replace(list []interface{}, resourceVersion string) error  {
+            for _, item := range list {
+                key, err := f.KeyOf(item)
+                f.queueActionLocked(Sync, item) //put Sync Delta into the queue
+            }
+
+            //delete any unknwon/old object
+            for _, k := range knownKeys {
+                if keys.Has(k) {
+                    continue
+                }       
+                f.queueActionLocked(Deleted, DeletedFinalStateUnknown{k, deletedObj})
+            }       
+
+            //record the initial state
+            if !f.populated {
+                f.populated = true
+                f.initialPopulationCount = len(list) + queuedDeletions
+            }
+    }
+
+    //HasSynced == all the initial list objects have been processed
+    //which means downstream store has get a snapshot of cared objects
+    func (f *DeltaFIFO) HasSynced() bool {
+        f.lock.Lock()
+        defer f.lock.Unlock()
+        return f.populated && f.initialPopulationCount == 0
+    }
+
+2 feed the delta to DeltaFIFO:
+    reflector: watchHandler
+    deltafifo.Add()     --> f.queueActionLocked(Added, obj)
+    deltafifo.Update()  --> f.queueActionLocked(Updated, obj)
+    deltafifo.Delete()  --> f.queueActionLocked(Deleted, obj) //existance of obj is checked
+    func (f *DeltaFIFO) queueActionLocked(actionType DeltaType, obj interface{}) error {
+        id, err := f.KeyOf(obj)
+
+        //Sync is normally handled as add, so if last delata is delete, no sync should be pushed
+        if actionType == Sync && f.willObjectBeDeletedLocked(id) {
+            return nil
+        }
+
+        newDeltas := append(f.items[id], Delta{actionType, obj})
+        newDeltas = dedupDeltas(newDeltas) //remove duplicate event, continuous delete is duplicate
+        _, exists := f.items[id]
+        
+        if len(newDeltas) > 0 {
+            if !exists {
+                f.queue = append(f.queue, id)
+            }
+            f.items[id] = newDeltas
+            f.cond.Broadcast()
+        } else if exists {      //this branch should never be reached
+            delete(f.items, id)
+        }
+        return nil
+    }
+    
+3 periodically resync the DeltaFIFO:
+    func (f *DeltaFIFO) Resync() error {
+        keys := f.knownObjects.ListKeys()
+        for _, k := range keys {
+            f.syncKeyLocked(k)
+        }
+    }
+    
+    func (f *DeltaFIFO) syncKeyLocked(key string) error {
+        obj, exists, err := f.knownObjects.GetByKey(key)
+        id, err := f.KeyOf(obj)
+        //there are pending events, so no need resync
+        if len(f.items[id]) > 0 {
+            return nil
+        }
+        f.queueActionLocked(Sync, obj)
+    }
+
+    resync just let handler(in controller) to get the chance to walk through
+    the whole objects in downstream store, normally, OnUpdate will be called
+
 
 client-go usage:
 1 get client --- kubernetes.ClientSet ---- kubernetes.NewForConfig(config)

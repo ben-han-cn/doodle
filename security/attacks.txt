@@ -1,0 +1,10 @@
+DNS rebinding:
+    1 attacker controll a dns server
+    2 attacker get victim to access the domain which host by the malicious dns server
+    3 the domain name return normal web server address when display the website
+    4 malicious js code is loaded, and it will visit a same origin resource
+    dns server will return a local well-known address by which js code bypass
+    the cross-orgin policy enforced by browser
+    5 the well-known local address is the IoT in victim's local network, which normally
+    provides web interface, through the js code, attacker could collect, controll the
+    local device. 

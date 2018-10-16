@@ -1,0 +1,8 @@
+The fundamental building block of most modern cryptography is a one-way function. 
+A one-way function is a function that is easy to compute, but its inverse is hard 
+to compute. (i.e. given f(x) = y, it is easy to calculate y given x, but to very hard
+to calculate x given y)
+There are two main ways that this is done:
+1 Factorization
+2 Elliptic Curve Logarithms
+
