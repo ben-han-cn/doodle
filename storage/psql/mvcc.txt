@@ -1,0 +1,26 @@
+Multiversion Concurrency Control(MVCC)
+1 every row except has all the coloms user define, also includes two extra colum
+    xmin 
+    xmax
+2 insert ---> xmin = tx create the row
+3 delete ---> xmax = tx delete the row
+4 update ---> 
+    xmax of old row = tx update the row
+    xmin of new row = tx update the row
+5 row visibility, for repeated read
+    current tid > xmin and xmin is commited
+    current tid < xman and xmax is commited
+6 tid could be in state of(tx state is saved in clog):
+    in progress
+    commited
+    invalid(0)
+    aborted
+
+
+for a individual transaction, a transaction snapshot is a dataset about whether
+all transaction are active, it will be used by row visibility.
+
+SELECT txid_current_snapshot();
+100:104:100,102
+xmin:xmax:xip_list
+xip_list is current active txs.

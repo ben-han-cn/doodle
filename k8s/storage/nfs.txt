@@ -15,7 +15,7 @@ sudo rpcinfo -p|grep nfs
 cat /var/lib/nfs/etab
 
 #at each k8s node install nfs client
-$ sudo apt-get install nfs-common
+$ sudo apt-get install -y nfs-common
 #check rfc service
 sudo systemctl status rpcbind.service
 #check server connection

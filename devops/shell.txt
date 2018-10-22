@@ -62,3 +62,27 @@ $, ^, b, w
 
 set -o emacs // set to emacs mode
 ctrl + a, ctrl + e
+
+lsattr, chattr
+chattr +a /var/log/message
+a -- file can only be open in append mode for writing
+i -- it cann't be deleted or renamed, no link can be created to this file, and
+     no data can be written to the file
+s -- when file is deleted, its block are zeroed and sync with disk
+S -- when file is modified, the changes are written synchronosly on the disk
+
+
+SUID, SGID, SBIT(sticky)
+s in x of owner 
+    for binary file, when user has x permission on f1, then user run f1, he
+    will get the permission of f1's owner  
+    chmod u+s f1
+
+s in x of group
+    for binary file, when user has x permission on f1, then user run f1, he
+    will get the permission of f1's group
+    chmod g+s f1
+
+s in x of others
+    for  folder, only the file creator and root can delete the file
+    chmod o+t tmp

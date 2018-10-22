@@ -1,5 +1,16 @@
 dst --- dynamic size type or unsized type, like str 
 
+there are two kind of dst in rust generally: [T] and Trait
+    [T] mean aribitrary number(which is unknown in compile time) of T contiguous in memory
+
+unsized value must always appear behind a pointer at runtime like &[T], &Trait, Box<Trait>, 
+which have the information required to computer their size and other relative properties, like
+the lenght for [T]
+or vtable for trait
+which storedd next to that pointer.
+
+related count of elements (for [T])
+
 rust needs to know how much memory to allocate for any value of
 a paritcular type, and all value of a type must use the same amount
 of memory.

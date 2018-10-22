@@ -9,6 +9,8 @@ pattern mainly used in:
                             pattern3 => express3,
                          }
 
+rust match support both expression-oriented and statement-oriented style
+
 
 
 let &mut x = &mut 10;   // with pattern matching, type of x is integer 

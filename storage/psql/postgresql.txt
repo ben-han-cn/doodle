@@ -1,0 +1,17 @@
+postgres --> databases
+database --> tables
+             indexes
+             views
+             functions
+             sequences
+             ..
+
+database and all it contains are object, with a object identifier(OID).
+physicall, object is stored in files, and file name is based on OID. 
+
+table file:
+blocks(8k pages)
+  page(block)
+    header, line pointers, space, tuples
+    (tuple is added from bottom to top, and pointers is the offsets, so
+     tuple could be index by (block index, offset))

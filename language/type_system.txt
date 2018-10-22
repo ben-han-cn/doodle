@@ -1,0 +1,14 @@
+subtype
+    Cat <: Mammal
+
+variance:
+    how subtypeing between the types affect subtypeing between the compostion type 
+    wrapping them
+
+    if S <: T:
+    Covariant:      Composite<S> <: Composite<T>
+    Contravariant:  Composite<T> <: Composite<S>
+    Bivariant:      Covariant and Contravariant
+    Invariant:      !Covariant and !Contravariant
+
+Composite type: Container(Vecotr, Map), function

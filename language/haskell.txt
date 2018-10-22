@@ -31,10 +31,8 @@ paramatic
 
 data constructor == value (only way to express value except the basic/primary types)
 
-
 foldr (^) 2 [4..6] == (4 ^ (5 ^ (6 ^ 2)))
 foldl (^) 2 [4..6] == (2 ^ (4 ^ (5 ^ 6)))
-
 
 foldMap :: (Monoid m, Foldable t) => (a -> m) -> t a -> m
 traverse :: (Applicative f, Traversable t) => (a -> f b) -> t a -> f (t b)
@@ -75,10 +73,7 @@ function is functor, applicative, monad
 >>= :: (a -> b) -> (b -> a -> c) -> (a -> c)
     g >>= h = \x -> h (g x) x
 
-
-
 a is isomorphic to b ==  a -> b , b -> a without lose information
-
 
 combine two general monad into one is impossible. In order to make the join
 happen, we need to reduce the polymorphism and get concrete information about
@@ -127,3 +122,27 @@ Data.ByteString(Data.ByteString.Lazy)
 
 MonadTrans, MonadBase, MonadTransControl, MonadPlus, Alternative, MonadError, MonadThrow, MonadCatch
 
+term -> type -> kind
+type has term is inhabited type, 
+maybe isnot inhabited type, they are type constructors.
+kind is the way to distinguish the difference between these types.
+    kind of inhabited type is * 
+
+data Either a b = Left a | Right b
+Either is type constructor, kind of Either is * -> * -> *
+Left and Right are data constructor
+
+HOF(high order funciton) function which accept or return other function
+HKT(high kinded types) type constructor which accept other type constructor
+    data NoEmpty f a = MKNoEmpty { head :: a, tail :: f a}
+
+box(lifted)/unboxed(unlifted) type
+    normal type is boxed
+    Int#, Char# is unlifted, these type is used to notify compiler to optimize there memory representation.
+
+Kind ploymorphism
+    data Proxy a = MkProxy (a here is inferred as inhabited type, it couldn't be Maybe)
+use language extension to support
+{-# LANGUAGE PolyKinds #-}
+{-# LANGUAGE DataKinds #-}
+data Proxy (a :: k) = MkProxy

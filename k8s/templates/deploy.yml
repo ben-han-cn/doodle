@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: counter-test
+  namespace: default
+  labels:
+    app: counter
+    stage: test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: counter
+  template:
+    metadata:
+      labels:
+        app: counter
+    spec:
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+      containers:
+      - name: counter
+        image: bikecn81/counter
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8888
+          name: counter-tcp
+          protocol: TCP

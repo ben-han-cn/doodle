@@ -38,3 +38,14 @@ macro_rules! vec {
 
 
 procedural macro to implement derive
+
+
+debug:
+#![feature(trace_macros)]
+macro_rules! rpn { /* ... */ }
+fn main() {
+  trace_macros!(true);
+  let e = rpn!(2 3 7 + 4 *);
+  trace_macros!(false);
+  println!("{}", e);
+}

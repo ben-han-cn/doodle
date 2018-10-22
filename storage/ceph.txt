@@ -22,6 +22,25 @@ if new osd turns on, it tells the monitor
 the monitor issues a new OSD map recording the change in state
 the osd cooperatively work together to move data to new nodes
 
-object -> location
-hash(obj name/key) % pg(replication group)
+object -> location(OSD id)
+hash(obj name/key) % PG
 CRUSH(pg, cluster state, rule set) //the latter two parameter is get from monitor
+
+
+RADOS(Reliable autonomic distributed object store)
+
+RBD (block device)
+RADOS GW (RestAPI)   --> librados  --> RADOS --> MON + MDS + OSD
+CephFS (file system)
+
+
+read/write:
+client --> one monitor node -> get five maps: monitor, OSD, MDS, CRUSH and PG map
+data --> OSD id --> OSD daemon
+
+
+PG(placement group) is a logical collection of objects that are replicated on OSD,
+it's a logic container holding multiple objects, such that the logic container is 
+mapped to multiple OSDs.
+
+PG --> a acting set( a set of OSDs, first OSD is the primary)

@@ -1,0 +1,79 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+    name: vanguard-cfg
+    namespace: "default"
+    labels:
+        app: vanguard
+data:
+    vanguard.conf: |
+        server:
+            addr: 
+            - 0.0.0.0:53
+            http_cmd_addr: 0.0.0.0:9000
+            handler_count: 512 
+            enable_tcp: false
+        logger:
+            query_log: 
+                enable: true
+                qlog_extension: true
+            general_log:
+                level: info
+        cache: 
+            enable: true
+            short_answer: true
+            prefetch: false
+        recursor:
+        - view: default
+          enable: true
+        resolver:
+          check_cname_indirect: false
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: vanguard
+  namespace: default
+  labels:
+    app: user-dns
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user-dns
+  template:
+    metadata:
+      labels:
+        app: user-dns
+    spec:
+      tolerations:
+      - operator: Exists
+        effect: NoSchedule
+      - operator: Exists
+        effect: NoExecute
+      containers:
+      - name: vanguard
+        image: zdnsopen/vanguard:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+            httpGet:
+                path: /health
+                port: 9000
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            periodSeconds: 15
+            failureThreshold: 2
+        ports:
+        - containerPort: 53
+          name: dns-port
+          protocol: UDP
+        - containerPort: 9000
+          name: cmd-port
+          protocol: TCP
+        volumeMounts:
+        - name: vanguard-cfg
+          mountPath: /etc/vanguard
+      volumes:
+      - name: vanguard-cfg
+        configMap:
+            name: vanguard-cfg

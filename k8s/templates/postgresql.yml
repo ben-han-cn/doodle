@@ -1,0 +1,39 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: postgres9
+spec:
+  serviceName: "postgres"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: postgres
+        image: postgres:9.6
+        env:	
+        - name: POSTGRES_USER
+          value: zdns
+        - name: POSTGRES_PASSWORD
+          value: zdns
+        - name: POSTGRES_DB
+          value: zdns
+        ports:
+        - containerPort: 5432
+          name: db
+        volumeMounts:
+        - name: pgdata
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+  - metadata:
+      name: pgdata
+      annotations:
+        volume.beta.kubernetes.io/storage-class: zdns-nfs-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi
