@@ -5,7 +5,10 @@ attributes.
 But some object like mutex is inherent shared mutable, since each
 owner (reference) could lock and unlock the mutex, and lock option 
 will inevitably modify its inner attribute. Another example is clone 
-for Rc<T> object
+for Rc<T> object, Rc or Arc itself cann't escape the alias check enforced
+by compiler, Rc/Arc make one data could be shared by different place, 
+but they still can only one mutable(ref) to one T, so Rc/Arc couldn't 
+solve the shared mutability problem. 
 
 UnsafeCell, Cell, RefCell is rust provoid tool to implement the 
 interior mutability, they are samiliar with const point in c++, point

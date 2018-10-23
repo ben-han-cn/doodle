@@ -1,0 +1,6 @@
+docker pull "bikecn81/linkerd-io-grafana:stable-2.0.0"
+docker pull "prom/prometheus:v2.4.0"
+docker pull "bikecn81/linkerd-io-web:stable-2.0.0"
+docker pull "bikecn81/linkerd-io-proxy:stable-2.0.0"
+docker pull "bikecn81/linkerd-io-proxy-init:stable-2.0.0"
+docker pull "bikecn81/linkerd-io-controller:stable-2.0.0"

@@ -1,0 +1,73 @@
+api:
+keys and values are bytes
+data are stored sorted by key
+update operation: Put/Delete/Merge
+queries: Get/Iterator
+
+LSM(log structured merge)
+
+write from application --> Memtable(RAM)    ---> sst (peroidically compact)   
+                           Transaction log
+
+
+read --> active memtab --> readonly memtab --> readonly Blockcache --> sst
+
+(when search sst, use Blooms to filter target instead of look each file)
+sst is all readonly
+since there is no delete, search is about to find where is the latest key.
+
+
+SST(static sorted table) files
+All keys are sorted
+Block based format (data on SSD)
+Plain table format (data on RAM)
+
+
+column families: save different kind of data into rocksdb
+    shared same transaction log
+    
+
+consistent level:
+1 disable wal
+    data in memtab will be lost
+2 sync = false
+    let os handle flush, so most write data maybe lost
+3 sync = true
+    every write will synced to disk
+
+wal(transaction log) recovery
+recover all data from WAl (if log file is corrupt, db won't be started)
+recover all except the last WAL record
+recover upto the first corrupted record
+recover all valid records (skip corrupted record)
+
+
+block cache:
+used only for reads
+adjacent keys are delta-encoded
+shared n ways to avoid lock contention
+configure:
+    index and filter blocks could be put into cache
+        index block stores the beg and end key of each block in SST file
+    compressed or uncompressed
+
+
+compaction filter:
+invoked during compact sst files
+    drop keys or modify values
+    c++ or lua code
+
+
+merge recoreds
+    user write a merge record to db
+    specifies a mergeOperator
+    invoked by compaction and get
+    avoid read-modify writes
+    assoicateMerge and genericMerge
+
+
+add external sst file
+    used to import data
+    all keys are added atomically
+    add as most recent or as oldest
+    it's implemented in constant time instead of insert key by key

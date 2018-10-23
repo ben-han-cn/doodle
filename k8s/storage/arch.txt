@@ -1,4 +1,11 @@
-volume:
+kubernetes:
+    storage connection management
+        FlexVols, CSI
+
+    storage dynamic provision
+        internel, external provisioners
+
+
 On-disk files in container are ephemeral
   volume keep the state out of the container.
 state needs to be shared between containers in same pod.

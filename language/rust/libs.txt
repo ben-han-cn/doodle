@@ -7,7 +7,6 @@ flag    ---> no value is specified   -v, -h
 option  ---> has value       -c config   //takes_value(true)
 
 
-
 serde
   serialization
 

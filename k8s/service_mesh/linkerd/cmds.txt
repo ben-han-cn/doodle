@@ -1,0 +1,5 @@
+linkerd inject emojivoto.yml | sed -e 's/gcr.io\/linkerd-io\//bikecn81\/linkerd-io-/g' > injected.yml
+
+linkerd dashboard
+
+kubectl -n emojivoto port-forward web-848d6c9894-pmgbv 8080:80
