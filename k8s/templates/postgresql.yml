@@ -1,7 +1,24 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: psql
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: psqlconf
+  namespace: psql
+type: Opaque
+data:
+  database: emRucw== #echo -n 'zdns' | base64
+  username: emRucw==
+  password: emRucw==
+---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
   name: postgres9
+  namespace: psql
 spec:
   serviceName: "postgres"
   replicas: 1
@@ -16,11 +33,20 @@ spec:
         image: postgres:9.6
         env:	
         - name: POSTGRES_USER
-          value: zdns
+          valueFrom:
+           secretKeyRef:
+            name: psqlconf
+            key: username
         - name: POSTGRES_PASSWORD
-          value: zdns
+          valueFrom:
+           secretKeyRef:
+            name: psqlconf
+            key: password
         - name: POSTGRES_DB
-          value: zdns
+          valueFrom:
+           secretKeyRef:
+            name: psqlconf
+            key: database
         ports:
         - containerPort: 5432
           name: db
@@ -31,7 +57,7 @@ spec:
   - metadata:
       name: pgdata
       annotations:
-        volume.beta.kubernetes.io/storage-class: zdns-nfs-storage
+        volume.beta.kubernetes.io/storage-class: managed-nfs-storage
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
