@@ -1,3 +1,21 @@
+Isolation level:
+    read uncommitted //useless
+    read committed //default
+    repeatable reads
+    serializable
+
+key difference between "read commited" and "repeated read"
+both can lead to phantom reads. invoke same query in one tx get 
+different result.
+but read commited --> rows include in first read can be changed
+repeated read --> rows include in first read cann't changed by other
+ transaction, but new row could be added which meet the first read.
+
+SET transaction isolation level repeatable read;
+SHOW transaction_isolation;
+
+
+
 Multiversion Concurrency Control(MVCC)
 1 every row except has all the coloms user define, also includes two extra colum
     xmin 

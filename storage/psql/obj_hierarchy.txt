@@ -1,0 +1,59 @@
+psql cluster:
+    a set of db
+        listen on same port
+        has same configuration
+        write data to same storage area
+    initdb create a cluster
+
+
+tablespace
+    a link to a directory in filesystem 
+    a container to hold all other objects, 
+    such as tables,indexes, and so on.
+
+    pg_default, pg_global is two default tablespace.
+
+    CREATE TABLESPACE mytablespace LOCATION '/pgdata/tbl1';
+    DROP TABLE IF EXISTS dept;
+    CREATE TABLE dept (id int, dept_name text) tablespace mytablespace;
+
+    \! oid2name -d test  //test is the db name
+    SELECT pg_relation_filepath('dept');
+
+    \! is used to execute shell in psql
+
+
+temp table
+    CREATE  UNLOGGED TABLE myunloggedtbl(id int);
+    CREATE TEMPORARY TABLE mynewtbl(id int);
+
+view
+    stores queries
+    make later query much convenient
+
+database
+    template: template0 and template1
+    CREATE DATABASE db1; //a clone of template1 db is created.
+    CREATE DATABASE newdb TEMPLATE mydb; 
+
+    schema: like a namespace
+        public //default namespace
+            CREATE SCHEMA mynewschema;
+            CREATE TABLE mynewschema.emp (id integer, first_name text);
+        table and index resides in schema
+        when no schema is specified in sql, a search path will be used
+            SHOW search_path;
+            SET search_path="$user",public,mynewschema; //order matters
+
+user and role 
+    \du+
+    ALTER USER my_user WITH superuser;
+    \dp+ table_emp; //show privilege on table
+    GRANT ALL ON table_emp TO my_user;
+    GRANT SELECT ON table_emp TO my_user;
+    r(Read), w(Wirte), a(Append/Insert), d(Delete), D(truncate), x(References)
+    t(Trigger), X(execute), C(create), c(connect)
+
+    CREATE USER bank PASSWORD 'bank';
+    ALTER USER bank WITH createdb;
+    \c test bank //connect to db test with user bank

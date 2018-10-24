@@ -1,0 +1,124 @@
+api design:
+    in seperate doc which is seprated from code
+    "user": {
+        "description": "Represent a single user in the system",
+        "fields": [
+            {"name": "id", "type": "string"},
+            {"name": "email", "type": "string", "required": false, "annotations": ["personal_data"]},
+            {"name": "name", "type": "name", "annotations": ["personal_data"]},
+            {"name": "status", "type": "user_status", "default": "active"},
+        ]
+    }
+
+    //which is used to create user
+    "user_from": {
+    "fields": [
+            {"name": "email", "type": "string", "required": false, "annotations": ["personal_data"]},
+            {"name": "password", "type": "string", "required": false, "annotations": ["personal_data"]},
+            {"name": "name", "type": "name_form", "required": false, "annotations": ["personal_data"]},
+        ]
+    }
+
+    it should be consistent in the scope of entire company (validate use linter)
+    automatic test to make sure the document is confirmed with the service
+    code generation tool to generate service/http routing function for the framework
+
+
+database architecture
+    echo micro service application own its database
+    no other service is allowed to connect to the database
+    other service use only the service interface (API + Events) 
+
+    tool to generate the db, table from the resource definition
+    (add hash_code to object to check whether it has changed to avoid unnecessary io operation)
+
+
+continuous delivery is very important
+    deploy trigger by a git change(commit or tag) --- delta
+
+standard health check
+    "models": {
+        "healthcheck": {
+            "fields": [
+                {"name" : "status", "type": "string", "example": "heathy"}
+            ]
+        }
+    }
+
+    "resources": {
+        "healthcheck": {
+            "path": "/_internal_",
+            "operations": [
+            {
+                "method": "GET",
+                "path": "/healthcheck",
+                "response": {
+                    "200": {"type": "healthcheck"},
+                    "422": {"type": "io.flow.error.v0.models.generic_error"}
+                }
+            ]
+        }
+    }
+
+
+we have an amazing api, but please subscribe to our evnet streams instead
+event interface:
+    first class schema for all events
+    "unions": {
+        "user_event": {
+            "discriminator": "discriminator",
+            "types": [
+                {"type": "user_upserted"},
+                {"type": "user_deleted"}
+            ]
+        }
+    }
+
+    "models": {
+        "user_upserted": {
+            "fields": [
+                {"name": "event_id", "type": "string"},
+                {"name": "timestamp", "type": "date-time-iso8601"},
+                {"name": "user", "type": "io.flow.common.v0.models.user"}
+            ]
+        },
+
+        "user_deleted":  {
+            "fields": [
+                {"name": "event_id", "type": "string"},
+                {"name": "timestamp", "type": "date-time-iso8601"},
+                {"name": "user", "type": "io.flow.common.v0.models.user"}
+            ]
+        }
+    }
+    producer guarantee at least once delivery
+    consumers implememt idempotency
+
+producer:
+    create a journal of All operations on table (journal like event source)
+    record operation (insert, update, delete)
+    on creation, queue the journal record to be published
+    real time, async, publish 1 event per journal record
+    enable replay by simply queueing journal record
+
+consumer:
+    store new events in local database, partitioned for fast removal
+    on event arrival, queue record to be consumed
+    process incoming event in micro batch(by default every 250ms)
+    record failure locally(report to center monitor system)
+
+stream:
+    has lib to handle stream
+    stream has name which also should include the serialization method (json, grpc, etc)
+    stream lib should easy for local end to end test (in memory queue)
+
+
+dependencies:
+    upgrade all servies every week to latest dependecies
+    dependencies tracking
+
+
+
+go-lang:
+    https://github.com/goadesign/goa.git
+    https://github.com/go-kit/kit

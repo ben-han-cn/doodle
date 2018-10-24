@@ -114,3 +114,4 @@ replicationcontrollers -- rc
 resourcequotas -- quota
 services -- svc
 serviceaccounts -- sa
+statefulset -- sts

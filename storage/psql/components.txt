@@ -1,0 +1,70 @@
+user rw -->  sharedbuff --> os cache --> disk
+
+sharedbuffer
+    psql handle data in block(8k)
+        emp table with one record;
+        SELECT pg_relation_filepath('emp');
+        base/24741/24742  --> 8192 bytes = 8K
+    write normaly only change the buffer, and write to WAL, 
+    
+
+checkpoint
+    a process to sync the data(record, index) between mem and disk
+    the basic unit to sync is block/page, and normally with 8k size
+    
+    checkpoint will run when any condition is met:
+    checkpoint_timeout period has elapsed
+    checkpoint_segments nubmer of WAL have been filled
+
+    longer checkpoint interval may cause io spikes which will affect
+    the query performance.
+
+    checkpoint_completion_target tells psql how quickly it must try and finish
+    the sync in each iteration. with default value of 0.5, psql can be exepected
+    to finish the sync using half of the interval.
+
+    At checkpoint time, all dirty data pages are flushed to disk and a
+    special checkpoint record is written to the log file.
+
+
+WAL:
+    write --> WAL buffer
+    commit --> sync to WAL segments, (each WAL segment is 16M)
+
+    wal_level decides the amount of information written to WAL
+    minimal: only support crash recovery
+    archive: archive WAL to support point-in-time recovery
+    hot_standby: run readonly queries on a standby server.
+
+background writer:
+writing to disk specific dirty buffers based on an algorithm, whereas checkpointer
+write all dirty buffers. It ensure that thera are available buffers in shared buffer
+for new data to fulfill read requirement.
+
+vacuum:
+    remove dead record which created for MVCC
+
+logger:
+    logging_collector = on
+    log level:
+        INFO
+        NOTICE
+        WARNING
+        ERROR
+        LOG
+        FATAL
+        PANIC
+
+stats collector
+    \d pg_stat
+    //when memory isn't enough, psql will use tmp file to implement some operation. 
+    SELECT temp_files, temp_bytes FROM pg_stat_database WHERE datname = 'postgres';
+
+WAL send and receive
+
+
+other mem:
+    work_mem --> for sort operation
+    maintenance_work_mem --> for vacuum
+
+
