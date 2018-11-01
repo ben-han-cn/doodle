@@ -1,0 +1,20 @@
+storage service: needs to be consistent across data centers
+computer service: driven by user traffic, as needed basis
+
+
+
+storage:
+postgresql: user, media, friendship 
+
+    django         read ---> replica
+                    
+                   write ---> master
+
+    batch write
+    across DC
+
+
+cassendra: user feeds, activites
+
+memcache isn't global consistent, use postgresql to invalidate the cache
+seperate daemon monitor postgresql log in each DC.

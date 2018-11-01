@@ -4,10 +4,18 @@ where to put code
 The role of each object in a big system?
 messy base class
 
-ns -> 100ns -> 150 000 -> 150 000 000
+object is very hard to design very condense/coherent:
+    all the function works on a common set of data
+big data is very cach unfriendly, since some method only needs
+part of the data.
 
+ns -> 100ns -> 150 000 -> 150 000 000
 
 base object --> first level object
 add new abstraction to struct without new attribute/state
 abstract algorithm instead of object
 make algorithm composable
+
+data driven design:
+    concentrate on data transformation
+

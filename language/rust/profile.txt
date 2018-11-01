@@ -1,0 +1,3 @@
+valgrind --tool=memcheck target/debug/hello
+valgrind --tool=massif target/debug/hello
+valgrind --tool=cachegrind target/debug/hello

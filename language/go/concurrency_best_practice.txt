@@ -1,0 +1,264 @@
+split code to producer and consumer side
+close channel at producer side, never let consumer side to tell, it's done
+write to or read from nil channel will block for ever
+
+1 generator
+func boringStringGen() <-chan string {
+    c := make(chan string)
+    go func() {
+        for i := 0; i < 100; i++ {
+            c <- "xxx"
+        }
+        close(c)
+    }()
+    return c
+}
+
+for s := range boringStringGen() {
+    fmt.Println(s)
+}
+
+
+2 sync function call
+
+func loop(notify chan struct{}) {
+    for {
+        select {
+        case <-notify:
+            cleanup()
+            noitfy <- struct{}{}
+        case ....
+        }
+    }
+}
+
+notify := make(chan struct{})
+loop(notify)
+....
+notify <- struct{}{}
+<-notify
+
+
+3 fan in/out 
+func merge(cs ...<-chan int) <-chan int {
+    var wg sync.WaitGroup
+    out := make(chan int)
+
+    collect := func(c <-chan int) {
+        for n := range c {
+            out <- n
+        }
+        wg.Done()
+    }
+
+    wg.Add(len(cs))
+    for _, c := range cs {
+        go collect(c)
+    }
+
+    go func() {
+        wg.Wait()
+        close(out)
+    }()
+    return out
+} 
+
+func split(cs <-chan int) (<-chan int, <-chan int) {
+    o1 := make(chan int)
+    o2 := make(chan int)
+    go func() {
+        for i := range cs {
+            var o1_, o2_ = o1, o2
+            for i := 0; i < 2; i++ {
+                select {
+                    case o1_ <- val:
+                        o1_ = nil
+                    case o2_ <- val:
+                        o2_ = nil
+                }
+            }
+        }
+    }()
+    return o1, o2
+}
+
+
+4 broadcast
+subscribe := func(c *sync.Cond, fn func()) {
+    scheduled := make(chan struct{})
+    go func() {
+        scheduled <- struct{}{}
+        c.L.Lock()
+        defer c.L.Unlock()
+        c.Wait()
+        fn()
+    }()
+    <-scheduled //make sure go routine is scheduled
+}
+
+var subscriberRunned sync.WaitGroup
+subscriberRunned.Add(3)
+event := sync.NewCond(&sync.Mutex{})
+subscribe(event, func() {
+    fmt.Printf("fired\n")
+    subscriberRunned.Done()
+})
+
+subscribe(event, func() {
+    fmt.Printf("clicked\n")
+    subscriberRunned.Done()
+})
+
+subscribe(event, func() {
+    fmt.Printf("send\n")
+    subscriberRunned.Done()
+})
+event.Broadcast()
+subscriberRunned.Wait()
+
+5 mem pool
+var putBufferPool = sync.Pool {
+  New: func() interface{} {
+    return &pubBuffer{}
+  },
+}
+
+func newPutBuffer() *putBuffer {
+  return putBufferPool.Get().(*putBuffer)
+}
+
+func (b *putBuffer) release() {
+  *b = pubBuffer{} //make sure b is cleared, and later user could get a
+                   //brand new buffer
+  putBufferPool.Put(b)
+}
+
+6 or, channels recursive
+func or(channels ...<-chan interface{}) <-chan interface{} {
+    switch len(channels) {
+    case 0:
+        return nil
+    case 1:
+        return channels[0]
+    }
+
+    orDone := make(chan interface{})
+    go func() {
+        defer close(orDone)
+        select {
+        case <-channels[0]:
+        case <-or(channels[1:]...):
+        }
+    }()
+    return orDone
+}
+
+7 pipeline
+func stage(done <-chan struct{}, input <-chan interface{}) <-chan interface{} {
+    output = make(chan interface{})
+    go func() {
+        defer close(output)
+        for val := range input {
+            select {
+            case <-done:
+                return
+            case output <- transformFunc(val):
+            }
+        }
+    }()
+    return output
+}
+
+adaptor
+func takeN(done <-chan struct{}, input <-chan interface{}, n int) <-chan interface{} {
+    output = make(chan interface{})
+    go func() {
+        defer close(output)
+        for i := 0; i < n; i++ {
+            select {
+            case <-done:  
+                return
+            case output <- <-input:
+            }
+        }
+    }()
+    return output
+}
+
+6 context
+func serve() {
+    var wg sync.WaitGroup
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel() //cancel should be called to release the resource associate with the ctx
+
+    wg.Add(1)
+    go func() {
+        wg.Done()
+        if err := longRun1(ctx); err != nil {
+            cancel()
+        }
+    }()
+
+    wg.Add(2)
+    go func() {
+        wg.Done()
+        if err := longRun2(ctx); err != nil {
+            cancel()
+        }
+    }()
+    
+    wg.Wait()
+}
+
+func longRun1(ctx context.Context) (string, error) {
+    ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+    defer cancel()
+    
+    select {
+    case <- ctx.Done():
+        return "", ctx.Err()
+    default:
+        runBigTask()
+    }
+    return xxx, nil
+}
+
+7 long work with heartbeat
+
+func doWork(ctx context.Context, pulseInterval time.Duration) (<-chan interface{}, <-chan struct{}) {
+    heartbeat := make(chan struct{})
+    result := make(chan interface{})
+
+    sendPuls := func() {
+        select {
+        case heartbeat<-struct{}{}:
+        default:
+        }
+    }
+
+    sendResult := func(val interface{}) {  
+        select {
+        case <-ctx.Done():
+        case result <- val:
+        }
+    }
+
+    go func() {
+        defer close(heartbeat)
+        defer close(result)
+        
+        pulse := time.Tick(pulseInterval)
+        for {
+            select {
+            case <-ctx.Done():
+                return
+            case <-pulse:
+                sendPuls()
+            default:
+                sendResult(doRealJob())
+            }
+        }
+    }()
+
+    return result, heartbeat
+}

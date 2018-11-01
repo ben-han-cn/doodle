@@ -1,0 +1,14 @@
+standard data structure
+    meta data
+
+standard verbs
+    post
+    put
+    get
+    delete
+    list
+    watch
+
+standard resource
+
+

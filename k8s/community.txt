@@ -1,0 +1,31 @@
+container-centric os (Red Hat CoreOS)
+k8s extension framework
+    kubebuilder
+    operator framework
+        operator development
+        operator lifecycle mangement
+        operator metering
+        https://github.com/operator-framework/awesome-operators
+
+enterprise level k8s -- Red Hat OpenShift
+
+container registry
+
+container vulnerability static analysis
+    https://github.com/coreos/clair
+
+storage
+    rook + ceph
+
+network
+    flannel
+    calico
+    weave
+    kube-router
+    
+
+development CI/CD:
+    GoCD  //jrails
+    concurse //https://github.com/concourse/concourse.git
+    Skaffold //CLI https://github.com/GoogleContainerTools/skaffold.git
+    argo //https://github.com/argoproj/argo.git

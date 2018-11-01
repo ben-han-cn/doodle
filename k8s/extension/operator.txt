@@ -1,0 +1,15 @@
+custom resource + controller
+    resource: an endpoint in k8s API that stores k8s objects of a
+    certain kind. A custom resource is essentially a resource that
+    can be added to k8s to extent the basic k8s API.
+
+
+1 operator-sdk new k8s-operator-example
+2 operator-sdk add api --api-version=zdns.cn/v1 --kind=SuperZone
+3 update types
+    vim pkg/apis/zdns/v1/superzone_types.go
+    operator-sdk generate k8s
+
+4 operator-sdk add controller --api-version=zdns.cn/v1 --kind=SuperZone
+5 build container
+    operator-sdk build zdnsopen/superzone

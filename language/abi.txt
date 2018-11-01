@@ -1,0 +1,14 @@
+Type:
+    Layout
+        Size
+        Alignment
+            hardware requirement
+            performance
+        Offsets
+
+
+ABI:
+    layout of type
+    call convention
+        parementer and return value
+        stack, register management

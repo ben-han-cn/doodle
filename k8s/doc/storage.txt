@@ -133,3 +133,9 @@ access mode:
 ReadWriteOnce: only one node could mount the volumn and read, write
 ReadOnlyMany: many nodes could mount it and read
 ReadWriteMany: many nodes could mount it and read, write
+
+
+persistentVolumeReclaimPolicy:
+Delete:  volumn will be delete
+Retain:  volumn is used by other, data is kept, but this pv couldn't be reused.
+Recycle: deprecate

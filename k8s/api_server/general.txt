@@ -22,6 +22,45 @@ a real object, so there is logical resource like "jobs/status" which has
 kind job which is same with resource jobs
 jobs/resources is sub resource of jobs
 
+use resourceVersion to deletect object change, also to avoid concurrent update
+
+use chucks to retrieving large result
+    client send limit as url param to server 
+    server return continue in metadata
+    client send limit and continue value to server again
+    server return all the data, set continue to empty
+
+
+    GET /api/v1/pods?limit=500
+    ---
+    200 OK
+    Content-Type: application/json
+    {
+    "kind": "PodList",
+    "apiVersion": "v1",
+    "metadata": {
+        "resourceVersion":"10245",
+        "continue": "ENCODED_CONTINUE_TOKEN",
+        ...
+    },
+    "items": [...] // returns pods 1-500
+    }
+    
+    GET /api/v1/pods?limit=500&continue=ENCODED_CONTINUE_TOKEN
+    ---
+    200 OK
+    Content-Type: application/json
+    {
+    "kind": "PodList",
+    "apiVersion": "v1",
+    "metadata": {
+        "resourceVersion":"10245",
+        "continue": "ENCODED_CONTINUE_TOKEN_2",
+        ...
+    },
+    "items": [...] // returns pods 501-1000
+    }
+
 
 multi-version object:
 different url to get one object

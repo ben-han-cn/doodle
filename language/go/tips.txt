@@ -6,23 +6,6 @@ pp.Stop()
 
 go tool pprof -pdf ../vanguard mem.pprof  > vgmem.pdf
 
-
-var putBufferPool = sync.Pool {
-  New: func() interface{} {
-    return &pubBuffer{}
-  },
-}
-
-func newPutBuffer() *putBuffer {
-  return putBufferPool.Get().(*putBuffer)
-}
-
-func (b *putBuffer) release() {
-  *b = pubBuffer{} //make sure b is cleared, and later user could get a
-                   //brand new buffer
-  putBufferPool.Put(b)
-}
-
 //go race check
 go test -race
 

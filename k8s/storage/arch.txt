@@ -86,3 +86,8 @@ PersistentVolumeReclaimPolicy
     Retain: adminstrator needs to clean data manually
     Recycle: rm -rf /thevolum/*
     Delete: delete the volume, use by cloud provider
+
+
+unit
+M, G, T -> mulitplies of 1000     (based on power of 10)
+Mi, Gi, Ti --> mulitplies of 1024 (based on power of 2)

@@ -1,0 +1,35 @@
+declarative style command
+
+apply -- compare three objects, calcuate diff(mainly about fields), then apply
+1 desired state, file specified in cmd
+2 last applyed state, which is saved in the live obj under annotation:
+    kubectl.kubernetes.io/last-applied-configuration
+3 live state, which is the conseqence of several operations
+(note: live state could be affected by several cmds, take deployment for example
+    apply, create --> create the obj
+    scale --> update the replica field.)
+
+except add or delete the whole object more complicate scenario is update.
+for the underlaying fields for one object:
+    desired sepcified, but last time not specified --> add
+    desired not sepcified, but last time specified --> delete
+    desired and last apply both not specified, but live obj have --> just keep the value
+    both desired and last apply specified:
+        primitve types (string, int, bool) -> replace
+        maps -> merge
+        list -> overwrite 
+                merge, JSON merge patch(rfc7386) + strategic merge patch (custom to k8s)
+
+type PodSpec struct {
+    Volumes []Volume `patchStrategy:"merge,retainKeys" patchMergeKey:"name" `
+    Containers []Container `patchStrategy:"merge" patchMergeKey:"name" `
+    Tolerations []Toleration `protobuf:"bytes,22,opt,name=tolerations"`
+}
+
+for each list field
+    patchStrategy -- what to do
+    patchMergeKey -- treat list as map and use which field for merge
+                     without patchMergeKey, the list will be replaced.
+
+so for admin to use apply to manage k8s obj, best practice is to store the last applied file
+into git, and make sure each apply is based on the latest file.

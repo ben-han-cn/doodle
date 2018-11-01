@@ -1,0 +1,23 @@
+index
+    is pure redundancy. 
+    it doesnot change the table data, but create a new data structure that refers to 
+    the table. 
+    it refers to the actual information stored in a different place.
+    implementation:
+        double linked list -- sorted and easy to modify 
+        balance tree
+
+
+
+double linked list to store leaf node:
+struct 
+    node (indexed-column, row-id)
+    prev 
+    next
+
+B+ tree for quick search the leaf node.
+
+index lookup:
+    travel tree
+    follow leaf node chain(same column key)
+    fetch the table data

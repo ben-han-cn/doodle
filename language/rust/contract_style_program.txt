@@ -1,0 +1,3 @@
+assert!(self.table.size() <= new_raw_cap);
+assert_eq!(self.table.size(), old_size);
+debug_assert!(buckets.index() != start_index);

@@ -12,3 +12,7 @@ serde
 
 parking_lot
   synchronization primitive
+
+
+azul
+    Desktop GUI framework (https://github.com/maps4print/azul.git)

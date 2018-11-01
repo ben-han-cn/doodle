@@ -1,0 +1,43 @@
+1 recreate
+shutdown old version then launch new version, which will cause downtime
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: recreate
+spec:
+  replicas: 3
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: nginx
+    spec:
+      containers: 
+        - name: nginx
+          image: nginx:1.10
+          ports:
+            - name: http
+              containerPort: 80
+
+
+2 rolling update (default)
+slowly rolling out new version by replacing the previous ones.
+request -> v1
+add v2
+request -> v1 and v2
+delete v1 one by one
+request -> v2
+
+3 blue/green
+deploy v1 and v2
+service selector match v1
+after successfully test v2
+change service selector to match v2
+
+4 A/B testing
+consumer sepration and providing different subsets of functionalities.
+deploy v1 and v2
+use smart router(service mesh) to route to different deploy based on query attributes 
+use case: seperate desktop from mobile user.

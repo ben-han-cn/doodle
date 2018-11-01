@@ -102,4 +102,5 @@ general purpose default cluster roles:
 cluster-admin ----> super user
 admin, edit, view ----> namespaced user roles
 
-
+for a container, service account related file is located at:
+    /var/run/secrets/kubernetes.io/serviceaccount/

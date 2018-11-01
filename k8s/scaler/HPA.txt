@@ -1,0 +1,35 @@
+system metrics
+    cpu/memory from container or node
+
+service metrics
+    explicity defined in appliation code and exported
+    including 
+        produced by k8s infrastructure components
+        produced by user applications
+
+
+horizontal pod autosaling use core metrics + service metrics
+
+
+core(system) metrics pipeline --> metric-server
+
+
+monitoring pipeline --> (cAdvisor + promethus)
+    cAdvisor: core and non-core system metrics (container level)
+    service metrics exposed by application via http handler
+    optional metrics about node itself from Node exporter
+
+
+HPA(horizontal pod autoscaler)
+    scale deployment to a target utilization within user-defined min/max bounds
+    pod count = ceil(sum(utiliztion) / target utilization)
+
+
+deploy HPA:
+1 metric server --> /apis/metrics.k8s.io (kubectl get --raw "/apis/metrics.k8s.io/")
+2 k8s-prometheus-adaptor  --> /apis/custom.metrics.k8s.io/v1beta1
+                              /apis/external.metrics.k8s.io/v1beta1
+    https://github.com/DirectXMan12/k8s-prometheus-adapter.git
+
+
+HPA controller fulfill its scaling through update the replicas field of a deployment.

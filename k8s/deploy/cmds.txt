@@ -16,7 +16,8 @@ k delete svc,deploy -l app=niceone // -l == select label with
 k delete pods --all --namespace test
 k delete -f xxx.yml
 
-k get pods --watch
+k get --raw /api/v1/namespaces/kube-system //direct access rest api
+k get pods --watch //k get pods -w
 k get pods -o json
 k get pods -o wide
 k get pods -o jsonpath="{.items[*].spec.containers[*].name}"
@@ -115,3 +116,7 @@ resourcequotas -- quota
 services -- svc
 serviceaccounts -- sa
 statefulset -- sts
+
+local proxy:
+k proxy --port=8080
+curl http://localhost:8080/api/v1/namespaces/kube-system

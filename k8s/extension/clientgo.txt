@@ -1,0 +1,67 @@
+"k8s.io/apimachinery/pkg/runtime/schema"
+type GroupVersionKind struct {
+    Group   string
+    Version string
+    Kind    string
+}
+
+"k8s.io/apimachinery/pkg/runtime"
+type Scheme struct {
+...
+}
+
+func (s *Scheme) KnownTypes(gv schema.GroupVersion) map[string]reflect.Type 
+func (s *Scheme) AllKnownTypes() map[schema.GroupVersionKind]reflect.Type
+func (s *Scheme) New(kind schema.GroupVersionKind) (Object, error)
+func (s *Scheme) Default(src Object) 
+func (s *Scheme) Convert(in, out interface{}, context interface{}) error
+
+"k8s.io/apimachinery/pkg/api/meta"
+type RESTMapper interface {
+    KindFor(resource schema.GroupVersionResource) (schema.GroupVersionKind, error)
+
+    // KindsFor takes a partial resource and returns the list of potential kinds in priority order
+    KindsFor(resource schema.GroupVersionResource) ([]schema.GroupVersionKind, error)
+
+    // ResourceFor takes a partial resource and returns the single match
+    ResourceFor(input schema.GroupVersionResource) (schema.GroupVersionResource, error)
+
+    // ResourcesFor takes a partial resource and returns the list of potential resource in priority order
+    ResourcesFor(input schema.GroupVersionResource) ([]schema.GroupVersionResource, error)
+
+    // RESTMapping identifies a preferred resource mapping for the provided group kind.
+    RESTMapping(gk schema.GroupKind, versions ...string) (*RESTMapping, error)
+    // RESTMappings returns all resource mappings for the provided group kind if no
+    // version search is provided. Otherwise identifies a preferred resource mapping for
+    // the provided version(s).
+    RESTMappings(gk schema.GroupKind, versions ...string) ([]*RESTMapping, error)
+
+    ResourceSingularizer(resource string) (singular string, err error)
+}
+
+type RESTMapping struct {
+    // Resource is the GroupVersionResource (location) for this endpoint
+    Resource schema.GroupVersionResource
+
+    // GroupVersionKind is the GroupVersionKind (data format) to submit to this endpoint
+    GroupVersionKind schema.GroupVersionKind
+
+    // Scope contains the information needed to deal with REST Resources that are in a resource hierarchy
+    Scope RESTScope
+}
+
+const (
+    RESTScopeNameNamespace RESTScopeName = "namespace"
+    RESTScopeNameRoot      RESTScopeName = "root"
+)
+
+type RESTScope interface {
+    Name() RESTScopeName
+}
+
+"k8s.io/apimachinery/pkg/runtime/schema"
+type GroupVersionResource struct {
+    Group    string
+    Version  string
+    Resource string
+}

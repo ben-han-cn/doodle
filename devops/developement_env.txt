@@ -72,8 +72,9 @@ protoc --go_out=. *.proto //put .proto file in right folder which will be used a
 
 
 curl https://sh.rustup.rs -sSf | sh
-cargo install rustfmt
+rustup component add rustfmt-preview
 git clone --depth=1 https://github.com/rust-lang/rust.vim.git ~/.vim/bundle/rust.vim
+:RustFmt
 
 adduser --ingroup xxx ben
 //add user go sudo group

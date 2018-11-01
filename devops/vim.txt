@@ -16,3 +16,19 @@ ctrl - n  #next match word
 ctrl - p  #prev match word
 
 /\ctarget #case insensitive search
+
+
+vim-go
+https://github.com/fatih/vim-go.git
+//install missing tools
+:GoInstallBinaries guru,gorename,gomodifytags,errcheck,gometalinter,golint
+
+:GoRun -- run current file
+:GoBuild -- compile current package
+
+:GoDef -- to the symbol/declaration
+:GoImport/GoDrop -- add/drop import package
+:GoAddTags/GoRemoveTags -- add tags to struct field
+    GoAddTags ---> add default json
+    GoAddTags yaml --> add `yaml:""`
+:GoErrCheck

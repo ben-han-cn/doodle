@@ -23,3 +23,9 @@ A generic function
     fn generic<T: Sized>(t: T)
 to relex the restriction
     fn generic<T: ?Sized>(t: &T)
+
+
+struct MyDST {
+    tag: u8,
+    data: [u8],
+}
