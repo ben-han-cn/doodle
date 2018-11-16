@@ -32,3 +32,29 @@ https://github.com/fatih/vim-go.git
     GoAddTags ---> add default json
     GoAddTags yaml --> add `yaml:""`
 :GoErrCheck
+
+
+screen movement
+H: top of screen
+M: middle of screen
+L: bottom of screen
+zz, zt, zb: make current line in the top/middle/bottom of screen
+ctrl - e: keep the cursor postion, make scroll down the screen
+ctrl - y: keep the cursor postion, make scroll up the screen
+ctrl-u, ctrl-d: half page movement
+ctrl-b, ctrl-f: full page movement
+0, $: beg, end of currnet line
+^, g_: first, last char on current line
+word-wise: wW, eE, bB
+w -- small word like abc
+W -- big word like abc-goo
+
+
+D == d$
+49,82d //delete from line 49 to 82
+
+
+
+select block, then :fold
+zo - open
+zc - close

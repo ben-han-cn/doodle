@@ -1,0 +1,17 @@
+docker run --rm --name mypsql -d -p 5432:5432 -e POSTGRES_USER=zdns -e POSTGRES_PASSWORD=zdns -e POSTGRES_DB=zdns postgres:11
+
+Cargo.toml
+[dependencies]
+diesel = { version = "1.0.0", features = ["postgres"] }
+dotenv = "0.9.0"
+
+
+//install diesel_cli to init/migrate database
+cargo install diesel_cli --no-default-features --features postgres
+
+
+echo DATABASE_URL=postgres://zdns:zdns@localhost/zdns > .env
+diesel setup
+
+diesel migration generate create_student
+

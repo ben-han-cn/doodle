@@ -1,0 +1,52 @@
+container platform
+
+1 multitenant abstraction
+    project
+        role:
+            admin, edit, view
+
+2 source to container 
+    build from source code
+    build from Dockerfile
+    git rep use webhook to trigger automate rebuilding and deployment
+
+3 application based deployment
+    deployment -> service -> ingress
+    debuging: 
+        local port forwarding
+
+    ingress:
+        edge: https --> proxy --> http
+        passthrough: https --> https
+
+    deployment upgrade strategy
+        rolling, v1 gradually migration to v2
+        recreate, shuddown v1 then start v2
+        blue/green, v1, v2 both deployed, when v2 pass test, route traffic to v2 
+        A/B testing, v1, v2 both deployed and receive traffic for different user
+
+    network between application
+    datasharing between application
+
+4 resource quotas (project scoped) set an upper bound:
+    resource objects
+    computer resource
+  limit range
+  request
+
+
+5 application healthy
+    readiness probe
+        decide related endpoint is added to service, even during pod is
+    running, it could still be remove from service end points, but the pod
+    is keep running without any reschedule action.
+
+    liveness probe
+        whether to create a new pod to replace current failed pod.
+
+6 logging, monitoring and debuging
+    view application logs
+    view resource objs and system events
+    view pod/container metrics
+    run a interactive shell
+    debug startup failure -----

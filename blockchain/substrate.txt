@@ -1,0 +1,14 @@
+paritytech
+substrate is a framework to build blockchain, which combination of three tech:
+    WebAssembly
+    Libp2p
+    AfG consensus
+
+
+block flow
+    1 generic checks
+    2 execute_block(b)
+        consensus check
+        execute transitions
+        get_state, set_state
+        store block

@@ -5,6 +5,8 @@ k expose deployments ghost --port=2368 --type=NodePort
 
 k get pods,rs,deployments
 k get pods --output=wide
+k get pods -l app=flask
+k get pods -L app,pod-template-hash //also display label value of specified key
 
 k logs redis-xxxxxxx
 
@@ -25,6 +27,7 @@ k exec ghost-6b8f77589d-lfcv8 -c ghost -- cat /etc/resolv.conf
 k exec -it ghost-6b8f77589d-lfcv8 /bin/sh
 
 k annotate namespace default daughter=xuru
+k apply -f deploy/flask.yml --dry-run --validate
 
 ETCDCTL_API=2 ./etcdctl ls / --recursive
 
@@ -120,3 +123,9 @@ statefulset -- sts
 local proxy:
 k proxy --port=8080
 curl http://localhost:8080/api/v1/namespaces/kube-system
+
+port forwarding:
+k -n emojivoto port-forward web-848d6c9894-pmgbv 8080:80
+emojivoto            --- namespace
+web-848d6c9894-pmgbv --- pod name
+8080:80              --- <local port>:<pod exposed port>

@@ -1,0 +1,4 @@
+operator
+    provision node
+    software/service
+    healthy check

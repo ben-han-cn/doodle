@@ -43,9 +43,6 @@ kubelet               system:node:${hostname}               system:nodes
 each kubelet has its own identity, which avoid one node to modify the 
 resources allocated on other node.
 
-
-
-
 certificates in k8s:
 api server:
     cluster ca            --> authenticate clients 

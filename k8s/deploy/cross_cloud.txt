@@ -1,0 +1,21 @@
+1 environment template
+k8s version
+    etcd backup/cloud backup service
+external dns
+health check
+networking cni
+    calico
+    rancher ipsec
+    weaveworks
+storage
+scheduler
+
+2 add hosts
+    local
+    cloud 
+
+
+monitoring
+etcd backup
+k8s upgrades
+    component by component

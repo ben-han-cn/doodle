@@ -4,6 +4,9 @@ dockershim:
 cri-containerd
     kubelet <--CRI--> cri-containerd <--> containerd --> runc --> container
 
+    kubelet <--CRI--> cri-o <--> runc --> container
+    kubelet <--CRI--> frakti  <--> runV --> container
+
 CRI is the Container Runtime Interface defined by kubernetes to allows for 
 pluggable container runtime for k8s.
 

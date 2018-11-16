@@ -38,6 +38,7 @@ service account:
     assign an identity to the processes running in a pod
     if not specified, default service account of the namespace
     will be used
+    for each serviceAccount, there will be a secret
 apiVersion: v1
 kind: Namespace
 metadata:

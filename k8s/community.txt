@@ -7,9 +7,11 @@ k8s extension framework
         operator metering
         https://github.com/operator-framework/awesome-operators
 
-enterprise level k8s -- Red Hat OpenShift
+enterprise level k8s distribution -- Red Hat OpenShift
+    https://github.com/openshift/origin
 
 container registry
+    openshift run container registry inside the cluster
 
 container vulnerability static analysis
     https://github.com/coreos/clair
@@ -22,6 +24,10 @@ network
     calico
     weave
     kube-router
+    cilium(BPF)                 https://github.com/cilium/cilium
+    local load balance          
+        baremetal       https://github.com/google/metallb
+        f5              https://github.com/F5Networks/k8s-bigip-ctlr
     
 
 development CI/CD:
@@ -29,3 +35,7 @@ development CI/CD:
     concurse //https://github.com/concourse/concourse.git
     Skaffold //CLI https://github.com/GoogleContainerTools/skaffold.git
     argo //https://github.com/argoproj/argo.git
+
+
+container runtime -- cri-o
+https://github.com/kubernetes-sigs/cri-o

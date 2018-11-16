@@ -1,3 +1,7 @@
+config file folder: /etc/cni/net.d
+plugin folder: /opt/cni/bin
+
+
 type CNI interface {
     AddNetworkList(net *NetworkConfigList, rt *RuntimeConf) (types.Result, error)
     DelNetworkList(net *NetworkConfigList, rt *RuntimeConf) error
@@ -62,3 +66,7 @@ CNIConfig.AddNetworkList: iterator all the plugins in config file, revoke ADD
     }
 
     return prevResult, nil
+
+
+
+
