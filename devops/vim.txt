@@ -25,13 +25,17 @@ https://github.com/fatih/vim-go.git
 
 :GoRun -- run current file
 :GoBuild -- compile current package
-
 :GoDef -- to the symbol/declaration
 :GoImport/GoDrop -- add/drop import package
 :GoAddTags/GoRemoveTags -- add tags to struct field
     GoAddTags ---> add default json
     GoAddTags yaml --> add `yaml:""`
 :GoErrCheck
+
+gorename -from '"cement/cache".Cache' -to KVCreate //rename struct name
+gorename -from '"cement/cache".Cache.Add' -to Create //rename struct method
+gorename -from '"cement/cache".Cache.maxMessageCount' -to maxCount //rename struct field
+gorename -from '"cement/cache".Cache.Get::elem' -to e //rename local variable elem in function Get to e
 
 
 screen movement

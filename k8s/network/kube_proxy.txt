@@ -10,3 +10,12 @@ pods (end points) select by the label.
 
 headless service has no clusterip, in this case, kube-proxy will 
 do nothing. and the service is exposed through DNS
+
+
+modprobe -- ip_vs
+modprobe -- ip_vs_rr
+modprobe -- ip_vs_wrr
+modprobe -- ip_vs_sh
+modprobe -- nf_conntrack_ipv4
+sudo apt-get install -y ipset
+KUBE_PROXY_MODE=ipvs

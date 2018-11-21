@@ -13,3 +13,29 @@ custom resource + controller
 4 operator-sdk add controller --api-version=zdns.cn/v1 --kind=SuperZone
 5 build container
     operator-sdk build zdnsopen/superzone
+
+
+
+customer resource
+metadata: (standard fields helping k8s to manage the object)
+    name/namespace
+    Labels      //query or group resource
+    OwnerReferences //handle resource relationship
+    Anotations  //store controller related metadata
+    Finalizers //pre deletion hook, custom cleanup routine
+
+Spec: (Desired resourcde state)
+    Custom field 1
+    ....
+    Custom field n
+
+
+Status: (Autual resource state)
+    Condtions (latest observations on current state)
+    
+    Custom field 1
+    ...
+    Custom field n
+
+
+parent/child resource

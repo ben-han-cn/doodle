@@ -1,0 +1,48 @@
+client module
+client
+functionality:
+	CRUD & List resources
+	update status of resource
+
+desgin:
+	expose runtime.Scheme and meta.RESTMapper which will make client
+	to understand not only k8s core type but other custom resources.
+
+typedClient
+    implementation of the client interface
+    invoke the go-client api with rest client and meta data
+    
+client_cache
+    return the rest client to typedClient for sepcified resource
+    cache rest client for known resources
+
+note:
+    resource has two kind
+        structured:         has related golang struct 
+        unstructured:       maps which includes key value
+    unstructured resource is handled by k8s.io/client-go/dynamic
+
+    "k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+    obj runtime.Object could be checked through 
+    u, ok := obj.(*unstructured.Unstructured)
+
+
+cache module
+cache interface
+    get/list resources
+    get informer for specified resource or gvk
+    indexing specified field of resource
+        index is used when list object use field selector 
+
+informerCache
+    implementation of the cache interface
+    a wrapper of InformersMap
+
+informersMap
+    for each gvk create a SharedIndexInformer
+    add client read interface to SharedIndexInformer
+
+SharedIndexInformer:(in client-go)
+    informer
+        index
+            store

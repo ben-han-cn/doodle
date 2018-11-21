@@ -10,7 +10,7 @@ indexFunc
   func : obj ---> keys []string
 
 index:
-  key ---> keys []string
+  key(field value) ---> keys(resource key) []string
 
 indices:
   index method ---> index
