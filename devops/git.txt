@@ -62,3 +62,10 @@ git count-objects
 
 git submodule add https://xxxxx.git lib_a
 git config -f .gitmodules submodule.lib_a.branch stable
+
+            new-files   modified-fiels deleted-fiels
+git add -A     +            +              +
+git add .      +            +              
+git add -u                  +              +
+
+git add ./\*.rs //add all the rust source file recursively

@@ -63,7 +63,4 @@ select block, then :fold
 zo - open
 zc - close
 
-            new-files   modified-fiels deleted-fiels
-git add -A     +            +              +
-git add .      +            +              
-git add -u                  +              +
+
