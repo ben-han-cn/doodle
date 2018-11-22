@@ -36,6 +36,7 @@ Under these circumstances 在这种情况下
 otherwise 否则
 whereas 然而（对比两个事实），鉴于
 suppose ... 假设
+In addition to 除此之外
 
 The concept of public libraries is largely based on the premise that all citizens
 in a democracy must have access to information. As more information

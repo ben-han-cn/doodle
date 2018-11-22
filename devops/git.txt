@@ -1,0 +1,64 @@
+git co -f                   //wipes out all the change you've made
+git cat-file -p HEAD        //p - print commit, blob tree object
+git fsck --dangling         //file not referred to by other objects or references
+
+
+git add -->     create blob
+git commit -->  create tree and commit
+
+git log --all --graph \
+   --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%ci) %C(bold blue)<%an>%Creset'
+
+
+git log --grep "bug: xxx" v3.1.0..HEAD
+git log --all --since="30 day ago" --oneline --auth="david"
+git diff --name-only v3.1.0..HEAD //list file changed since v3.1.0 
+git diff --name-only --diff-filter=D v3.1.0..HEAD //list file changed since v3.1.0  //list deleted file
+git diff --name-status --diff-filter=DA branch1 branch2
+
+git merge --no-ff vs git merge
+    branch1   c1
+    branch2      c2 c3 c4
+
+when branch2 based on branch1, after some commit, and merge with branch1, but branch1 has no commit
+during branch2
+    with fast forward: 
+        c1 c2 c3 c4 //merge doesn't add new commit, and from histroy, no branch is displayed
+    with no fast forward:
+        c1           c5 //c5 is the new commit, although there is no difference from c4, but branch history is
+            c2 c3 c4    //reserved
+
+
+git shortlog -5 --numbered --summary
+
+
+.git/hook/prepare-commit-msg
+.git/hook/commit-msg
+.git/hook/pre-push
+
+
+git reset --hard HEAD^ //remove the last commit
+git reset --mixed HEAD^ //remove the last commit, reset staging area, but keep working directory
+git reset --soft HEAD^ //remove the last commit, keep the staging area and working directory
+
+
+git log --oneline
+c3
+c2
+c1
+git revert c2 //revert add a new commit, and apply the anti-patch introduced by the commit in question.
+git log --oneline
+c4
+c3
+c2
+c1
+
+git revert -m 1 merge_commit //keep the mainline, revert the change in other branch
+
+git fetch --prune
+git gc
+git count-objects
+
+
+git submodule add https://xxxxx.git lib_a
+git config -f .gitmodules submodule.lib_a.branch stable
