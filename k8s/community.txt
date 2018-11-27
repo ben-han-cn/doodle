@@ -12,9 +12,14 @@ enterprise level k8s distribution -- Red Hat OpenShift
 
 container registry
     openshift run container registry inside the cluster
+    harbor: https://github.com/goharbor/harbor
+    
 
 container vulnerability static analysis
     https://github.com/coreos/clair
+
+container image builder
+    kaniko https://github.com/GoogleContainerTools/kaniko
 
 storage
     rook + ceph

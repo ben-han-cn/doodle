@@ -45,5 +45,3 @@ Quality Atributes
     Auditability
 
 Evolutionary Archtecture
-
-          

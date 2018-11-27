@@ -7,3 +7,6 @@ ip route show
 
 ip route add 20.10.0.0/16 via 10.0.0.1 //next hop route (L3)
 ip route get 20.10.3.3 //how route work
+
+sysctl net.ipv4.ip_forward 
+/etc/sysctl.conf

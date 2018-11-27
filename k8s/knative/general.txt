@@ -1,0 +1,25 @@
+serving -- request driven compute taht can scale to zero
+build   -- source-to-container build orchestration
+eventing -- management and delivery of events
+
+
+resources
+service: creates route and configuration
+route:   map a network endpoint to one or more revisions
+configuration: mutable desired state for deployment, each modification creating a new revision
+revision: immutable point-in-time snapshot
+
+
+
+eventing:
+    loose coupling between event producers and consumers
+    composable flows across independently scaling components
+    pluggable message middleware provisioners
+    pluggable event source provisioners
+
+
+resources:
+flow:    high level resource
+source:  emits events to a channel
+channel: event transport, typically backed by a message system
+subscription: registers an interest in a channel on behalf of an app/function

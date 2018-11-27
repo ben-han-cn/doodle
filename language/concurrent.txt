@@ -1,0 +1,39 @@
+memory operation 
+atomic
+    atomic read/write
+    special operation for specific atomic type
+        for example: for int, like ++, +=, --, -= 
+        there are related explicit method which make the intension more clearly 
+            fetch, store, fetch_add, ...
+            
+
+cache line cocherency: cache synchronization
+    cache are independent
+    memory is shared resource
+    memory access needs to be arbitrated
+    only one cache get to read from/write to memory in given cycle
+    each cahce snoops on bus traffic to keep track of what other caches are doing
+    state for each cache line
+    invalid   ---> contents are stale, same as the line isn't in cache
+    shared    ---> read only
+    exclusive ---> others are invalid
+    modified  ---> others are invalid, needs to write back to memory
+    
+    
+
+memory barriers 
+    control the order of memory access
+    gloal control, across all CPUs
+    memory barriers are implemented by hardware and invoke through processor-specific instructions
+    barriers are often attibutes on read/write operations, ensuring the specified order of reads and writes
+    memory barriers are closely related to memory order
+
+
+relax-order
+    memory operation(read/write) could be scheduled by compiler in any order
+
+acquire-release order
+    thread 1, prepare data(write to variable/atomic or non-atomic), then release(publish) the atomic varaible 
+    x use release order
+
+    thread 2, acquire the atomic varaible x and all the write operation before x is guarantee to be visible

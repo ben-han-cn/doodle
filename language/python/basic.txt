@@ -1,11 +1,125 @@
-itertools
+application env
 
-iter(c) call c.__iter__, this funciton return object who has __next__ method 
-next(c) call c.__next__
+python3 -m venv myproject
+myproject/bin/activate
+deactivate
 
+iterator -- generator
+class SquaresIterator:
+    def __init__(self, max_root_value):
+        self.max_root_value = max_root_value
+        self.current_root_value = 0
+    
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.current_root_value >= self.max_root_value:
+            raise StopIteration
+        square_value = self.current_root_value ** 2
+        self.current_root_value += 1
+        return square_value
+
+//gen_num return a generator object
+def gen_nums():
+    n = 0
+    while n < 4:
+        yield n
+        n += 1
+
+gen_num is a coroutine, coroutine is a function, with several entrypoint 
+and several exit point, normal function has only one. Each yield statement 
+simultaneously defines an exit point, and a re-entry point.
+when generator object return/exist, StopIteration will be automatically 
+generated.
+
+what 'yield from' does is "delegating to a subgenerator"
+def matching_lines_from_file(pattern, path):
+    lines = lines_from_file("log.txt")
+    yield from matching_lines(lines, 'WARNING:')
+==>
+def matching_lines_from_file(pattern, path):
+    lines = lines_from_file("log.txt")
+    for line in matching_lines(lines, 'WARNING:'):
+        yield line
+
+(x for line in blocked for x in line) //generator expression 
+==
+for line in blocked:
+  for x in line:
+    yield x
+
+
+comprehension
+1 [ n*n for n in range(6) 
+    if n % 2 == 0 
+    if n > 2 ]
+2 { invert_name(student.name): student.gpa
+    for student in students
+    if student.gpa > 3.5 } 
+3 set(student.major for student in students)
+
+4 generator = ((student.name, student.gpa) for student in students)
+  tuple(generator) = tuple constructor 
+  dict(generator) = dict constructor
+
+iterable:
+has __iter__ return a iterator  or
+has __getitem__ return a elem //sequence protocol
+
+iterator:
+has __iter__ return itself(normally) 
+has __next__ return next elem, return StopIteration if no elem left
+
+
+advanced function:
+1 variable arguments, packing arguments to tuple 
+ def read_files(*paths): // paths will be a tuple
+    data = ""
+    for path in paths:
+        with open(path) as handle:
+            data += handle.read()
+    return data
+
+ def print_kwargs(**kwargs):
+    for k, v in kwargs.items(): 
+
+2 argument unpacking, tuple to param list
+  def normal_func(a, b, c): ...
+  numbers = [2, 3, 4]
+  normal_func(*numbers)
+    
+  numbers = {"a": 7, "b": 5, "c":3}
+  normal_func(**numbers)
+
+from operator import itemgetter, attrgetter
+sorted(students, key=itemgetter("major")) //students are dicts
+sorted(students, key=itemgetter("gpa"))  //students are instances of class Student
+
+
+exception:
+    KeyError, IndexError, TypeError, ValueError, OSError
+
+
+property == decorators + data descriptor
+class Ticket:
+    def __init__(self, price):
+        self._price = price
+
+    @property
+    def price(self):
+        return self._price
+
+    @price.setter
+    def price(self, new_price):
+        if new_price < 0:
+            raise ValueError("Nice try")
+        self._price = new_price
+
+    @price.deleter
+    ....
 
 with context:
-
 import sys
 class RedirectStdoutTo:
   def __init__(self, out_new):
@@ -82,20 +196,12 @@ def pairs(iterable):
 pairs == zip(l, l[1:]) //but zip only work on seq objects
 
 
-(x for line in blocked for x in line) //generator expression 
-==
-for line in blocked:
-  for x in line:
-    yield x
-
 python slice:
 a[start:end] # items start through end-1
 a[start:]    # items start through the rest of the array
 a[:end]      # items from the beginning through end-1
 a[:]         # a copy of the whole array
 a[start:end:step] # start through not past end, by step
-
-
 
 collection function category:
 map:    zip, enumerate(generate pair of (index, original_elem)), map, sorted(container, key=fun),
@@ -475,124 +581,12 @@ in all the child file(module) use absolute import path
 from libname.pkg2 import xxxx
 
 
-pytest
-  pip3 install pytest-cov
-pytest -lf (last failed)
-pytest -l (show locals)
-pytest --duration=N (report the slowest n number of test)
-pytest -v test_task_fail.py::test_task_equality //only test specified funciton in one file
-
-#exception test
-def test_add_raises():
-  with pytest.raises(TypeError):
-    tasks.add(task='not a Task object')
-
-# mark test
-# run subset tests
-@pytest.mark.smoke
-def test_list_raises():
-  with pytest.raises(TypeError):
-    tasks.list_tasks(owner=123)
-
-@pytest.mark.get
-@pytest.mark.smoke
-def test_get_raises():
-  with pytest.raises(TypeError):
-    tasks.get(task_id='123')
-
-pytest -v -m 'smoke' test_api_exception.py
-pytest -v -m 'get' test_api_exceptions.py
-pytest -v -m 'smoke and get' test_api_exceptions.py
-pytest -v -m 'smoke and not get' test_api_exceptions.py
-
-
-#test class
-class TestUpdate():
-  def test_bad_id(self):
-    with pytest.raises(TypeError):
-      tasks.update(task_id={'dict instead': 1},
-                   task=tasks.Task())
-
-  def test_bad_task(self):
-    with pytest.raises(TypeError):
-      tasks.update(task_id=1, task='not a task')
-
-pytest -v tests/func/test_api_exceptions.py::TestUpdate
-pytest -v tests/func/test_api_exceptions.py::TestUpdate::test_bad_id
-
-
-usage of pytest fixture
-1 generate data
-@pytest.fixture                                                                 
-def db():                                                                       
-  db_ = TinyDB(storage=MemoryStorage)                                         
-  db_.purge_tables()                                                          
-  db_.insert_multiple({'int': 1, 'char': c} for c in 'abc')                   
-  return db_     
-
-# db is used as a parameter, pytest its name is same with 
-# fixture, and the function will be invoked and return value
-# is used as parameter
-def test_purge(db):                                                                
-    db.purge()                                                                     
-    db.insert({})                                                                  
-    db.purge()                                                                     
-    assert len(db) == 0 
-
-2 setup and tear down environment
-@pytest.fixture()
-def tasks_db(tmpdir):
-  tasks.start_tasks_db(str(tmpdir), 'tiny')
-  yield 
-  tasks.stop_tasks_db()
-
-def test_add_returns_valid_id(tasks_db):
-  new_task = Task('do something')
-  task_id = tasks.add(new_task)
-  assert isinstance(task_id, int)
-
-
-fixture use other fixtures
-@pytest.fixture()
-def tasks_just_a_few():
-  return (
-    Task('Write some code', 'Brian', True),
-    Task("Code review Brian's code", 'Katie', False),
-    Task('Fix what Brian did', 'Michelle', False))
-
-@pytest.fixture()
-def db_with_3_tasks(tasks_db, tasks_just_a_few):
-  for t in tasks_just_a_few:
-    tasks.add(t)
-
-pytest --setup-show test_add.py::test_add_increases_count
-
-built-in fixture
-def test_tmpdir(tmpdir):
-  a_file = tmpdir.join('something.txt')
-  a_sub_dir = tmpdir.mkdir('anything')
-  another_file = a_sub_dir.join('something_else.txt')
-  a_file.write('contents may settle during shipping')
-  another_file.write('something different')
-  assert a_file.read() == 'contents may settle during shipping'
-  assert another_file.read() == 'something different'
-
-
-setup.cfg
-[aliases]
-test=pytest
-
-[tool:pytest]
-addopts = -l -v --cov-append --cov-report
-
-
-built-in exception:
-ValueError, TypeError, KeyError
-
 &: bitwise add
 and: logic and,  
 &&: illegal
 
+num = 765
+f"foo{num:<(>^)7d}bar"
 "{0:b}".format(n)
 b -- binary
 x -- hex
@@ -716,3 +710,31 @@ def decorator_function_with_arguments(arg1, arg2, arg3):
     return wrap
 
 with arguments, returned object will be called immediately and return the final object
+
+
+logging
+import logging
+logging.basicConfig(level=logging.INFO)
+logging.basicConfig(filename="log.txt", filemode="w|a", format="%(asctime)s %(funcName)s %(lineno)d %(message)s%(pathname)s")
+logging.debug("look out!")
+logging.info("look out!")
+logging.warning("look out!")
+logging.error("look out!")
+logging.critical("look out!")
+
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+# Warnings and higher only on the console.
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.WARNING)
+fmt = logging.Formatter("My message is: %(message)s")
+console_handler.setFormatter(fmt)
+logger.addHandler(console_handler)
+# But allow everything to into the log file.
+logfile_handler = logging.FileHandler("log.txt")
+logger.addHandler(logfile_handler)
+logger.warning("This goes to both the console, AND into log.txt.")
+logger.debug("While this only goes to the file.")
+
+

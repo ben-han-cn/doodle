@@ -122,3 +122,65 @@ dependencies:
 go-lang:
     https://github.com/goadesign/goa.git
     https://github.com/go-kit/kit
+
+
+core axioms
+    no components are privileged
+    all components communicate in the same simple, homogeneous way
+    components can be composed from other components
+
+service communication
+    rpc                    -->    command
+    message queue          -->    event
+service dependency (service <-> class)
+    dependency tree
+    depth of tree affect latency, set performance target
+    merge service
+
+data consistent
+
+service mesh
+    network of service proxy
+    proxy ---> routing
+               load balanceing
+               health check
+               retry + meltdown mechanism
+               security
+
+microservice arch expose much more bigger/widder attack interface 
+
+Different performance, data-safety, security and scaling requirement for diffrerent microservice
+
+microservice allow you to separate business-logic code from infrastructure code.
+infrastructure code --> scaling, self healing, monitoring ...
+
+
+
+functional breakdown
+services and inter communication/message flow
+
+message:
+    synchronous  -- command
+    asynchronous -- event
+    oberve       -- others can see it
+    consume      -- others cann't see it
+
+asynchronous message:
+    make interface idempotent
+    message queue should support deliver at-least-once behavior
+    message should contain metadata to identify
+
+data
+    data is heterogeneous not homogeneous -- relational db, document db, key-value db
+    CQRS(command query responsibility segregation) 
+        synchronous read and asynchronous write
+        performance and eventual consistency.
+    UUID is a default choice for primary key 
+    data will be duplicated in different serivce and in this case, eventually consistency is preferred.
+
+
+
+CD -- the ability to safely deploy a component(service) to production at any time
+essential pipeline:
+    version-controlled local development environment for each service, supported by unit test
+    staging env to both validate the micorservice and build, reproducibly, and arifact for deployment

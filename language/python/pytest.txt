@@ -1,0 +1,110 @@
+pytest
+  pip3 install pytest-cov
+
+pytest -lf (last failed)
+pytest -l (show locals)
+pytest --duration=N (report the slowest n number of test)
+pytest -v test_task_fail.py::test_task_equality //only test specified funciton in one file
+
+#exception test
+def test_add_raises():
+  with pytest.raises(TypeError):
+    tasks.add(task='not a Task object')
+
+# mark test
+# run subset tests
+@pytest.mark.smoke
+def test_list_raises():
+  with pytest.raises(TypeError):
+    tasks.list_tasks(owner=123)
+
+@pytest.mark.get
+@pytest.mark.smoke
+def test_get_raises():
+  with pytest.raises(TypeError):
+    tasks.get(task_id='123')
+
+pytest -v -m 'smoke' test_api_exception.py
+pytest -v -m 'get' test_api_exceptions.py
+pytest -v -m 'smoke and get' test_api_exceptions.py
+pytest -v -m 'smoke and not get' test_api_exceptions.py
+
+
+#test class
+class TestUpdate():
+  def test_bad_id(self):
+    with pytest.raises(TypeError):
+      tasks.update(task_id={'dict instead': 1},
+                   task=tasks.Task())
+
+  def test_bad_task(self):
+    with pytest.raises(TypeError):
+      tasks.update(task_id=1, task='not a task')
+
+pytest -v tests/func/test_api_exceptions.py::TestUpdate
+pytest -v tests/func/test_api_exceptions.py::TestUpdate::test_bad_id
+
+
+usage of pytest fixture
+1 generate data
+@pytest.fixture                                                                 
+def db():                                                                       
+  db_ = TinyDB(storage=MemoryStorage)                                         
+  db_.purge_tables()                                                          
+  db_.insert_multiple({'int': 1, 'char': c} for c in 'abc')                   
+  return db_     
+
+# db is used as a parameter, pytest its name is same with 
+# fixture, and the function will be invoked and return value
+# is used as parameter
+def test_purge(db):                                                                
+    db.purge()                                                                     
+    db.insert({})                                                                  
+    db.purge()                                                                     
+    assert len(db) == 0 
+
+2 setup and tear down environment
+@pytest.fixture()
+def tasks_db(tmpdir):
+  tasks.start_tasks_db(str(tmpdir), 'tiny')
+  yield 
+  tasks.stop_tasks_db()
+
+def test_add_returns_valid_id(tasks_db):
+  new_task = Task('do something')
+  task_id = tasks.add(new_task)
+  assert isinstance(task_id, int)
+
+
+fixture use other fixtures
+@pytest.fixture()
+def tasks_just_a_few():
+  return (
+    Task('Write some code', 'Brian', True),
+    Task("Code review Brian's code", 'Katie', False),
+    Task('Fix what Brian did', 'Michelle', False))
+
+@pytest.fixture()
+def db_with_3_tasks(tasks_db, tasks_just_a_few):
+  for t in tasks_just_a_few:
+    tasks.add(t)
+
+pytest --setup-show test_add.py::test_add_increases_count
+
+built-in fixture
+def test_tmpdir(tmpdir):
+  a_file = tmpdir.join('something.txt')
+  a_sub_dir = tmpdir.mkdir('anything')
+  another_file = a_sub_dir.join('something_else.txt')
+  a_file.write('contents may settle during shipping')
+  another_file.write('something different')
+  assert a_file.read() == 'contents may settle during shipping'
+  assert another_file.read() == 'something different'
+
+
+setup.cfg
+[aliases]
+test=pytest
+
+[tool:pytest]
+addopts = -l -v --cov-append --cov-report
