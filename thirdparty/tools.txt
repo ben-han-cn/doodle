@@ -53,6 +53,7 @@ sse(server-sent events)       https://github.com/manucorporat/sse
 perigord(golang ethereum dev tool) https://github.com/swarmdotmarket/perigord
 gokit(build micro-service)     https://github.com/go-kit/kit 
 noise(p2p network)            https://github.com/perlin-network/noise
+gen(code generation)          https://github.com/clipperhouse/gen
 
 
 

@@ -81,6 +81,8 @@ its resides has failed, since k8s has to make sure only one pod with same name e
 
 1. Ordered operations with ordinal index
 2. Stable,unique name across restarts
+    the instance could be relayed on as master, after it startup, the following instance
+    could get launched
 3. Stable, persistent storage 
     pod -> pvc -> pv (when pod rescheduled to another node, same pvc and pv is 
     automatically rebined, which will make sure the pod get the old state) 

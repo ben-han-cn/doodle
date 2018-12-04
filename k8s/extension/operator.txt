@@ -39,3 +39,41 @@ Status: (Autual resource state)
 
 
 parent/child resource
+
+
+
+code gen:
+CRD
+    runtime object structure
+    deepcopy gen
+apis
+clientset
+lister
+informer
+
+
+tags:
+    global --- normally in doc.go
+    local  --- above the types to process
+
+
+use operator-sdk
+    mkdir project_folder
+    mkdir build deploy build
+    touch build/Dockerfile
+    touch deploy/role.yaml
+    touch deploy/role_binding.yaml
+
+    operator-sdk add api --api-version=zdns.cn/v1 --kind=SuperZone
+        create 
+            pkg/apis/zdns/v1/superzone_types.go
+            pkg/apis/addtoscheme_zdns_v1.go
+            pkg/apis/zdns/v1/register.go
+            pkg/apis/zdns/v1/doc.go
+            deploy/crds/zdns_v1_superzone_cr.yaml
+            deploy/crds/zdns_v1_superzone_crd.yaml
+        update
+            deploy/role.yaml //add the permssion for the api group to role
+
+        generate
+            pkg/apis/zdns/v1/zz_generated.deepcopy.go

@@ -6,8 +6,26 @@ type GroupVersionKind struct {
 }
 
 "k8s.io/apimachinery/pkg/runtime"
+
+Scheme 
+    map golang struct type to gvk and vice verse
+    support set default value to object
+    conversion between different version
+
+object's GetObjectKind may return empty
+get related type info for object use Scheme
+
 type Scheme struct {
-...
+    gvkToType map[schema.GroupVersionKind]reflect.Type
+    typeToGVK map[reflect.Type][]schema.GroupVersionKind
+    unversionedTypes map[reflect.Type]schema.GroupVersionKind
+    unversionedKinds map[string]reflect.Type
+    fieldLabelConversionFuncs map[schema.GroupVersionKind]FieldLabelConversionFunc
+    defaulterFuncs map[reflect.Type]func(interface{})
+    converter *conversion.Converter
+    versionPriority map[string][]string
+    observedVersions []schema.GroupVersion
+    schemeName string
 }
 
 func (s *Scheme) KnownTypes(gv schema.GroupVersion) map[string]reflect.Type 
@@ -15,7 +33,7 @@ func (s *Scheme) AllKnownTypes() map[schema.GroupVersionKind]reflect.Type
 func (s *Scheme) New(kind schema.GroupVersionKind) (Object, error)
 func (s *Scheme) Default(src Object) 
 func (s *Scheme) Convert(in, out interface{}, context interface{}) error
-
+////////////////////////////////////////////////
 "k8s.io/apimachinery/pkg/api/meta"
 type RESTMapper interface {
     KindFor(resource schema.GroupVersionResource) (schema.GroupVersionKind, error)
@@ -65,3 +83,5 @@ type GroupVersionResource struct {
     Version  string
     Resource string
 }
+
+

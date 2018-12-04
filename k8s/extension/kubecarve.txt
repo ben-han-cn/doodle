@@ -1,4 +1,4 @@
-client module
+1 client module
 client
 functionality:
 	CRUD & List resources
@@ -27,7 +27,7 @@ note:
     u, ok := obj.(*unstructured.Unstructured)
 
 
-cache module
+2 cache module
 cache interface
     get/list resources
     get informer for specified resource or gvk
@@ -43,6 +43,56 @@ informersMap
     add client read interface to SharedIndexInformer
 
 SharedIndexInformer:(in client-go)
-    informer
-        index
-            store
+
+type SharedInformer interface {
+    AddEventHandler(handler ResourceEventHandler)
+    AddEventHandlerWithResyncPeriod(handler ResourceEventHandler, resyncPeriod time.Duration)
+    GetStore() Store
+    GetController() Controller
+    Run(stopCh <-chan struct{})
+    HasSynced() bool
+    LastSyncResourceVersion() string
+}
+
+type SharedIndexInformer interface {
+    SharedInformer
+    AddIndexers(indexers Indexers) error
+    GetIndexer() Indexer
+}
+
+informer get event from listwatcher, listwatcher do list and watch through restclient
+c.Get().
+  Namespace(namespace).
+  Resource(resource).
+  VersionedParams(&options, metav1.ParameterCodec).
+  Watch() 
+
+3 publisher module
+EventRecorder(/k8s.io/client-go/tools/record/event.go):
+create event, and send to broadcaster, four fuction each add more info to the event
+type interface {
+    Event(object runtime.Object, eventtype, reason, message string)
+    Eventf(object runtime.Object, eventtype, reason, messageFmt string, args ...interface{})
+    PastEventf(object runtime.Object, timestamp metav1.Time, eventtype, reason, messageFmt string, args ...interface{})
+    AnnotatedEventf(object runtime.Object, annotations map[string]string, eventtype, reason, messageFmt string, args ...interface{})
+} 
+
+EventBroadcaster(/k8s.io/client-go/tools/record/event.go):
+return EventRecorder which connect to current boradcaster, and dispatch the event send from EventRecorder to specified sinker
+// EventBroadcaster knows how to receive events and send them to any EventSink, watcher, or log.
+type EventBroadcaster interface {
+    StartEventWatcher(eventHandler func(*v1.Event)) watch.Interface
+    StartRecordingToSink(sink EventSink) watch.Interface
+    StartLogging(logf func(format string, args ...interface{})) watch.Interface
+    NewRecorder(scheme *runtime.Scheme, source v1.EventSource) EventRecorder
+}
+
+publisher
+    a wrapper around a broadcaster
+    return recorder for specified component which will be used as event source 
+
+type EventSource struct {
+    Component string 
+    // Node name on which the event is generated.
+    Host string 
+}

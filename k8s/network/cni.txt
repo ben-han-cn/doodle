@@ -1,6 +1,8 @@
 config file folder: /etc/cni/net.d
 plugin folder: /opt/cni/bin
 
+each node will check network status, if cni isn't configured, the node status will be NotReady.
+so if the previous two folder is empty, no pod will be setup
 
 type CNI interface {
     AddNetworkList(net *NetworkConfigList, rt *RuntimeConf) (types.Result, error)
