@@ -184,3 +184,77 @@ CD -- the ability to safely deploy a component(service) to production at any tim
 essential pipeline:
     version-controlled local development environment for each service, supported by unit test
     staging env to both validate the micorservice and build, reproducibly, and arifact for deployment
+
+
+migration: //choose not vital/critical feature
+    freedom and responsibility culture
+
+
+product mgr -> ux -> dev -> QA -> DBA      sys adm -> net adm -> san adm
+<-----microservice team ------------>      <---- platform team --------->
+
+
+reduce production bug:
+amount of changes that we have between each release of software is called batch size.
+priciple:
+    reduce batch size to the minimum allowable size we can handle
+
+we need to be this tall to use microservices
+    distribute system are difficult
+    tracing, monitoring, log aggreation, resilience.
+    network is unstable, bandwidth is limited.
+
+patterns:
+    event source
+    materialized views
+    command-query responsibility segregation(CQRS)
+
+information collection:
+1 the dependency structure within and outside the monolith
+2 how a single request walks through the code base
+
+migration:
+    db table -> service -> provide api
+
+decouple ui from app  ---> traffic routing
+create new service:
+    API design and boudnary of new service
+    rewritten or copy the code from old monolith
+    //think about the event which will be emit or consume by service
+    new service connect directly to old db //with new db?
+    add gateway between ui and monolith
+    change monolith code from v1 to v2 which will use new service, and route part traffic to the v2
+    remove v1 version of monolith
+    one time ETL for new service, and new service will handle all traffic
+    
+
+use service mesh to route traffic based on http header
+zero time deployment
+blue/green: blue == current version, green == new version 
+    only one accept all the traffic, if green has problem, roll back to blue immediately
+    green relase should backward compatible
+
+canary:
+    redirect the amount of traffic to new version gradually.
+
+A/B testing:
+    two different and separate production environments to test a business hypothesis.
+    there is no relation of current/new version, both version can be different branches of code.
+    two version run simutanously to determine which one perfroms better in terms of business value
+    it imply there is a very advanced monitoring system.
+
+
+database migration (schama evoluation):
+    part of software deployment process
+    it's code, versioned with application code
+    schema between consecutive release must be mutually compatible, we can't afford to lose any data.
+
+CRUD:some data model for both read and write
+CQRS:use different models to represent read and write operations. It's quite often that read and 
+     write use different data store. Write operation will emit event which will be used to update
+     read data store.
+Event soursing:
+    not only store the current state.
+    trait the system state as a sequence of event. 
+    save the events in a append-only data store.
+    could use a store to save the current state but it's not the canonical source.

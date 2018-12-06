@@ -1,0 +1,108 @@
+1 create coroutine
+async def f():
+    return 123
+
+cor = f() 
+type(cor) //<class 'coroutine'>
+
+similar with  
+def g():
+    yield 1
+
+gen = g()
+type(gen) //<class 'generator'>, next(gen), StopIteration
+
+
+2 what is coroutine
+coroutine is 
+start with send(Null) 
+    event loop and await will invoke this function on coroutine
+
+endwith StopIteration
+    return in coroutine function
+    StopIteration.value will store the returned value
+
+cancel with throw(asyncio.CancelledError)
+    event loop normally will invoke this function 
+
+
+3 event loop, task, future (task derived from future)
+coroutine when record by a event loop will became a task
+    task = loop.create_task(cor)
+through the task, we can get the status of the coroutine, or cancel it
+    task.done()
+    task.set_result()
+    task.set_exception()
+    task.result()
+    task.cancel()
+when event loop is running, all the tasks recorded will be scheduled to run
+    loop.run_until_complete(cor) //stop when specified task is done
+    loop.run_forever() //keep running until loop.stop() is invoked
+    loop.close()
+clean up all the tasks when loop is returned
+    loop = asyncio.get_event_loop()
+    tasks = asyncio.Task.all_tasks() 
+    for t in tasks:
+        t.cancel()
+    group = asyncio.gather(*tasks, return_exceptions=True)//trait exception as returned value,
+                                                  //avoid exception in one task stop the loop
+    loop.run_until_complete(group)
+    loop.close()
+
+
+4 async context manager
+#implement using class
+class Connection:
+    async def __aenter__(self):
+        self.conn = await get_conn(self.host, self.port)
+        return conn
+
+    async def __aexit__ (self, exc_type, exc, tb):
+        self.conn.close()
+
+async with Connection('localhost', 1000) as conn:
+    process_conn(conn)
+
+#implement use function
+from contextlib import asynccontextmanager
+@asynccontextmanager
+async def new_conn(host, port):
+    conn = await get_conn(host, port)
+    yield conn
+    await close_conn(conn)
+
+async with new_conn('localhost', 1000) as conn:
+    process_conn(conn)
+
+5 async iterator
+#implement use class
+class RedisKeys:
+    def __aiter__(self):
+        self.iter = iter(self.keys)
+        return self
+
+    def __anext__(self):
+        try:
+            k = next(self.iter)
+        except StopIteration:
+            raise StopAsyncIteration
+
+        value = await redis.get(k)
+        return value
+
+async for value in RedisKeys(redis, keys): 
+    await do_something_with(value)
+
+#implement use function
+async def redis_keys(redis, keys): 
+    for k in keys:
+        value = await redis.get(k) 
+        yield value
+
+async for value in redis_keys(redis, keys): 
+    await do_something_with(value)
+
+6 async comprehension
+[x async for x in gen(3)]
+{x:y async for x,y in gen(3)}
+{x async for x in gen(3)}
