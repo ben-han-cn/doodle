@@ -1,0 +1,25 @@
+configure:
+test:
+  - image: gcr.io/k8s-skaffold/skaffold-example
+    structureTests:
+      - ./test/*
+
+
+/test/structure_test.yaml
+
+schemaVersion: 2.0.0
+
+fileExistenceTests:
+  - name: 'no local go binary'
+    path: /usr/local/bin/go'
+    shouldExist: false
+
+
+type Tester interface {
+    Test(context.Context, io.Writer, []build.Artifact) error //run StructureTests
+
+    TestDependencies() ([]string, error) //return all the structure tests, which
+                                         //normally used for watch change
+}
+
+container tests is implemented by invoke command: container-structure-test

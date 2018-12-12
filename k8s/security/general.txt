@@ -1,0 +1,13 @@
+kube-bench: CIS(center of internet security) k8s benchmark
+    a list of tests to ensure basic best practices
+    
+image assurance: ensure only approved images can run in k8s environment
+
+user asscess control
+
+runtime protection: 
+    ensure container only have the minimum privileges and capabilities they
+need to funciton and blocks attempted attacked.
+
+container firewall
+    inter-container firewall rules to enforce segmentation.

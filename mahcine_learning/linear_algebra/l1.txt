@@ -1,4 +1,4 @@
-fundamental: solver linear equation.
+fundamental: solve linear equation.
     2x - y  = 0
     -x + 2y = 3
 

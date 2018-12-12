@@ -1,0 +1,83 @@
+SkaffoldPipeline
+    Build    BuildConfig  `yaml:"build,omitempty"`
+    Test     []*TestCase  `yaml:"test,omitempty"`
+    Deploy   DeployConfig `yaml:"deploy,omitempty"`
+    Profiles []Profile    `yaml:"profiles,omitempty"`
+
+
+BuildConfig 
+    Artifacts []*Artifact `yaml:"artifacts,omitempty"`
+    TagPolicy TagPolicy   `yaml:"tagPolicy,omitempty"`
+    BuildType `yaml:",inline"`
+
+BuildType 
+    LocalBuild          *LocalBuild          `yaml:"local,omitempty" yamltags:"oneOf=build"`
+    GoogleCloudBuild    *GoogleCloudBuild    `yaml:"googleCloudBuild,omitempty" yamltags:"oneOf=build"`
+    KanikoBuild         *KanikoBuild         `yaml:"kaniko,omitempty" yamltags:"oneOf=build"`
+    AzureContainerBuild *AzureContainerBuild `yaml:"acr,omitempty" yamltags:"oneOf=build"`
+
+LocalBuild 
+    Push         *bool `yaml:"push,omitempty"`
+    UseDockerCLI bool  `yaml:"useDockerCLI,omitempty"`
+    UseBuildkit  bool  `yaml:"useBuildkit,omitempty"`
+
+TestCase 
+    ImageName      string   `yaml:"image"`
+    StructureTests []string `yaml:"structureTests,omitempty"`
+
+DeployConfig 
+    DeployType `yaml:",inline"`
+
+DeployType 
+    HelmDeploy      *HelmDeploy      `yaml:"helm,omitempty" yamltags:"oneOf=deploy"`
+    KubectlDeploy   *KubectlDeploy   `yaml:"kubectl,omitempty" yamltags:"oneOf=deploy"`
+    KustomizeDeploy *KustomizeDeploy `yaml:"kustomize,omitempty" yamltags:"oneOf=deploy"`
+
+KubectlDeploy 
+    Manifests       []string     `yaml:"manifests,omitempty"`
+    RemoteManifests []string     `yaml:"remoteManifests,omitempty"`
+    Flags           KubectlFlags `yaml:"flags,omitempty"`
+
+KubectlFlags 
+    Global []string `yaml:"global,omitempty"`
+    Apply  []string `yaml:"apply,omitempty"`
+    Delete []string `yaml:"delete,omitempty"`
+
+
+type Artifact struct {
+    ImageName    string            `yaml:"image,omitempty"`
+    Workspace    string            `yaml:"context,omitempty"`
+    Sync         map[string]string `yaml:"sync,omitempty"`
+    ArtifactType `yaml:",inline"`
+}
+
+// Profile is additional configuration that overrides default
+// configuration when it is activated.
+Profile 
+    Name   string       `yaml:"name,omitempty"`
+    Build  BuildConfig  `yaml:"build,omitempty"`
+    Test   []*TestCase  `yaml:"test,omitempty"`
+    Deploy DeployConfig `yaml:"deploy,omitempty"`
+
+ArtifactType 
+    DockerArtifact    *DockerArtifact    `yaml:"docker,omitempty" yamltags:"oneOf=artifact"`
+    BazelArtifact     *BazelArtifact     `yaml:"bazel,omitempty" yamltags:"oneOf=artifact"`
+    JibMavenArtifact  *JibMavenArtifact  `yaml:"jibMaven,omitempty" yamltags:"oneOf=artifact"`
+    JibGradleArtifact *JibGradleArtifact `yaml:"jibGradle,omitempty" yamltags:"oneOf=artifact"`
+
+type DockerArtifact 
+    DockerfilePath string             `yaml:"dockerfile,omitempty"`
+    BuildArgs      map[string]*string `yaml:"buildArgs,omitempty"`
+    CacheFrom      []string           `yaml:"cacheFrom,omitempty"`
+    Target         string             `yaml:"target,omitempty"`
+
+
+
+Profile is used to specify more attributes for build, test and deploy configurations, they will 
+be applied after parse the three section.
+ApplyProfiles
+    for structure:
+        overwrite whole structure
+        or overwrite one field
+    for slice:
+        overwrite whole slice

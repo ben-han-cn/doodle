@@ -1,0 +1,17 @@
+hashicorp/raft v0.1.0
+
+core feature:
+    leader selection
+    log replication
+
+log replication is trigger by call Apply on leader node.
+    func (r *Raft) Apply(cmd []byte, timeout time.Duration) 
+    leader save the log to local
+    replicate log to majority number of follower
+    apply the cmd to local FSM == commit the log
+    log is binary data which is meaningful for FSM but opaque to raft 
+
+state
+
+snapshot
+    

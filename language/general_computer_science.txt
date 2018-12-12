@@ -27,3 +27,23 @@ memory allocation, pointer redirection
 abstract, concrete type and type parameter
 type and memory management
 macro and function inline
+
+data locality
+array of struct(AOS) vs struct of array(SOA)
+
+struct Person {
+    contract_detail: ContractDetail,
+    data_of_births: DataTime<Utc>,
+}
+
+struct Word {                      struct World {
+    persons: Vec<Person>,  =>           contract_details: Vec<ContractDetail>,
+}                                       data_of_births: Vec<DataTime<Utc>>,
+                                   }
+
+when iterator person, to do calcuation, normally one function only need part of 
+the attributes of persion, but whole persion is fetched in the cache, which make
+the cache line missing more probable.
+EC arch, merge all the attributes of component into world using vection, and use
+save all the components as a vector of ids, and use the id to fetch the related
+attirbutes from the world(a container for all the attributes)

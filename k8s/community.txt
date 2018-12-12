@@ -55,3 +55,6 @@ https://github.com/kubernetes-sigs/cri-o
 security:
 kube-hunter, penetration testing: https://github.com/aquasecurity/kube-hunter
 kube-bench, deployment is follow security best practices: https://github.com/aquasecurity/kube-bench
+
+cluster status check:
+sonobuoy: https://github.com/heptio/sonobuoy

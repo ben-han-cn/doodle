@@ -1,3 +1,36 @@
+Admission controllers are powerful tools for intercepting requests to the
+k8s API server prior to persistence of the object.
+
+Admission controller is built into api-server, so external admission webhooks are
+protomoted as a solution to address this limitation. External Admission Webhooks
+are split into MutationgAdmissionWebhook and ValidatingAdmissionWebhook.
+
+webhooks to create additional mutating and validating admission plugins to admission chain
+of apiserver without recompiling them. This provides developers with the freedom and flexibility
+to customize admission logic on multiple actions like CREATE, UPDATE, and Delete on any resource.
+Some common use case include:
+1 Mutating resources before creating them. Istio inject a envoy sidecar containers to target pod.
+2 Automated provisioning of StorageClass
+3 Validating complex custom resource. Make sure custom resource can only be created after its definition
+and all dependencies created and available.
+4 Restricting namespace. On multi-tenant systems, avoid resources created in reversed namespaces.
+
+workflow:
+1 register hook to apiserver using MutatingWebhookConfiguration. in the configuration including:
+how to connect to the server
+how to verify the server
+the url path of the server
+rule defining which resource and waht action it handles
+how unrecognized errors from the server are handled
+
+2 enable MutationgAdmissionWebhook which is a plugin of admission controller for aip server
+3 webhook admission server
+a plain http server
+follow the api
+get AdmissionReview from MutationgAdmissionWebhook and response with AdmissionResponse
+
+
+
 Kubernetes submits an AdmissionReview to your webhook, containing
     an AdmissionRequest, which has
         a UID
@@ -9,3 +42,6 @@ The AdmissionReview contains an
         the original UID from the AdmissionRequest
         A Patch (if applicable)
         The Allowed field which is either true or false
+
+
+

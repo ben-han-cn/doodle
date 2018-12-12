@@ -1,0 +1,19 @@
+type SkaffoldRunner struct {
+    build.Builder
+    deploy.Deployer
+    test.Tester
+    tag.Tagger
+    watch.Trigger
+    sync.Syncer
+
+    opts         *config.SkaffoldOptions
+    watchFactory watch.Factory
+    builds       []build.Artifact
+}
+
+
+SkaffoldRunner.Run
+    r.Build(ctx, out, r.Tagger, artifacts)
+    r.Test(ctx, out, bRes)
+    r.Deploy(ctx, out, bRes)
+    r.TailLogs(ctx, out, artifacts, bRes)

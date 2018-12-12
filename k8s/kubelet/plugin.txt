@@ -1,0 +1,3 @@
+CSI, gpu
+
+device monitoring plugins

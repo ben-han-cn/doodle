@@ -64,3 +64,9 @@ the format is json, for example:
 {"log":"I0925 06:59:27.761600       1 hostgw_network.go:89] Subnet added: 10.42.2.0/24 via 10.0.0.33\n","stream":"stderr","time":"2018-09-2    5T06:59:27.761853012Z"}
 
 fluent-bit (fluentd c version)
+
+
+k8s' three essential components:
+cluster
+pipeline
+registry
