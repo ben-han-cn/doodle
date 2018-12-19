@@ -36,4 +36,96 @@ cmd/controller-manager/app/options/nodeipamcontroller.go:36:
 
 
 
+apiVersion: v1
+kind: Service
+metadata:
+  name: linkerd-web
+  namespace: linkerd
+  resourceVersion: "11263548"
+spec:
+  clusterIP: 10.43.90.121
+  ports:
+  - name: http
+    port: 8084
+    protocol: TCP
+    targetPort: 8084
+  - name: admin-http
+    port: 9994
+    protocol: TCP
+    targetPort: 9994
+  selector:
+    linkerd.io/control-plane-component: web
+  type: ClusterIP
 
+
+endpoint
+- apiVersion: v1
+  kind: Endpoints
+  metadata:
+    name: linkerd-web
+    namespace: linkerd
+    resourceVersion: "11263718"
+  subsets:
+  - addresses:
+    - ip: 10.42.1.22
+      nodeName: slave1
+      targetRef:
+        kind: Pod
+        name: linkerd-web-67fc55446-8j8hc
+        namespace: linkerd
+        resourceVersion: "11263717"
+    ports:
+    - name: http
+      port: 8084
+      protocol: TCP
+    - name: admin-http
+      port: 9994
+      protocol: TCP
+
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: elasticsearch-logging
+    namespace: logging
+    resourceVersion: "11445389"
+  spec:
+    clusterIP: 10.43.186.123
+    ports:
+    - port: 9200
+      protocol: TCP
+      targetPort: db //port defined in container spec
+    selector:
+      k8s-app: elasticsearch-logging
+    sessionAffinity: None
+    type: ClusterIP
+
+//the service refer to two pods created by statefulset
+//pod created by statefulset will has hostname(elasticsearch-logging-0)
+//and the host name could be queried
+apiVersion: v1
+  kind: Endpoints
+  metadata:
+    name: elasticsearch-logging
+    namespace: logging
+  subsets:
+  - addresses:
+    - hostname: elasticsearch-logging-0
+      ip: 10.42.0.42
+      nodeName: slave2
+      targetRef:
+        kind: Pod
+        name: elasticsearch-logging-0
+        namespace: logging
+        resourceVersion: "11445423"
+    - hostname: elasticsearch-logging-1
+      ip: 10.42.1.33
+      nodeName: slave1
+      targetRef:
+        kind: Pod
+        name: elasticsearch-logging-1
+        namespace: logging
+        resourceVersion: "11445475"
+    ports:
+    - port: 9200
+      protocol: TCP

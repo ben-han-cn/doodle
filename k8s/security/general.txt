@@ -11,3 +11,15 @@ need to funciton and blocks attempted attacked.
 
 container firewall
     inter-container firewall rules to enforce segmentation.
+
+
+best practice:
+RBAC
+protect api server
+network policy
+    allow specified pod access related db, etc
+host os security for container
+    runAsUser: 1000
+    readOnlyRootFilesystem: true
+    allowPrivilegeEscalation: false
+use pod security policy

@@ -36,6 +36,8 @@ pub struct TraitObject {
     pub vtable: *mut (),
 }
 trait object is noramlly used as a way to do dynamic dispatch
+trait object is compile time trick, so the restrictions are the set of things related
+to compile time.
 
 1 concrete type is erased
 2 different vtable is generated for each concrete type

@@ -43,6 +43,7 @@ development CI/CD:
     Draft: https://github.com/Azure/draft
 
     odo //https://github.com/redhat-developer/odo
+    Telepresence https://github.com/telepresenceio/telepresence (make deployment much faster)
 
 k8s debug
     telepresence: https://github.com/telepresenceio/telepresence

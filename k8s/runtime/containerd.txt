@@ -1,0 +1,25 @@
+containerd 
+runtime manager over runc
+
+CRI/OCI support
+
+smaller footprint/focused feature
+
+architecture:
+CRI API                    containerd API
+containerd  servcie interfaces
+metadata, diff, tasks, events
+snapshotter, content store, runtime manager (runc, kata, ...)
+
+extensibility:
+storage plugin
+runtime plugin
+
+containerd has sdk for go client 
+
+---------------------------------------------------
+cri --> containerd client --> containerd services |  --> shims --> runc --> pods
+---------------------------------------------------
+
+
+kubelet --container-runtime=remote --container-runtime-endpoint=unix:///run/containerd/containerd.sock

@@ -1,0 +1,13 @@
+linkerd check --pre //check k8s cluster is ok
+
+linkerd install | sed -e 's/gcr.io\/linkerd-io\//bikecn81\/linkerd-io-/g'| k create -f 
+
+//launch proxy to linkerd web
+k -n linkerd port-forward linkerd-web-67fc55446-8j8hc 8080:8084 
+linkerd dashboard
+
+
+//run demo 
+linkerd inject emojivoto.yml | sed -e 's/gcr.io\/linkerd-io\//bikecn81\/linkerd-io-/g' > injected.yml
+//proxy to  demo web
+kubectl -n emojivoto port-forward web-848d6c9894-pmgbv 8080:80

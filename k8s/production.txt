@@ -1,5 +1,7 @@
-CI/CD工具集成 ---> Service Mesh
+新dashboard
 多集群管理
+系统用户权限管理
+CI/CD工具集成 ---> Service Mesh
 
 
 针对不同的技术堆栈，提供工具和框架去帮助客户构建微服务。

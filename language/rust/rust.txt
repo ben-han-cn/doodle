@@ -184,3 +184,9 @@ rust will reference at max once (T -> &T)
 
 PartialEq ---> a == b --> b == a, a == b && b == c ---> a == c
 Eq --> a == a, f32: PartialEq not Eq
+
+
+rustup show
+rustup toolchain install nightly
+rustup override set nightly
+rustup default stable

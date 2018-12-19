@@ -69,3 +69,33 @@ git add .      +            +
 git add -u                  +              +
 
 git add ./\*.rs //add all the rust source file recursively
+
+
+remote:
+a node/machine in git network, it's identified by a name and a url
+git remote -v //origin	https://github.com/tokio-rs/tokio.git
+each remote has a dir under .git/refs/remotes/
+
+branchs
+local branch (non-tracking)
+    git br
+    .git/refs/heads
+    
+remote branch
+    branch on remote machine
+    git remote show <remote>
+
+remote tracking branch
+    a local cache of remote branch
+    it's read only
+    git fetch //used to syn with remote branchs 
+    git br -r //origin/master
+    under dir .git/refs/remotes/
+    git remote prune <remote> //delete all stale remote-tracking branch
+
+local tracking branch
+    create branch to track remote br //git br --track branchname remote-branch
+    local branch make update and sync with remote branch much more convienent
+    git br -vv //show branch and it's tracking branch
+    it's tracking remote tracking branch
+    git pull //update remote tracking branch, then merge with local tracking branch

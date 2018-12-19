@@ -1,0 +1,23 @@
+opensourced by Lyft
+
+1 microservice state
+languages and frameworks
+protcols(http/1, http/2, gRPC, database and cache etc)
+load balances (physical or virtual)
+observability 
+distributed system design pattern (retry, circuit breaking, rate limiting, timeouts)
+authentication and authroization
+
+
+transparent, smart and obserable network infrastructure.
+
+
+c++14 code base
+L3/L4 filter architecture (plugin support different low leve protocol)
+http L7 filter architecture, http/2 first
+service discovery
+active/passive health checking (passive by check the traffic)
+configuration api (xDS), separate control and data plane, dynamic configuration
+advanced load balancing
+observability
+edge proxy

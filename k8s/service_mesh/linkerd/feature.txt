@@ -1,0 +1,187 @@
+data plane:
+    sidecar to micro service 
+    instrumentation
+    encryption
+    policy based filter
+
+
+    proxy-init container
+    change iptable to hijack the traffic from and to pod
+
+    proxy
+    http,http2 and tcp
+    metric export to prometheus
+    web socket proxy
+    latency-aware layer-7 load balancing
+    layer-4 load balancing for non-http traffic
+    tls
+    on-demand diagnostic tap API
+    service discovery (DNS and destination gRPC api)
+
+
+injection:
+    use init container to modify ip table rules
+    use sidecar to hijack the network
+
+    deployment:
+        spec:
+            template:
+                spec:
+                    containers:
+                    - original container
+                    - name: linkerd-proxy 
+                      image: linkerd-io/proxy:stable-2.1.0
+                      ports:       
+                      - containerPort: 4143      
+                        name: linkerd-proxy      
+                      - containerPort: 4191      
+                        name: linkerd-metrics    
+                      livenessProbe:
+                        httpGet:
+                          path: /metrics
+                          port: 4191
+                      readinessProbe:            
+                        httpGet:                 
+                            path: /metrics         
+                            port: 4191             
+                      initialDelaySeconds: 10 
+                      env:
+                      - name: LINKERD2_PROXY_CONTROL_URL
+                        value: tcp://linkerd-proxy-api.linkerd.svc.cluster.local:8086
+                      - name: LINKERD2_PROXY_CONTROL_LISTENER
+                        value: tcp://0.0.0.0:4190
+                      - name: LINKERD2_PROXY_METRICS_LISTENER
+                        value: tcp://0.0.0.0:4191
+                      - name: LINKERD2_PROXY_OUTBOUND_LISTENER
+                        value: tcp://127.0.0.1:4140
+                      - name: LINKERD2_PROXY_INBOUND_LISTENER  
+                        value: tcp://0.0.0.0:4143
+                      - name: LINKERD2_PROXY_POD_NAMESPACE                        
+                        valueFrom:
+                          fieldRef:                                               
+                              fieldPath: metadata.namespace
+                      
+                     initContainers:                                                   
+                     - args:
+                       - --incoming-proxy-port                                         
+                       - "4143"
+                       - --outgoing-proxy-port                                         
+                       - "4140"
+                       - --proxy-uid                                                   
+                       - "2102"
+                       - --inbound-ports-to-ignore                                     
+                       - 4190,4191
+                       image: linkerd-io/proxy-init:stable-2.1.0              
+                       name: linkerd-init                                              
+                       resources: {}
+                       securityContext:                                                
+                        capabilities:                                                 
+                          add:
+                          - NET_ADMIN
+                        privileged: false
+                                        
+linkerd deployed resource:
+                            
+linkerd controller servce account:
+    deployments, replicasets -- list, get, watch
+    pods, endpoints, services, namespaces, replicationcontrollers -- list get watch
+    servieprofiles(CRD) ---- list get watch
+
+linkerd prometheus service accout:
+    pods -- list get watch
+
+two services:
+    linkerd-controller-api => http:8086
+    linkerd-proxy-api      => grpc:8086
+    two servcie has same selector
+        linkerd.io/control-plane-component: controller
+
+linkerd controller deployment:
+    labels:
+        linkerd.io/control-plane-component: controller
+
+    containers:
+    - args:
+        - public-api
+        - -prometheus-url=http://linkerd-prometheus.linkerd.svc.cluster.local:9090
+        - -controller-namespace=linkerd
+        - -single-namespace=false
+        - -log-level=info
+      image: bikecn81/linkerd-io-controller:stable-2.1.0
+      ports:
+      - containerPort: 8085
+        name: http
+      - containerPort: 9995
+        name: admin-http
+    
+    - args:
+        - proxy-api
+        - -addr=:8086
+        - -controller-namespace=linkerd
+        - -single-namespace=false
+        - -enable-tls=false
+        - -enable-h2-upgrade=true
+        - -log-level=info
+      image: bikecn81/linkerd-io-controller:stable-2.1.0
+      ports:
+      - containerPort: 8086
+        name: grpc
+      - containerPort: 9996
+        name: admin-http
+
+    - args:
+        - tap
+        - -controller-namespace=linkerd
+        - -single-namespace=false
+        - -log-level=info
+      image: bikecn81/linkerd-io-controller:stable-2.1.0
+      imagePullPolicy: IfNotPresent
+      livenessProbe:
+        httpGet:
+          path: /ping
+          port: 9998
+        initialDelaySeconds: 10
+      name: tap
+      ports:
+      - containerPort: 8088
+        name: grpc
+      - containerPort: 9998
+        name: admin-http
+
+    //start proxy on controller
+    - env:
+        - name: LINKERD2_PROXY_LOG
+          value: warn,linkerd2_proxy=info
+        - name: LINKERD2_PROXY_BIND_TIMEOUT
+          value: 10s
+        - name: LINKERD2_PROXY_CONTROL_URL
+          value: tcp://localhost.:8086
+        - name: LINKERD2_PROXY_CONTROL_LISTENER
+          value: tcp://0.0.0.0:4190
+        - name: LINKERD2_PROXY_METRICS_LISTENER
+          value: tcp://0.0.0.0:4191
+        - name: LINKERD2_PROXY_OUTBOUND_LISTENER
+          value: tcp://127.0.0.1:4140
+        - name: LINKERD2_PROXY_INBOUND_LISTENER
+          value: tcp://0.0.0.0:4143
+        - name: LINKERD2_PROXY_DESTINATION_PROFILE_SUFFIXES
+          value: .
+        - name: LINKERD2_PROXY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      name: linkerd-proxy
+      image: bikecn81/linkerd-io-proxy:stable-2.1.0
+      ports:
+        - containerPort: 4143
+          name: linkerd-proxy
+        - containerPort: 4191
+          name: linkerd-metrics
+        
+    initContainers:
+        image: bikecn81/linkerd-io-proxy-init:stable-2.1.0
+
+
+linkerd.io/web
+prometheus
+linkerd.io/grafana
