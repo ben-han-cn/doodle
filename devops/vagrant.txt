@@ -1,5 +1,3 @@
 sudo apt-get install virtualbox
 sudo apt-get install vagrant
 vagrant plugin install vagrant-disksize //used to expand disk size
-
-

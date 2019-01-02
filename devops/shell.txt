@@ -42,6 +42,7 @@ pgrep, pkill - look up or signal processes based on name and other attributes
 //call once, will ;, each find result will be run grep once, in this case + is prefered
 find . -name "*.go" -exec grep -wn 'main' {} +
 find . -name "*.go" -exec grep -wn 'main' {} \;
+find / -size +500M -exec ls -alh {} +
 
 //remove all containers
 docker rm -f $(docker ps -a -q)
@@ -123,3 +124,7 @@ systemctl status/start/stop/restart svcname
 netstat np //show numbers, pid
         tu //tcp/udp
         lc //listen or conneciton
+
+
+/proc/self/exe ---> current binary
+/proc/self     ---> current pid

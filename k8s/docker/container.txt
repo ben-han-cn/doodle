@@ -19,3 +19,12 @@ volumes
 network
     bridge
     overlay
+
+
+image ----> container
+
+create namespaces
+create cgroup // create file in /sys/fs/cgroup/memory/....
+                                /sys/fs/cgroup/pids/
+    chroot
+    create new process ---> 

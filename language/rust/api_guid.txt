@@ -1,0 +1,90 @@
+1 convension
+as_       borrowed -> borrowed
+to_       borrowed -> owned   
+          owned -> owned
+into_     owned -> owned
+
+as, to will keep current obj
+into will consume current obj
+
+str::as_bytes       &str -> &[u8]
+Path::to_str        &Path -> Option<&str>
+String::into_bytes  String -> Vec<u8>
+
+2 no get_ prefix for getter function
+exception is the general container, which has
+no specified attribute to return
+
+3 iter on collection
+iter(&self) -> Iter             (Iterator<Item = &U>)
+iter_mut(&mut self) -> IterMut  (Iterator<Item = &mut U>)
+into_iter(self) -> IntoItem     (Iterator<Item = U>)
+
+4 use a consistent word order
+JoinPathError
+ParseBoolError  --->  verb-obj-error
+
+
+5 implement common trait
+basic:
+    Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug, Display, Default
+convention:
+    From, TryFrom, AsRef, AsMut
+collection:
+    FromIterator, Extend
+serialization:
+    Serde's Serialize, Deserialize
+IO:
+    Read, Write
+smart pointer:
+    Deref, DerefMut
+
+6 new type 
+struct Miles(pub f64);
+
+7 fucntion parameter validation
+perfer to use specified types
+use assert! or debug_assert!
+
+8 use mem::replace to avoid clone
+use std::mem;
+
+enum MyEnum {
+    A { name: String, x: u8 },
+    B { name: String }
+}
+
+fn a_to_b(e: &mut MyEnum) {
+    *e = if let MyEnum::A { ref mut name, x: 0 } = *e {
+        MyEnum::B { name: mem::replace(name, String::new()) }
+    } else { return }
+}
+//mem::replace(self, src: T) -> T, empty string allocate nothing
+
+9 visitor pattern
+mod ast {
+    pub enum Stmt {
+        Expr(Expr),
+        Let(Name, Expr),
+    }
+
+    pub struct Name {
+        value: String,
+    }
+
+    pub enum Expr {
+        IntLit(i64),
+        Add(Box<Expr>, Box<Expr>),
+        Sub(Box<Expr>, Box<Expr>),
+    }
+}
+
+mod visit {
+    use ast::*;
+
+    pub trait Visitor<T> {
+        fn visit_name(&mut self, n: &Name) -> T;
+        fn visit_stmt(&mut self, s: &Stmt) -> T;
+        fn visit_expr(&mut self, e: &Expr) -> T;
+    }
+}

@@ -18,3 +18,9 @@ the value not the referencd to its funciton.
 any, all, count, sum, min, max, collect is iterator 
 consumer 
 collect return a new seq
+
+
+closure is a function which implement one of the following traits:
+Fn(&self)            ----  captured variable is only used through a shared reference
+FnMut(&mut self)     ----  captured variable is used through a mutable reference
+FnOnce(self)         ----  captured variable is moved

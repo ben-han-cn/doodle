@@ -1,0 +1,16 @@
+watch => incremental change notification feed
+single connection on http protocol
+
+
+watch event:
+resource (runtime.Object)               Event type
+pod                                     added
+node                                    modified
+deploy                                  deleted
+
+
+     push event               event transform
+etcd -----------> api server -----------------> cache(circular buffer)
+client watch on specified version
+if version is in cache, cache will push events after the version
+otherwise, cache will return the latest snapshot then push event from that point

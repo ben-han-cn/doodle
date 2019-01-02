@@ -33,8 +33,6 @@ network
     local load balance          
         baremetal       https://github.com/google/metallb
         f5              https://github.com/F5Networks/k8s-bigip-ctlr
-    
-
 development CI/CD:
     GoCD  //jrails
     concurse //https://github.com/concourse/concourse.git
@@ -44,18 +42,22 @@ development CI/CD:
 
     odo //https://github.com/redhat-developer/odo
     Telepresence https://github.com/telepresenceio/telepresence (make deployment much faster)
+    kanister(application data management) https://github.com/kanisterio/kanister
 
 k8s debug
     telepresence: https://github.com/telepresenceio/telepresence
     squash      : https://github.com/solo-io/squash
 
 container runtime -- cri-o
-https://github.com/kubernetes-sigs/cri-o
+    https://github.com/kubernetes-sigs/cri-o
 
 
 security:
-kube-hunter, penetration testing: https://github.com/aquasecurity/kube-hunter
-kube-bench, deployment is follow security best practices: https://github.com/aquasecurity/kube-bench
+    kube-hunter, penetration testing: https://github.com/aquasecurity/kube-hunter
+    kube-bench, deployment is follow security best practices: https://github.com/aquasecurity/kube-bench
 
 cluster status check:
-sonobuoy: https://github.com/heptio/sonobuoy
+    sonobuoy: https://github.com/heptio/sonobuoy
+
+k8s component:
+    virtual kubelet     https://github.com/virtual-kubelet/virtual-kubelet

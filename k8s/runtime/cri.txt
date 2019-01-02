@@ -1,0 +1,129 @@
+type CRIService interface {
+    runtimeapi.RuntimeServiceServer
+    runtimeapi.ImageServiceServer
+    Start() error
+}
+
+type ImageServiceServer interface {
+    ListImages(context.Context, *ListImagesRequest) (*ListImagesResponse, error)
+    ImageStatus(context.Context, *ImageStatusRequest) (*ImageStatusResponse, error)
+    PullImage(context.Context, *PullImageRequest) (*PullImageResponse, error)
+    RemoveImage(context.Context, *RemoveImageRequest) (*RemoveImageResponse, error)
+    ImageFsInfo(context.Context, *ImageFsInfoRequest) (*ImageFsInfoResponse, error)
+}
+
+
+type RuntimeServiceServer interface {
+    Version(context.Context, *VersionRequest) (*VersionResponse, error)
+    RunPodSandbox(context.Context, *RunPodSandboxRequest) (*RunPodSandboxResponse, error)
+    StopPodSandbox(context.Context, *StopPodSandboxRequest) (*StopPodSandboxResponse, error)
+    RemovePodSandbox(context.Context, *RemovePodSandboxRequest) (*RemovePodSandboxResponse, error)
+    PodSandboxStatus(context.Context, *PodSandboxStatusRequest) (*PodSandboxStatusResponse, error)
+    ListPodSandbox(context.Context, *ListPodSandboxRequest) (*ListPodSandboxResponse, error)
+
+    CreateContainer(context.Context, *CreateContainerRequest) (*CreateContainerResponse, error)
+    StartContainer(context.Context, *StartContainerRequest) (*StartContainerResponse, error)
+    StopContainer(context.Context, *StopContainerRequest) (*StopContainerResponse, error)
+    RemoveContainer(context.Context, *RemoveContainerRequest) (*RemoveContainerResponse, error)
+    ListContainers(context.Context, *ListContainersRequest) (*ListContainersResponse, error)
+    ContainerStatus(context.Context, *ContainerStatusRequest) (*ContainerStatusResponse, error)
+    UpdateContainerResources(context.Context, *UpdateContainerResourcesRequest) (*UpdateContainerResourcesResponse, error)
+    ReopenContainerLog(context.Context, *ReopenContainerLogRequest) (*ReopenContainerLogResponse, error)
+    // ExecSync runs a command in a container synchronously.
+    ExecSync(context.Context, *ExecSyncRequest) (*ExecSyncResponse, error)
+    // Exec prepares a streaming endpoint to execute a command in the container.
+    Exec(context.Context, *ExecRequest) (*ExecResponse, error)
+    Attach(context.Context, *AttachRequest) (*AttachResponse, error)
+    PortForward(context.Context, *PortForwardRequest) (*PortForwardResponse, error)
+    ContainerStats(context.Context, *ContainerStatsRequest) (*ContainerStatsResponse, error)
+    ListContainerStats(context.Context, *ListContainerStatsRequest) (*ListContainerStatsResponse, error)
+    UpdateRuntimeConfig(context.Context, *UpdateRuntimeConfigRequest) (*UpdateRuntimeConfigResponse, error)
+    Status(context.Context, *StatusRequest) (*StatusResponse, error)
+}
+
+type CreateContainerRequest struct {
+    PodSandboxId string `protobuf:"bytes,1,opt,name=pod_sandbox_id,json=podSandboxId,proto3" json:"pod_sandbox_id,omitempty"`
+    Config *ContainerConfig `protobuf:"bytes,2,opt,name=config" json:"config,omitempty"`
+    SandboxConfig *PodSandboxConfig `protobuf:"bytes,3,opt,name=sandbox_config,json=sandboxConfig" json:"sandbox_config,omitempty"`
+}
+
+
+type ContainerConfig struct {
+    // Metadata of the container. This information will uniquely identify the
+    // container, and the runtime should leverage this to ensure correct
+    // operation. The runtime may also use this information to improve UX, such
+    // as by constructing a readable name.
+    Metadata *ContainerMetadata 
+    // Image to use.
+    Image *ImageSpec 
+    // Command to execute (i.e., entrypoint for docker)
+    Command []string 
+    // Args for the Command (i.e., command for docker)
+    Args []string `protobuf:"bytes,4,rep,name=args" json:"args,omitempty"`
+    // Current working directory of the command.
+    WorkingDir string 
+    // List of environment variable to set in the container.
+    Envs []*KeyValue 
+    // Mounts for the container.
+    Mounts []*Mount 
+    // Devices for the container.
+    Devices []*Device 
+    Labels map[string]string 
+
+    Annotations map[string]string
+    // Path relative to PodSandboxConfig.LogDirectory for container to store
+    // the log (STDOUT and STDERR) on the host.
+    LogPath string
+
+    // Variables for interactive containers, these have very specialized
+    // use-cases (e.g. debugging).
+    Stdin     bool `protobuf:"varint,12,opt,name=stdin,proto3" json:"stdin,omitempty"`
+    StdinOnce bool `protobuf:"varint,13,opt,name=stdin_once,json=stdinOnce,proto3" json:"stdin_once,omitempty"`
+    Tty       bool `protobuf:"varint,14,opt,name=tty,proto3" json:"tty,omitempty"`
+    Linux *LinuxContainerConfig `protobuf:"bytes,15,opt,name=linux" json:"linux,omitempty"`
+    Windows *WindowsContainerConfig `protobuf:"bytes,16,opt,name=windows" json:"windows,omitempty"`
+}
+
+type LinuxContainerConfig struct {
+    // Resources specification for the container.
+    Resources *LinuxContainerResources `protobuf:"bytes,1,opt,name=resources" json:"resources,omitempty"`
+    // LinuxContainerSecurityContext configuration for the container.
+    SecurityContext *LinuxContainerSecurityContext `protobuf:"bytes,2,opt,name=security_context,json=securityContext" json:"security_context,omitempty"`
+}
+
+
+type PodSandboxConfig struct {
+    Metadata *PodSandboxMetadata 
+    Hostname string 
+    // Path to the directory on the host in which container log files are
+    // stored.
+    // By default the log of a container going into the LogDirectory will be
+    // hooked up to STDOUT and STDERR. However, the LogDirectory may contain
+    // binary log files with structured logging data from the individual
+    // containers. For example, the files might be newline separated JSON
+    // structured logs, systemd-journald journal files, gRPC trace files, etc.
+    // E.g.,
+    //     PodSandboxConfig.LogDirectory = `/var/log/pods/<podUID>/`
+    //     ContainerConfig.LogPath = `containerName/Instance#.log`
+    //
+    // WARNING: Log management and how kubelet should interface with the
+    // container logs are under active discussion in
+    // https://issues.k8s.io/24677. There *may* be future change of direction
+    // for logging as the discussion carries on.
+    LogDirectory string 
+    DnsConfig *DNSConfig 
+    PortMappings []*PortMapping 
+    Labels map[string]string 
+    Annotations map[string]string 
+    Linux *LinuxPodSandboxConfig `protobuf:"bytes,8,opt,name=linux" json:"linux,omitempty"`
+}
+
+type LinuxPodSandboxConfig struct {
+    // The cgroupfs style syntax will be used, but the container runtime can
+    // convert it to systemd semantics if needed.
+    CgroupParent string 
+    // LinuxSandboxSecurityContext holds sandbox security attributes.
+    SecurityContext *LinuxSandboxSecurityContext 
+    // Sysctls holds linux sysctls config for the sandbox.
+    Sysctls map[string]string 
+}

@@ -1,0 +1,7 @@
+edge --> gateway --> cloud
+
+app deployment/upgrade in edge
+data synchronization between edge and cloud
+message/event middleware
+
+deploy k8s in the edge

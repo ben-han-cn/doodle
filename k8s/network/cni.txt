@@ -71,4 +71,30 @@ CNIConfig.AddNetworkList: iterator all the plugins in config file, revoke ADD
 
 
 
+CNI project (github.com/containernetwork):
+1 cni specification documents
+    libcni, a CNI runtime implementation
+    skel, a reference plugin implementation
+2 a set of "base" plugin
+    interface plugin: ptp, bridge, ipvlan, macvlan
+    ipam: host-local, DHCP, static
+    meta: bandwidth, flannel, portmap, tunning
 
+specification:
+    configuration (fed to plugin on stdin for each operation)
+        json:
+        must have: 
+            "name": ""
+            "type": "bridge",
+            "ipam": {
+                "type": "host-local",   
+                "subnet": "10.10.0.0/16",
+            }
+                
+    runtime interface
+        basic commands: add, del, version
+        plugins are executables
+        spawned by runtime when network operations are desribed
+        fed plugin json configuration via stdin
+        also fed container-specific data via stdin, (name, namespace, port mapping etc)
+        get strucutred result via stdout (plugin created ip, interface, dns and routing info, etc)

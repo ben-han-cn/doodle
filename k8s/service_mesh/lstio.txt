@@ -1,0 +1,50 @@
+pilot: config data to proxy(envoy)
+mixer: policy checks, telemetry
+citadel: tls certs to proxies
+
+envoy talk to mixer at runtime synronisely in the query flow, 
+but the other two component is in asyncrous way
+
+
+envoy support discovery service, refer to as xDS apis
+listener(LDS)     what envoy listen to (port, protocol)
+    |
+route(RDS)        where traffic can be set (condition, match)
+    |
+cluster(CDS)      how to send traffic (load balance, cert)
+    |
+endpoint(EDS)     hosts able to receive traffic 
+secret(SDS)
+
+envoy use pull based config model, eventually consistent
+
+envoy use loopback to transfer message to real service
+
+pilot watch endpoint event, and send route info to envoy
+pilot pass the routine info to envoy via its data plane api(starndard rest api)
+pilot:
+    ingress routing
+    traffic mirriring
+    traffic shifting
+    canary deployments
+    cricuit breaking
+    fault injection
+
+mix will be queried by envoy before send pkt to other services
+mix client is used as a plugin in envoy
+mixer(report and check): //runtime policies
+    check: acls/authorization, rate limiting
+    report:
+        log, metrics, tracing
+    
+
+citadel
+    tls certs to envoy
+
+
+ingress
+egress
+
+istio CDR:
+gateway
+virtual service

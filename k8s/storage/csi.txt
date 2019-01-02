@@ -1,24 +1,122 @@
-master: controller plugin //could run anywhere
-node:   node plugin       //resides on each node
-To make CSI more generic, implemention could merge controller and node
-into same plugin to support CO which doesn't have a master/node architecture 
+arch:
+
+k8s core ---->   k8s helper components -------> 3rd party components
+master              driver registrar         dirver implement following interface:
+kubelet             external provisioner        Identity, Controller, Node
+                    external attacher
 
 
-interface:
-identity service: implemented by both controller and node plugin
-controller service: implemented by controller plugin
-node service: implemented by node plugin
+k8s helper components is implmeneted by k8s team.
+
+Driver registrar — is a sidecar container that registers the CSI driver with kubelet, 
+and adds the drivers custom NodeId to a label on the Kubernetes Node API Object. It
+depeneds on CSI driver's Identity interface and GetNodeId operation
 
 
-procedure:
-CreateVolume, ControllerPublishVolume, NodePublishVolume
+External provisioner — is a sidecar container that watches Kubernetes PersistentVolumeClaim 
+objects and triggers CSI CreateVolume and DeleteVolume operations against a driver endpoint.
+
+External attacher — is a sidecar container that watches Kubernetes VolumeAttachment objects 
+and triggers CSI ControllerPublish and ControllerUnpublish operations against a driver 
+endpoint
+
+
+CSI interface:
+CSI Identity — is mainly for identifying the plugin service, making sure it’s healthy, 
+and returning basic information about the plugin itself (whether it's a node or controller
+plugin)
+
+service Identity {
+  // return the version and name of the plugin
+  rpc GetPluginInfo(GetPluginInfoRequest) returns (GetPluginInfoResponse) {}
+
+  // reports whether the plugin has the ability of serving the Controller interface
+  rpc GetPluginCapabilities(GetPluginCapabilitiesRequest) returns (GetPluginCapabilitiesResponse) {} 
+
+  // called by the CO just to check whether the plugin is running or not
+  rpc Probe (ProbeRequest) returns (ProbeResponse) {}
+}
+
+
+CSI controller — is responsible of controlling and managing the volumes, such as: 
+creating, deleting, attaching/detaching, snapshotting, 
+service Controller {
+  rpc CreateVolume (CreateVolumeRequest) returns (CreateVolumeResponse) {}
+  rpc DeleteVolume (DeleteVolumeRequest) returns (DeleteVolumeResponse) {}
+    
+  // make a volume available on some required node
+  rpc ControllerPublishVolume (ControllerPublishVolumeRequest) returns (ControllerPublishVolumeResponse) {}
+  // make a volume un-available on some required node
+  rpc ControllerUnpublishVolume (ControllerUnpublishVolumeRequest) returns (ControllerUnpublishVolumeResponse) {}
+
+  // E.g. can it be used for read/write simultaneously from multiple nodes
+  rpc ValidateVolumeCapabilities (ValidateVolumeCapabilitiesRequest) returns (ValidateVolumeCapabilitiesResponse) {}
+
+  rpc ListVolumes (ListVolumesRequest) returns (ListVolumesResponse) {}
+
+  rpc GetCapacity (GetCapacityRequest) returns (GetCapacityResponse) {}
+
+  rpc ControllerGetCapabilities (ControllerGetCapabilitiesRequest) returns (ControllerGetCapabilitiesResponse) {}
+
+  rpc CreateSnapshot (CreateSnapshotRequest) returns (CreateSnapshotResponse) {}
+
+  rpc DeleteSnapshot (DeleteSnapshotRequest) returns (DeleteSnapshotResponse) {}
+
+  rpc ListSnapshots (ListSnapshotsRequest) returns (ListSnapshotsResponse) {}
+}
+
+CSI Node — is responsible for controllong volume’s action in the kubernetes node.
+service Node {
+  // temporarily mount the volume to a staging path
+  rpc NodeStageVolume (NodeStageVolumeRequest) returns (NodeStageVolumeResponse) {}
+
+  rpc NodeUnstageVolume (NodeUnstageVolumeRequest) returns (NodeUnstageVolumeResponse) {}
+
+  // mount the volume from staging to target path
+  rpc NodePublishVolume (NodePublishVolumeRequest) returns (NodePublishVolumeResponse) {}
+
+  rpc NodeUnpublishVolume (NodeUnpublishVolumeRequest) returns (NodeUnpublishVolumeResponse) {}
+
+  rpc NodeGetVolumeStats (NodeGetVolumeStatsRequest) returns (NodeGetVolumeStatsResponse) {}
+
+  // return a unique ID of the node
+  rpc NodeGetId (NodeGetIdRequest) returns (NodeGetIdResponse) {
+    option deprecated = true;
+  }
+
+  // returns the capabilities of the Node plugin
+  rpc NodeGetCapabilities (NodeGetCapabilitiesRequest) returns (NodeGetCapabilitiesResponse) {}
+
+  // Similar to NodeGetId
+  rpc NodeGetInfo (NodeGetInfoRequest) returns (NodeGetInfoResponse) {}
+}
+
+NodeStageVolume: This method is called by the CO to temporarily mount the volume to a staging path. 
+Usually this staging path is a global directory on the node. In Kubernetes, after it’s mounted 
+to the global directory, you mount it into the pod directory (via NodePublishVolume). The reason 
+that mounting is a two step operation is because Kubernetes allows you to use a single volume by 
+multiple pods. This is allowed when the storage system supports it (say NFS) or if all pods run on the 
+same node. One thing to note is that you also need to format the volume if it’s not formatted already. 
+
+3rd party plugin could has two functionality:
+Identity + Node  //only use node storage
+Identity + Node + Controller  //use cloud or other block storage
+
+kubelet communicate with node plugin
+only registrar and provisioner sidecar communicate with controller plugin, these two sidecar is under
+github.com/kubernetes-csi repo
+
+2 Deployment
+all k8s node which want its pod to use CSI volume has to deploy a daemonset,
+whose pods has two container: 
+    node plugin + plugin registrar sidecar
+    (node plugin implement Identity + Node)
+
+Statefulset has only one instance which runs 3 containers:
+    controller plugin + external attacher sidecar + external provisioner sidecar
+    (controller plugin implement Identity + Controller)
+
 
 
 kubelet ---unix socket--> CSI volumn dirvier
 socket path == /var/lib/kubelet/plugins/[SanitizedCSIDriverName]/csi.sock
-
-
-admin create StorageClass point to external provisioner.
-user crate PVC reference the StorageClass
-external provisioner watch the PVC and issue the CreateVolumn call against
-the CSI volumn dirver.

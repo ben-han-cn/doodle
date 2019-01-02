@@ -48,3 +48,51 @@ any
     binary
                   none
 
+
+
+GC
+a generational copying garbage collection that runs inside each process private heep
+independently, and also a reference counting occurs for gloabl shared heep.
+There are two strategies: Generational(Minor) and Fullsweep(Major). Generational GC divides
+the heap into tw segments: young and old generations. the seperation is based on the fact that
+if an object survives a GC cycle the chances of it becoing garbage in short term is low. So the 
+young generation is for newly allocated data, and old generation is for the data that have survived
+an implementation specific number of GC. this sepration helps the GC to reduce is unnecessary cycles.
+The generational GC just collects the young heap, but fullsweep collect both young and old heap.
+
+
+Scheduling
+preemptive vs cooperative. 
+whether the scheduler needs task's cooperation for context switching. Preemptive scheduler does 
+context switch based on factors like priority, time slice or reductions.
+
+Erlang scheduler is preemptive. The scheduling is based on priority, processes with same priority 
+will be scheduled in a round robin fashion. 
+collect the young heap, but fullsweep collect both young and old heep.
+Reductions is also used to do scheduling. it's counter per process and is normally incremented by one
+for each function call. When the count reach the limitation, the process will be preemptived.
+
++--------------------------------------------------------+
+|                                                        |
+|  +-----------------+-----------------+                 |
+|  |                 |                 |                 |
+|  |  Scheduler # 1  |  Run Queue # 1  <--+              |
+|  |                 |                 |  |              |
+|  +-----------------+-----------------+  |              |
+|                                         |              |
+|  +-----------------+-----------------+  |              |
+|  |                 |                 |  |              |
+|  |  Scheduler # 2  |  Run Queue # 2  <----> Migration  |
+|  |                 |                 |  |     Logic    |
+|  +-----------------+-----------------+  |              |
+|                                         |              |
+|  +-----------------+-----------------+  |              |
+|  |                 |                 |  |              |
+|  |  Scheduler # N  |  Run Queue # N  <--+              |
+|  |                 |                 |                 |
+|  +-----------------+-----------------+                 |
+|                                                        |
++--------------------------------------------------------+
+
+migration logic is used to makeing scheduling fair and efficient. It tries to control and balance run queues
+based on the statistics that collect from system.

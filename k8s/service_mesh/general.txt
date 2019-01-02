@@ -13,4 +13,18 @@ data plan
 
 
 
-      
+why serivce mesh:
+bloated service code
+duplicating work to make services production-ready
+    load balancing, auto scaling, rate limit, traffic routing
+inconsistency across services
+    retry, tls, failover for each language framework
+    policy and debugging
+diffusing responsibility of service management
+
+
+observability
+    logging, metrcis, tracing
+traffic control
+    resiliency, effiency, security, policy
+

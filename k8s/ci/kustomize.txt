@@ -1,0 +1,8 @@
+yaml file transformer without using template
+
+use kustomization.yaml as makefile to generate new yaml
+file based on raw yaml, without modify the old yaml
+
+generate configfile based on configuration file or leteral 
+
+inject service mesh sidecar

@@ -39,10 +39,11 @@ Rook Agent
 
 Rook flex volume plugin
 
-
 ceph
 operator runs ceph commands to initialize and bootstrap cluster
 create deploymens to manage ceph daemon
     use init containers to generate configure
     main container run daemon
 monitor the componenets
+
+

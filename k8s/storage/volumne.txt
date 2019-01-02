@@ -1,0 +1,76 @@
+In essential, a volume is just a directory which is accessible to the containers in a pod.
+How the directory comes to be, the medium that backes it, and the content of it are determined
+by the particular volume type used.
+
+type of volumes:
+cephfs
+configMap
+csi
+emptyDir
+fc(fibre channel)
+glusterfs
+hostPath
+iscsi
+local
+nfs
+pvc
+rdb
+
+
+//kubernetes/pkg/volume/volume.go
+type Volume interface {
+    GetPath() string //which volume should be mounted for the pod
+    metricsProvider
+}
+
+type MetricsProvider interface {
+    GetMetrics() (*Metrics, error)
+}
+
+
+type Metrics struct {
+    Time metav1.Time
+    //total bytes used by the volume
+    Used *resource.Quantity
+    //total capacity of the volume's underlying storage
+    Capacity *resource.Quantity
+    Available *resource.Quantity
+
+    // InodesUsed represents the total inodes used by the Volume.
+    InodesUsed *resource.Quantity
+    Inodes *resource.Quantity
+    InodesFree *resource.Quantity
+}
+
+// VolumeInfo contains information about the volume.
+type VolumeInfo struct {
+    Mounter volume.Mounter
+    BlockVolumeMapper volume.BlockVolumeMapper
+    SELinuxLabeled bool
+    ReadOnly bool
+    InnerVolumeSpecName string
+}
+
+
+type Mounter interface {
+    Volume
+
+    CanMount() error
+
+    // SetUp prepares and mounts/unpacks the volume to a
+    // self-determined directory path. The mount point and its
+    // content should be owned by 'fsGroup' so that it can be
+    // accessed by the pod. This may be called more than once, so
+    // implementations must be idempotent.
+    SetUp(fsGroup *int64) error
+    // SetUpAt prepares and mounts/unpacks the volume to the
+    // specified directory path, which may or may not exist yet.
+    // The mount point and its content should be owned by
+    // 'fsGroup' so that it can be accessed by the pod. This may
+    // be called more than once, so implementations must be
+    // idempotent.
+    SetUpAt(dir string, fsGroup *int64) error
+    // GetAttributes returns the attributes of the mounter.
+    // This function is called after SetUp()/SetUpAt().
+    GetAttributes() Attributes
+}

@@ -39,7 +39,9 @@ k8s philosophy:
     scheduler monitor the pod create event ---> select node ---> update the pod object
     kubelet monitor the pod update event ---> run the pod scheduled to it 
     it means all the componenet whether its built-in or third parity use the same mechanism
-3 work load protability
+3 meet the user where they are
+    don't ask user to modify their app to use k8s
+4 work load protability
     same deployment could be runned into any k8s cluster, no matter it's private or public,
     Any node or hardware binding is very bad pratcice
 
@@ -70,3 +72,14 @@ k8s' three essential components:
 cluster
 pipeline
 registry
+
+
+
+advantage of k8s
+1 workload portability, flixibility (run everywhere)
+2 convenience of operation and automation
+3 independence from vendor lock-in
+4 rich ecosystem
+5 start-up times, cost savings
+6 extensible api
+7 existing k8s infrastcuture

@@ -17,3 +17,26 @@ the host filesystem.
 When lanch container useing -v to share file between host and container, docker doesn't create
 volumn, it just mount the host directory into the container. Instead, normal volumn is resides
 in host path /var/lib/dockder/volumens/....
+
+different volumn, docker also support mount bind
+A bind mount is an alternate view of a directory tree. Classically, mounting creates a view of 
+a storage device as a directory tree. A bind mount instead takes an existing directory tree and 
+replicates it under a different point.
+
+sudo mount --bind t1 t2 
+t2 and t1 both exsists before mount bind, after mount bind, t2 has same content with t1, and file
+could be modified from two directory, the content of t2 will be hidden.
+sudo umount t2 //will remove the bind
+
+the difference between volumes and mount bind, 
+1 is the directory created in container from that volumn is managed by container, but the folder 
+created by mount bind, could be modified by both container and process in host machine.
+2 src must exists when use mount bind
+
+
+in container, df will display a list of df
+filesystem            mounted on
+overlay                 / 
+tmpfs                   /dev
+/dev/sda1               /ben        //this is volume to share with host
+tmpfs                   /proc/scsi

@@ -1,0 +1,21 @@
+thread specific context in linux == TCB (thread control block) == struct pthread == TLS (thread local storage)
+has specific regisiter(FS) to point to 
+
+TLS is setup by ld.so
+
+TLS implementation requires compiler, linker, kernel and language runtime.
+
+ELF
+.data    initialized data 
+.bss     uninitialized data
+.tdata   thread local initialized data
+.tbss    thread local uninitialized data
+
+unlike normal section, thread local section willn't be used directly.
+
+each object(static, dynmaic lib) could add value to TLS
+
+
+regisiter point to TCB
+TCB has point to a array == [dtv, dtv ...]
+dtv == dynamic thread vector

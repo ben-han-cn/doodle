@@ -1,0 +1,58 @@
+access methods:
+    how does application wants to access the data?
+        all at once or piece by piece
+        sequentially or randomly
+    what type of the data is it?
+        database, txt, video/audio, photo
+        static or dynamic, data is changed a lot or once write never change
+
+data sharing
+     does the data need to shared?
+        shared by application vs shared by the storage device
+        shared reading vs shared writing
+        how many client will share the data
+
+    security and access control
+        applied at what level
+
+
+block storage
+    ideal for performance-intensive primary storage
+    use case
+        OLTP (structured database storage)
+        virutal volumns
+        applications using server-side processing
+    workloads
+        high change content
+        randon r/w
+        burstly io
+    how block storage is organized
+        data is typically stored on device in fixed-size blocks (512 bytes)
+        data is stored without any higher-level metadata
+        accessed by os as mounted drive volume
+        app/file system decide how blocks are accessed, combined and modified
+    how block device is accessed
+        app write data block (manage a big file? posix interface?)
+        block goes to software/hardware initiator and over DAS/SAN connections
+            DAS(direct attached storage): SATA(6 GB/s), NVMe, SAS(SCSI) (12 GB/s) 
+            Etherenet SAN: iSCSI
+            Fibre Channel SAN: FCP
+        storage device controller receives blocks
+        data written to device 
+
+    (NAS(network attached storage) vs SAN (storage area network) 
+     NAS is trated as as file system level: NFS 
+     SAN is trated as a block device)
+            
+file storage
+    logic(from os point of view, the file arch, no matter file syste) --> virtual(different file system) ---> physical layer
+    network access layer
+    posix interface
+
+
+object storage
+    objects have a handle (a url or id)
+    objects have metadata
+    objects may have version
+    normally shard into smaller pieces
+    normally expose RESTful interface

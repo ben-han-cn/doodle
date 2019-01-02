@@ -5,9 +5,6 @@ sudo apt-get update
 sudo apt-get install -y docker-ce
 sudo usermod -aG docker ${USER}
 
-
-
-
 $ docker pull registry
 $ docker run -d -p 5000:5000 --name localregistry registry
 $ docker pull alpine

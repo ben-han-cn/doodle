@@ -1,0 +1,9 @@
+when change to a new arch, you should understand
+
+1 what are downsides and challenges of your current env for running your system
+2 what problems will switch to new arch solve
+3 what new problems will new arch create
+4 how big will increase/decrease in cost be
+5 what team or process changes will need to happen 
+
+ultimately, to make the right decision is to understand how things work.
