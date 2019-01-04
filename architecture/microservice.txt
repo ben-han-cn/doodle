@@ -24,8 +24,11 @@ api design:
     code generation tool to generate service/http routing function for the framework
 
 
-database architecture
+database architecture: (core: embrace eventual consistency)
     echo micro service application own its database
+        not only about dependency 
+        same data may save in different db in different format for different reason: performance, ..
+        but for same info, there should has only one auth, which create and update the data
     no other service is allowed to connect to the database
     other service use only the service interface (API + Events) 
 
@@ -258,3 +261,7 @@ Event soursing:
     trait the system state as a sequence of event. 
     save the events in a append-only data store.
     could use a store to save the current state but it's not the canonical source.
+
+service dependency:
+    the api of other service
+    the event emit by other service

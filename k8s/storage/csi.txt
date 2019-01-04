@@ -117,6 +117,30 @@ Statefulset has only one instance which runs 3 containers:
     (controller plugin implement Identity + Controller)
 
 
-
-kubelet ---unix socket--> CSI volumn dirvier
-socket path == /var/lib/kubelet/plugins/[SanitizedCSIDriverName]/csi.sock
+3 General mechanism
+    cluster admin
+        create StorageClass which specify CSI driver's externer provisioner and any parameters required by driver.
+    User 
+        create pvc referring to the StorageClass
+    pvc controller 
+        watched the pvc and realizes that dynamic provisioning is needed, mark the pvc with annotaiton
+        volume.beta.kubernetes.io/storage-provisioner
+    external provisioner
+        get pvc from k8s 
+        check the storage class and the provisioner is point to itself
+        call CreateVolume to controller 
+        create pv to k8s
+    internal CSI attacher(controller/volume/attachdetach/AttachDetachController)
+        watch pv then create VolumeAttachment
+        this is done by in-tree csi volumen plugin(kubernetes/pkg/volume/csi/csiAttacher)
+            in the VolumeAttachment, it will choose the node
+    external attacher
+        watch VolumeAttachment invoke ControllerPublish to controller, update VolumeAttachment 
+        object set the value of Attached field
+    volumenMgr in kubelet  
+        watch a PV is scheduled to node
+        call inner csi volume plugin's WaitForAttach
+            keep waiting until watch Attached field of VolumeAttachment to be set to true
+        call inner csi volume plugin's MountDevice (which do nothing)
+        call inner csi volume plugin's Setup to invoke node plugin's NodePublishVolume which will
+            mount the specified path into pod container

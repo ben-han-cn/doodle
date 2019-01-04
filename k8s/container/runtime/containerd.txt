@@ -1,0 +1,63 @@
+containerd 
+runtime manager over runc
+
+CRI/OCI support
+
+smaller footprint/focused feature
+
+architecture:
+CRI API                    containerd API
+containerd  servcie interfaces
+metadata, diff, tasks, events
+snapshotter, content store, runtime manager (runc, kata, ...)
+
+extensibility:
+storage plugin
+runtime plugin
+
+containerd has sdk for go client 
+
+---------------------------------------------------
+cri --> containerd client --> containerd services |  --> shims --> runc --> pods
+---------------------------------------------------
+
+kubelet --container-runtime=remote --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+
+
+containerd client 
+    lib used by other app
+    handle high level functionality
+    communicate with server using gRPC
+
+
+containerd server
+    api (support CRI)
+    services
+        metadata store
+        diff
+        tasks
+        events
+
+
+metadata store (boltdb)
+images                           contents                                                       snapshots
+
+reg.io/alpine:latest   ---->  sha256:6fe6...(oci manifest) ---> sha256:0f41...(oci image) ----> alpine base layer
+                                                           ---> sha256:3b87...(oci layer)            ^
+                                                           |                                         |
+reg.io/redis:latest    ---->  sha256:78cf...(oci manifest) +                                         |
+                                                           ---> sha256:b5cc...(oci layer)            |
+                                                           ---> sha256:b5cc...(oci image) --->  redis + alpine
+oci layer == compressed tar
+
+snapshotter(manage immutable snapshots) is a interface, could be implemented by plugin
+
+
+tasks --- runtime (pluggable) -- default to runc
+Create
+Start
+Pids
+Pause
+Kill
+Exec 
+...

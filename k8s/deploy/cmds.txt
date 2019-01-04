@@ -7,6 +7,8 @@ k get pods,rs,deployments
 k get pods --output=wide
 k get pods -l app=flask
 k get pods -L app,pod-template-hash //also display label value of specified key
+k label node <nodename> <labename>=xxxx //add label
+k label node <nodename> <labename>- //delete label
 
 k logs redis-xxxxxxx
 

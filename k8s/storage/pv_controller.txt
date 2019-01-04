@@ -1,0 +1,43 @@
+//csi plugin isn't included in pv_controller's volumePluginMgr
+
+
+syncUnboundClaim
+    if claim.Spec.VolumeName == "" {
+        // User did not care which PV they get.
+        // class.VolumeBindingMode == storage.VolumeBindingWaitForFirstConsumer
+        delayBinding, err := ctrl.shouldDelayBinding(claim)
+        volume, err := ctrl.volumes.findBestMatchForClaim(claim, delayBinding)
+        if volume == nil {
+           if delayBinding  //event: waiting for first consumer to be created before binding
+           else  
+            provisionClaim(claim)
+        } else {
+            ctrl.bind(volume, claim)
+        }
+    }
+
+provisionClaimOperation
+    //find related plugin(provsioner), storage class
+    plugin, storageClass, err := ctrl.findProvisionablePlugin(claim)
+
+    // Add provisioner annotation so external provisioners know when to start
+    newClaim, err := ctrl.setClaimProvisioner(claim, storageClass)
+
+    // get related volume
+    pvName := ctrl.getProvisionedVolumeNameForClaim(claim)
+    volume, err := ctrl.kubeClient.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+
+    options := vol.VolumeOptions{}
+    provisioner, err := plugin.NewProvisioner(options)
+
+    opComplete := util.OperationCompleteHook(plugin.GetPluginName(), "volume_provision")
+    volume, err = provisioner.Provision(selectedNode, allowedTopologies)
+    opComplete(&err)
+
+    // Try to create the PV object several times
+    ctrl.kubeClient.CoreV1().PersistentVolumes().Create(volume)
+
+
+ctrl.findProvisionablePlugin(claim)
+    //vol.VolumePluginMgr => k8s.io/kubernetes/pkg/volume/plugins.go
+    ctrl.volumePluginMgr.FindProvisionablePluginByName(class.Provisioner)

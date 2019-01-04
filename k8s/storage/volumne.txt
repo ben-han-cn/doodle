@@ -16,6 +16,48 @@ nfs
 pvc
 rdb
 
+type PersistentVolume struct {
+    Spec PersistentVolumeSpec 
+    Status PersistentVolumeStatus
+}
+
+type PersistentVolumeSpec struct {
+    Capacity ResourceList
+
+    // The actual volume backing the persistent volume.
+    // for each volume type, there is one PersistentVolumeSource
+    PersistentVolumeSource
+
+    // ClaimRef is part of a bi-directional binding between PersistentVolume and PersistentVolumeClaim.
+    ClaimRef *ObjectReference
+    
+    PersistentVolumeReclaimPolicy PersistentVolumeReclaimPolicy 
+    StorageClassName string 
+    MountOptions []string
+
+    // volumeMode defines if a volume is intended to be used with a formatted filesystem
+    // or to remain in raw block state.
+    VolumeMode *PersistentVolumeMode
+    NodeAffinity *VolumeNodeAffinity
+}
+
+type PersistentVolumeStatus struct {
+    Phase PersistentVolumePhase
+    Message string 
+    Reason string
+}
+
+const (
+    VolumePending PersistentVolumePhase = "Pending"
+    VolumeAvailable PersistentVolumePhase = "Available"
+    VolumeBound PersistentVolumePhase = "Bound"
+    // used for PersistentVolumes where the bound PersistentVolumeClaim was deleted
+    // released volumes must be recycled before becoming available again
+    // this phase is used by the persistent volume claim binder to signal to another process to reclaim the resource
+    VolumeReleased PersistentVolumePhase = "Released"
+    VolumeFailed PersistentVolumePhase = "Failed"
+)
+
 
 //kubernetes/pkg/volume/volume.go
 type Volume interface {
@@ -74,3 +116,5 @@ type Mounter interface {
     // This function is called after SetUp()/SetUpAt().
     GetAttributes() Attributes
 }
+
+CSIPersistentVolumeSource

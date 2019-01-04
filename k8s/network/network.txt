@@ -53,3 +53,6 @@ iptable:
   
   whan a hook is triggered related chain will be processed, and the order is
   nat(snat) -> security -> filter -> nat(dnat) -> mangle -> raw
+
+
+svc kubernetes is the api server, the ep address for it is based on default route on that host/node
