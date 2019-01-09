@@ -1,0 +1,36 @@
+CRD + operator
+
+multi-storage system support:
+    different backend has its own CRD
+    different backend has its own controller
+    common struct/type embedded in different CRD
+
+
+common struct in rook.io
+type StorageScopeSpec struct {
+    metav1.TypeMeta `json:",inline"`
+    Nodes           []Node            `json:"nodes,omitempty"`
+    UseAllNodes     bool              `json:"useAllNodes,omitempty"`
+    NodeCount       int               `json:"nodeCount,omitempty"`
+    Location        string            `json:"location,omitempty"`
+    Config          map[string]string `json:"config"`
+    Selection
+}
+
+type Selection struct {
+    // Whether to consume all the storage devices found on a machine
+    UseAllDevices *bool `json:"useAllDevices,omitempty"`
+    // A regular expression to allow more fine-grained selection of devices on nodes across the cluster
+    DeviceFilter string `json:"deviceFilter,omitempty"`
+    // List of devices to use as storage devices
+    Devices []Device `json:"devices,omitempty"`
+    // List of host directories to use as storage
+    Directories []Directory `json:"directories,omitempty"`
+    // PersistentVolumeClaims to use as storage
+    VolumeClaimTemplates []v1.PersistentVolumeClaim `json:"volumeClaimTemplates,omitempty"`
+}
+
+specific CRD in dbname.rook.io 
+    ceph.rook.io
+    cockroachdb.rook.io
+    ...

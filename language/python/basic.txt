@@ -580,6 +580,9 @@ __all__ = [
 in all the child file(module) use absolute import path
 from libname.pkg2 import xxxx
 
+As the main module for a program always has the name "__main__", any modules that will be the main 
+module of an application must use absolute imports.
+
 
 &: bitwise add
 and: logic and,  
@@ -736,5 +739,3 @@ logfile_handler = logging.FileHandler("log.txt")
 logger.addHandler(logfile_handler)
 logger.warning("This goes to both the console, AND into log.txt.")
 logger.debug("While this only goes to the file.")
-
-

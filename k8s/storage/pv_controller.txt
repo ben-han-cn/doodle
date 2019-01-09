@@ -1,18 +1,100 @@
-//csi plugin isn't included in pv_controller's volumePluginMgr
+bi-directional pointer between PV and PVC which is represented by pvc.Spec.VolumeName
+and pv.Spec.ClaimRef. 
+(pv.Spec.ClaimRef.UID == pvc.UID
+ pvc.Spec.VolumeName == pv.Name)
 
+binding is two step process. pv.Spec.ClaimRef is modified first, then pvc.Spec.VolumeName.
+    bindVolumeToClaim(volume, claim)
+         claimRef, err := ref.GetReference(scheme.Scheme, claim)
+         volume.Spec.ClaimRef = claimRef
+         SetMetaDataAnnotation(&volumeClone.ObjectMeta, annBoundByController, "yes")
+    updateVolumePhase(volume, v1.VolumeBound, "")
+    bindClaimToVolume(claim, volume)
+         claim.Spec.VolumeName = volume.Name
+         metav1.SetMetaDataAnnotation(&claim.ObjectMeta, annBoundByController, "yes")
+         metav1.SetMetaDataAnnotation(&claim.ObjectMeta, annBindCompleted, "yes")
+    updateClaimStatus(claim, v1.ClaimBound, volume)
 
-syncUnboundClaim
+several annotation is very important to specify the binding state
+(variable prefix ann is shortcut for annotation)
+1 annBindCompleted("pv.kubernetes.io/bind-completed") 
+    applies to PVCs 
+    indicates that the lifecycle of the PVC has passed through the initial setup
+
+2 annBoundByController("pv.kubernetes.io/bound-by-controller")
+    applies to PVs and PVCs 
+    indicates the binding (PV->PVC or PVC->PV) was installed by the controller.
+    the absence of this annotation means the binding was done by user
+
+3 annDynamicallyProvisioned("pv.kubernetes.io/provisioned-by")
+    applies to PVs
+    indicates the PV has been dynamically provisioned by Kubernetes. Its value is 
+    name of volume plugin that created the volume.
+
+4 annStorageProvisioner("volume.beta.kubernetes.io/storage-provisioner")
+    applies to PVCs
+    indicate the PVC is supposed to be dynamically provisioned. Its value is name of 
+    volume plugin that is supposed to provision a volume for this PVC
+
+5 annSelectedNode("volume.kubernetes.io/selected-node")
+    applies to PVC
+    indicates the PVC has been triggered by scheduler to be dynamically provisioned. 
+    Its value is the name of the selected node.
+    
+
+main logic for PVC:
+    if metav1.HasAnnotation(claim.ObjectMeta, annBindCompleted) {
+        syncBoundClaim
+    } else {
+        syncUnboundClaim
+    }
+
+syncBoundClaim
+    if claim.Spec.VolumeName == "" {
+        //claim state to Lost, which is a terminal state
+        ctrl.updateClaimStatusWithEvent(claim, v1.ClaimLost)
+    }
+    volume, found, err := ctrl.volumes.store.GetByKey(claim.Spec.VolumeName)
+    if found == false {
+         ctrl.updateClaimStatusWithEvent(claim, v1.ClaimLost)
+    } else {
+        if volume.Spec.ClaimRef == nil {
+            ctrl.bind(volume, claim)
+        } else if volume.Spec.ClaimRef.UID == claim.UI {
+            ctrl.bind(volume, claim)
+        } else {
+            ctrl.updateClaimStatusWithEvent(claim, v1.ClaimLost)
+        }
+    }
+
+syncUnboundClaim 
     if claim.Spec.VolumeName == "" {
         // User did not care which PV they get.
         // class.VolumeBindingMode == storage.VolumeBindingWaitForFirstConsumer
         delayBinding, err := ctrl.shouldDelayBinding(claim)
         volume, err := ctrl.volumes.findBestMatchForClaim(claim, delayBinding)
         if volume == nil {
-           if delayBinding  //event: waiting for first consumer to be created before binding
+           if delayBinding  
+                do nothing//event: waiting for first consumer to be created before binding
+                ctrl.updateClaimStatus(claim, v1.ClaimPending, nil)
+           else if v1helper.GetPersistentVolumeClaimClass(claim) != "":
+                ctrl.provisionClaim(claim)
            else  
-            provisionClaim(claim)
+                ctrl.updateClaimStatus(claim, v1.ClaimPending, nil)
         } else {
-            ctrl.bind(volume, claim)
+            if volume.Spec.ClaimRef == nil {
+                checkVolumeSatisfyClaim(volume, claim)
+                ctrl.bind(volume, claim)
+            } else if isVolumeBoundToClaim(volume, claim) {
+                ctrl.bind(volume, claim)
+            } else {
+                if metav1.HasAnnotation(claim.ObjectMeta, annBoundByController) {
+                    return err //volume is bind to other PVC
+                } else {
+                    updateClaimStatus(claim, v1.ClaimPending, nil)
+                    //wait for another retry
+                }
+            }
         }
     }
 
@@ -26,7 +108,12 @@ provisionClaimOperation
     // get related volume
     pvName := ctrl.getProvisionedVolumeNameForClaim(claim)
     volume, err := ctrl.kubeClient.CoreV1().PersistentVolumes().Get(pvName, metav1.GetOptions{})
+    if volume != nil && err == nil {
+        //do nothing, already been done
+        return 
+    }
 
+    //normally for cloud provisioner
     options := vol.VolumeOptions{}
     provisioner, err := plugin.NewProvisioner(options)
 

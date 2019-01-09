@@ -1,0 +1,56 @@
+time-series == metric name + unique combination of labels
+    <identifier> --> [(t1, v1), (t2, v2), ...] (t0 == int64, v1 == float64)
+
+example:
+a set of series identifiers that are part of metric couting requests. 
+requests_total{path="/status", method="GET", instance=”10.0.0.1:80”}
+requests_total{path="/status", method="POST", instance=”10.0.0.3:80”}
+requests_total{path="/", method="GET", instance=”10.0.0.2:80”}
+
+service discovery
+
+n-dimensional label set, encode in exposition format
+
+promQL
+    metric_name{label_key=value}[window] offset xxx
+
+2.3.2 first fully stable release
+
+
+exposition format
+line, text based protocol
+each line may has following format:
+# HELP metric_name ....(other description)
+# TYPE metric_name metric_type(counter, gauge, histogram, summary, untype)
+metric_name [{ lables }] value [timestamp]
+
+examples:
+
+# HELP http_requests_total The total number of HTTP requests.
+# TYPE http_requests_total counter
+http_requests_total{method="post",code="200"} 1027 1395066363000
+http_requests_total{method="post",code="400"}    3 1395066363000
+
+# A histogram, which has a pretty complex representation in the text format:
+# HELP http_request_duration_seconds A histogram of the request duration.
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{le="0.05"} 24054
+http_request_duration_seconds_bucket{le="0.1"} 33444
+http_request_duration_seconds_bucket{le="0.2"} 100392
+http_request_duration_seconds_bucket{le="0.5"} 129389
+http_request_duration_seconds_bucket{le="1"} 133988
+http_request_duration_seconds_bucket{le="+Inf"} 144320
+http_request_duration_seconds_sum 53423
+http_request_duration_seconds_count 144320
+
+histogram/summary ==> data dirtribution, average data may hide outliers
+Quantiles are better measuremento. 
+for query latency
+    0.5-quantiles 100ms --> (50% query is under 100ms)
+    0.99-quantiles 4s   --> (99% query is under 4s)
+histogram use pre-defined buckets to sampling the observation. For exmaple,
+we can defined <10ms, <100ms, <1s, <10s as the buckets for query latency.
+
+While Histograms use sampling (with buckets) and estimate quantiles on the 
+Prometheus server, Summaries are calculated on the client side. Client side means
+the service which expose the metric.

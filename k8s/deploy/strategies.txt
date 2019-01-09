@@ -30,13 +30,18 @@ request -> v1 and v2
 delete v1 one by one
 request -> v2
 
-3 blue/green
+3 blue/green (no downtime and quick rollback)
 deploy v1 and v2
 service selector match v1
 after successfully test v2
 change service selector to match v2
 
-4 A/B testing
+4 canary 
+deploy v1 and v2
+slowly routing more traffic to v2
+finally v2 will handle all traffic
+
+5 A/B testing (compare two version to select the better one based on real traffic)
 consumer sepration and providing different subsets of functionalities.
 deploy v1 and v2
 use smart router(service mesh) to route to different deploy based on query attributes 

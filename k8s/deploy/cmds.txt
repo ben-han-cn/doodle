@@ -131,3 +131,6 @@ k -n emojivoto port-forward web-848d6c9894-pmgbv 8080:80
 emojivoto            --- namespace
 web-848d6c9894-pmgbv --- pod name
 8080:80              --- <local port>:<pod exposed port>
+
+//set node taint to avoid k8s to schedule other pod into this node
+k taint nodes <nodeName> postgres=:NoSchedule

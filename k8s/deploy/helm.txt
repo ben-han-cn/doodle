@@ -1,0 +1,20 @@
+helm
+    service dependency
+
+chart
+    packaged k8s resources
+
+chart respository
+    usable/accessable chart
+
+release
+    a deployed instance of a chart
+
+
+helm components:
+    client
+    tiller
+        lives in cluster
+        manage release, history and introspection
+
+client send yaml to tiller, tiller will apply the yaml

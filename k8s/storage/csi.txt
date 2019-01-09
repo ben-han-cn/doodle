@@ -144,3 +144,19 @@ Statefulset has only one instance which runs 3 containers:
         call inner csi volume plugin's MountDevice (which do nothing)
         call inner csi volume plugin's Setup to invoke node plugin's NodePublishVolume which will
             mount the specified path into pod container
+
+4 communication 
+    kubelet <-> node plugin
+        unix socket in /var/lib/kubelet/plugins/<csidrivername>/csi.sock
+    external attacher/external provisioner <-> controller plugin
+        mount emptyDir to /var/lib/csi/sockets/pluginproxy/
+        create unix socket in that folder
+        the folder is accessible by attacher, provisioner and controller
+        
+5 finalizers set by external attacher
+    VolumeAttachment 
+    PersistentVolume referenced by VolumeAttachment
+
+6 CSINodeInfo
+    upon initialization of the external csi volume driver, kubelet must call NodeGetInfo of the node plugin to
+    mapping k8s node name to csi driver's NodeID and the associated accessible_topology.

@@ -3,12 +3,28 @@ sudo route del default gw 192.168.1.1
 
 ip route list table local type local
 ip route add 10.0.0.0/8 dev eth1 (L2)
+ip route add default via 10.0.0.1
 ip route show
 
 ip route add 20.10.0.0/16 via 10.0.0.1 //next hop route (L3)
 ip route get 20.10.3.3 //how route work
 
-sysctl net.ipv4.ip_forward 
-/etc/sysctl.conf
+echo net.ipv4.ip_forward=1 > /etc/sysctl.conf
+sysctl -p /etc/sysctl.conf
 
+ip link set dev eth0 up
 ip link delete cni0 //remove device
+ip addr add dev eth0 10.0.0.1/24
+ip addr list eth0
+
+configure ipv4 permanently
+/etc/network/interfaces
+    auto eth0
+    #iface eth0 inet dhcp
+    iface eth0 inet static
+        address 10.0.0.1
+        netmask 255.255.255.0
+ifup eth0
+
+
+

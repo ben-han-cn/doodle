@@ -22,28 +22,9 @@ RBD (block device) , RGW (gateway interface), CephFS
 
 
 
-Rook
-framework for many storage providers and solutions.
-    storage resource normalization
-    operator patterns/plumbing
-    common policies, specs, logic
-
-Rook Operators
-    Ceph
-    CockroachDB
-    Minio
-    NFS
-    Cassandra
-    
-Rook Agent
-
-Rook flex volume plugin
-
 ceph
 operator runs ceph commands to initialize and bootstrap cluster
 create deploymens to manage ceph daemon
     use init containers to generate configure
     main container run daemon
 monitor the componenets
-
-

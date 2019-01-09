@@ -1,0 +1,421 @@
+when kubelet get new pod from api server, before create
+container and run the pod, it needs to handle volume first
+    kl.makePodDataDirs(pod)
+    kl.volumeManager.WaitForAttachAndMount(pod)
+    
+
+makePodDataDirs(pod)
+    /var/lib/kubelet/pods/<pod id>/
+        containers  
+        etc-hosts ---> /etc/hosts content  
+        plugins	
+        volumes
+    os.MkdirAll(kl.getPodDir(uid), 0750);
+    os.MkdirAll(kl.getPodVolumesDir(uid), 0750);
+    os.MkdirAll(kl.getPodPluginsDir(uid), 0750)
+
+WaitForAttachAndMount(pod)
+    expectedVolumes := getExpectedVolumes(pod)
+    uniquePodName := util.GetUniquePodName(pod)
+    vm.desiredStateOfWorldPopulator.ReprocessPod(uniquePodName)
+    //wait for all volume is mounted
+    wait.PollImmediate(
+        vm.verifyVolumesMountedFunc(uniquePodName, expectedVolumes))
+
+
+volumeManager.Run
+    //desiredStateOfWorld update the data in actualStateOfWorld, desiredStateOfWorldPopulator
+    go vm.desiredStateOfWorldPopulator.Run()
+    //reconciler based on two state and do real attach/mount/deattach/unmount
+    go vm.reconciler.Run()
+
+
+desiredStateOfWorldPopulator.Run()
+    populatorLoop
+
+dswp.populatorLoop
+    dswp.findAndAddNewPods()
+    dswp.findAndRemoveDeletedPods()
+
+dswp.findAndAddNewPods:
+    for _, pod := range dswp.podManager.GetPods() {
+        if dswp.isPodTerminated(pod) {
+            // Do not (re)add volumes for terminated pods
+            continue
+        }   
+        dswp.processPodVolumes(pod, mountedVolumesForPod, processedVolumesForFSResize)
+    }   
+
+dswp.processPodVolumes
+    uniquePodName := util.GetUniquePodName(pod)
+    if dswp.podPreviouslyProcessed(uniquePodName) {
+        return
+    }
+    mountsMap, devicesMap := dswp.makeVolumeMap(pod.Spec.Containers)
+    for _, podVolume := range pod.Spec.Volumes {
+        pvc, volumeSpec, volumeGidValue, err := dswp.createVolumeSpec(podVolume, pod.Name, pod.Namespace, mountsMap, devicesMap)
+        dswp.desiredStateOfWorld.AddPodToVolume(uniquePodName, pod, volumeSpec, podVolume.Name, volumeGidValue)
+    }
+
+
+desiredStateOfWorld.AddPodToVolume
+    volumePlugin, err := dsw.volumePluginMgr.FindPluginBySpec(volumeSpec)
+    attachable := dsw.isAttachableVolume(volumeSpec)
+    deviceMountable := dsw.isDeviceMountableVolume(volumeSpec)
+    if attachable || deviceMountable {
+        // For attachable/device-mountable volumes, use the unique volume name as reported by
+        // the plugin.
+        volumeName, err = util.GetUniqueVolumeNameFromSpec(volumePlugin, volumeSpec)
+    } else {
+        // For non-attachable and non-device-mountable volumes, generate a unique name based on the pod
+        // namespace and name and the name of the volume within the pod.
+        volumeName = util.GetUniqueVolumeNameFromSpecWithPod(podName, volumePlugin, volumeSpec)
+    }
+    if _, volumeExists := dsw.volumesToMount[volumeName]; !volumeExists {
+        dsw.volumesToMount[volumeName] = volumeToMount{
+            volumeName:              volumeName,
+            podsToMount:             make(map[types.UniquePodName]podToMount),
+            pluginIsAttachable:      attachable,
+            pluginIsDeviceMountable: deviceMountable,
+            volumeGidValue:          volumeGidValue,
+            reportedInUse:           false,
+        }   
+    }   
+
+    // Create new podToMount object. If it already exists, it is refreshed with
+    // updated values (this is required for volumes that require remounting on
+    // pod update, like Downward API volumes).
+    dsw.volumesToMount[volumeName].podsToMount[podName] = podToMount{
+        podName:             podName,
+        pod:                 pod,
+        volumeSpec:          volumeSpec,
+        outerVolumeSpecName: outerVolumeSpecName,
+    }   
+    return volumeName, nil
+
+
+reconciler.Run
+    reconciler.reconciliationLoopFunc
+        rc.reconcile()
+        rc.sync()
+
+reconciler.reconcile
+    for _, mountedVolume := range rc.actualStateOfWorld.GetMountedVolumes() {
+        if !rc.desiredStateOfWorld.PodExistsInVolume(mountedVolume.PodName, mountedVolume.VolumeName) { 
+            rc.operationExecutor.UnmountVolume()
+        }
+    }
+
+    for _, volumeToMount := range rc.desiredStateOfWorld.GetVolumesToMount() {
+        volMounted, devicePath, err := rc.actualStateOfWorld.PodExistsInVolume(volumeToMount.PodName, volumeToMount.VolumeName)
+        volumeToMount.DevicePath = devicePath
+        if cache.IsVolumeNotAttachedError(err) {
+            if rc.controllerAttachDetachEnabled || !volumeToMount.PluginIsAttachable {
+                // Volume is not attached (or doesn't implement attacher), kubelet attach is disabled, wait
+                // for controller to finish attaching volume.
+                rc.operationExecutor.VerifyControllerAttachedVolume()
+            } else {
+                // Volume is not attached to node, kubelet attach is enabled, volume implements an attacher,
+                // so attach it
+                volumeToAttach := operationexecutor.VolumeToAttach{
+                    VolumeName: volumeToMount.VolumeName,
+                    VolumeSpec: volumeToMount.VolumeSpec,
+                    NodeName:   rc.nodeName,
+                }
+                rc.operationExecutor.AttachVolume(volumeToAttach, rc.actualStateOfWorld)
+            }
+        } else if !volMounted || cache.IsRemountRequiredError(err) {
+            rc.operationExecutor.MountVolume()
+        } else if cache.IsFSResizeRequiredError(err) && 
+            utilfeature.DefaultFeatureGate.Enabled(features.ExpandInUsePersistentVolumes) {
+            rc.operationExecutor.ExpandVolumeFSWithoutUnmounting()
+        }
+    }
+
+    for _, attachedVolume := range rc.actualStateOfWorld.GetUnmountedVolumes() {
+        // Check IsOperationPending to avoid marking a volume as detached if it's in the process of mounting.
+        if !rc.desiredStateOfWorld.VolumeExists(attachedVolume.VolumeName) &&
+            !rc.operationExecutor.IsOperationPending(attachedVolume.VolumeName, nestedpendingoperations.EmptyUniquePodName) {
+            if attachedVolume.GloballyMounted {
+                rc.operationExecutor.UnmountDevice()
+            } else {
+                if rc.controllerAttachDetachEnabled || !attachedVolume.PluginIsAttachable {
+                    rc.actualStateOfWorld.MarkVolumeAsDetached(attachedVolume.VolumeName, attachedVolume.NodeName)
+                } else {
+                    rc.operationExecutor.DetachVolume()
+                }
+            }
+        }
+    }
+
+reconciler.sync
+    reconciler.syncStates
+        volumesNeedUpdate := make(map[v1.UniqueVolumeName]*reconstructedVolume)
+        podVolumes, err := getVolumesFromPodDir(rc.kubeletPodsDir)
+        for _, volume := range podVolumes {
+            if rc.actualStateOfWorld.VolumeExistsWithSpecName(volume.podName, volume.volumeSpecName) {
+                continue
+            }
+            volumeInDSW := rc.desiredStateOfWorld.VolumeExistsWithSpecName(volume.podName, volume.volumeSpecName)
+            reconstructedVolume, err := rc.reconstructVolume(volume)
+            volumesNeedUpdate[reconstructedVolume.volumeName] = reconstructedVolume
+        }
+
+        if len(volumesNeedUpdate) > 0 {
+            rc.updateStates(volumesNeedUpdate)
+        }
+
+reconciler.updateStates
+    rc.updateDevicePath(volumesNeedUpdate)
+    for _, volume := range volumesNeedUpdate {
+        rc.actualStateOfWorld.MarkVolumeAsAttached()
+        rc.actualStateOfWorld.MarkVolumeAsMounted()
+        if volume.attachablePlugin != nil {
+            deviceMountPath, err := getDeviceMountPath(volume)
+            rc.actualStateOfWorld.MarkDeviceAsMounted(volume.volumeName, volume.devicePath, deviceMountPath)
+        }
+    }
+        
+
+operationExecutor.AttachVolume
+    generatedOperations, err := oe.operationGenerator.GenerateAttachVolumeFunc(volumeToAttach, actualStateOfWorld)
+    oe.pendingOperations.Run(volumeToAttach.VolumeName, "" /* podName */, generatedOperations)
+
+
+operationExecutor.MountVolume
+    fsVolume, err := util.CheckVolumeModeFilesystem(volumeToMount.VolumeSpec)
+    if fsVolume {
+        // Filesystem volume case
+        // Mount/remount a volume when a volume is attached
+        generatedOperations = oe.operationGenerator.GenerateMountVolumeFunc()
+    } else {
+        // Block volume case
+        // Creates a map to device if a volume is attached
+        generatedOperations, err = oe.operationGenerator.GenerateMapVolumeFunc(
+            waitForAttachTimeout, volumeToMount, actualStateOfWorld)
+         if !volumeToMount.PluginIsAttachable && !volumeToMount.PluginIsDeviceMountable {
+            podName = util.GetUniquePodName(volumeToMount.Pod)
+         }
+    }
+    oe.pendingOperations.Run(volumeToMount.VolumeName, podName, generatedOperations)
+
+
+
+operationGenerator.GenerateAttachVolumeFunc
+    attachableVolumePlugin, err := og.volumePluginMgr.FindAttachablePluginBySpec(volumeToAttach.VolumeSpec)
+    volumeAttacher, newAttacherErr := attachableVolumePlugin.NewAttacher()
+    attachVolumeFunc := func() (error, error) {
+        devicePath, attachErr := volumeAttacher.Attach(volumeToAttach.VolumeSpec, volumeToAttach.NodeName)
+        actualStateOfWorld.MarkVolumeAsAttached()
+    }
+
+
+operationGenerator.GenerateAttachVolumeFunc
+    volumePlugin, err := og.volumePluginMgr.FindPluginBySpec(volumeToMount.VolumeSpec)
+    mountVolumeFunc := func() (error, error) {
+         affinityErr := checkNodeAffinity(og, volumeToMount, volumePlugin)
+         volumeMounter, newMounterErr := volumePlugin.NewMounter()
+         checkMountOptionSupport(og, volumeToMount, volumePlugin)
+         attachableVolumePlugin, _ := og.volumePluginMgr.FindAttachablePluginBySpec(volumeToMount.VolumeSpec)
+         var volumeAttacher volume.Attacher
+         if attachableVolumePlugin != nil {
+             volumeAttacher, _ = attachableVolumePlugin.NewAttacher()
+         }
+        
+         deviceMountableVolumePlugin, _ := og.volumePluginMgr.FindDeviceMountablePluginBySpec(volumeToMount.VolumeSpec)
+         var volumeDeviceMounter volume.DeviceMounter
+         if deviceMountableVolumePlugin != nil {
+             volumeDeviceMounter, _ = deviceMountableVolumePlugin.NewDeviceMounter()
+         }
+
+         var fsGroup *int64
+         if volumeToMount.Pod.Spec.SecurityContext != nil &&
+             volumeToMount.Pod.Spec.SecurityContext.FSGroup != nil {
+             fsGroup = volumeToMount.Pod.Spec.SecurityContext.FSGroup
+         }
+    
+         devicePath := volumeToMount.DevicePath
+         if volumeAttacher != nil {
+            devicePath, err = volumeAttacher.WaitForAttach(volumeToMount.VolumeSpec, devicePath, volumeToMount.Pod, waitForAttachTimeout)
+         }
+         if volumeDeviceMounter != nil {
+            deviceMountPath, err := volumeDeviceMounter.GetDeviceMountPath(volumeToMount.VolumeSpec)
+            volumeDeviceMounter.MountDevice(volumeToMount.VolumeSpec, devicePath, deviceMountPath)
+            actualStateOfWorld.MarkDeviceAsMounted()
+         }
+
+         if og.checkNodeCapabilitiesBeforeMount {
+            if canMountErr := volumeMounter.CanMount(); canMountErr != nil {
+                return err
+            }
+         }
+        
+         mountErr := volumeMounter.SetUp(fsGroup)
+         actualStateOfWorld.MarkVolumeAsMounted()
+    }
+
+
+//k8s.io/kubernetes/pkg/volume/emptydir
+emptydir.NewMounter
+    medium := v1.StorageMediumDefault
+    if spec.Volume.EmptyDir != nil { // Support a non-specified source as EmptyDir.
+        medium = spec.Volume.EmptyDir.Medium
+    }   
+
+    return &emptyDir{
+        pod:             pod,
+        volName:         spec.Name(),
+        medium:          medium,
+        mounter:         mounter,
+        mountDetector:   mountDetector,
+        plugin:          plugin,
+        MetricsProvider: volume.NewMetricsDu(getPath(pod.UID, spec.Name(), plugin.host)),
+    }, nil 
+
+
+emptydir.SetUp --> SetUpAt(ed.GetPath(), fsGroup)
+    SetUpAt(dir string, fsGroup *int64) 
+        switch ed.medium {
+        case v1.StorageMediumDefault:
+            err = ed.setupDir(dir)
+        case v1.StorageMediumMemory:
+            err = ed.setupTmpfs(dir)
+        case v1.StorageMediumHugePages:
+            err = ed.setupHugepages(dir)
+        default:
+            err = fmt.Errorf("unknown storage medium %q", ed.medium)
+        }
+        volume.SetVolumeOwnership(ed, fsGroup)
+        if err == nil {
+            volumeutil.SetReady(ed.getMetaDir())
+        }
+        return err
+
+
+
+type VolumePlugin interface {
+    Init(host VolumeHost) error
+    NewMounter(spec *Spec, podRef *v1.Pod, opts VolumeOptions) (Mounter, error)
+    ...
+}
+
+type VolumeHost interface {
+    GetPluginDir(pluginName string) string
+    GetVolumeDevicePluginDir(pluginName string) string
+    GetPodsDir() string
+    GetPodVolumeDir(podUID types.UID, pluginName string, volumeName string) string
+    GetPodPluginDir(podUID types.UID, pluginName string) string
+    GetKubeClient() clientset.Interface
+    GetCSIClient() csiclientset.Interface
+    NewWrapperMounter(volName string, spec Spec, pod *v1.Pod, opts VolumeOptions) (Mounter, error)
+    GetMounter(pluginName string) mount.Interface
+}
+
+VolumePlugin normally use VolumeHost to get some info from the host
+Mounter in pkg/volume is mainly used to prepare volume 
+mount in pkg/util is linux utility wrapper, it's low level
+
+kubelet init plugins:
+//k8s.io/kubernetes/pkg/kubelet/volume_hosts.go
+NewInitializedVolumePluginMgr
+    mountPodManager, err := mountpod.NewManager(kubelet.getRootDir(), kubelet.podManager)
+    kvh := &kubeletVolumeHost{
+        kubelet:          kubelet,
+        volumePluginMgr:  volume.VolumePluginMgr{},
+        secretManager:    secretManager,
+        configMapManager: configMapManager,
+        tokenManager:     tokenManager,
+        mountPodManager:  mountPodManager,
+    }   
+    kvh.volumePluginMgr.InitPlugins(plugins, prober, kvh)
+    return &kvh.volumePluginMgr, nil
+
+
+
+/kubernetes/pkg/kubelet
+func (kvh *kubeletVolumeHost) GetMounter(pluginName string) mount.Interface {
+    exec, err := kvh.getMountExec(pluginName)
+    if exec == nil {
+        //default mounter, which is in kubernetes/pkg/util/mount/mount_linux.go
+        return kvh.kubelet.mounter
+    }   
+    return mount.NewExecMounter(exec, kvh.kubelet.mounter)
+}
+
+/kubernetes/pkg/util/mount
+type execMounter struct {
+    wrappedMounter Interface
+    exec           Exec
+}
+implement Mount/Unmount use exec.Run, for other interface use wrappedMounter
+
+func (m *execMounter) Mount(source string, target string, fstype string, options []string) error {
+    bind, bindOpts, bindRemountOpts := isBind(options)
+    if bind {
+        err := m.doExecMount(source, target, fstype, bindOpts)
+        return m.doExecMount(source, target, fstype, bindRemountOpts)
+    }   
+    return m.doExecMount(source, target, fstype, options)
+}
+
+func (m *execMounter) doExecMount(source, target, fstype string, options []string) error {
+    mountArgs := makeMountArgs(source, target, fstype, options)
+    output, err := m.exec.Run("mount", mountArgs...)
+    return err
+}
+
+
+func (kvh *kubeletVolumeHost) getMountExec(pluginName string) (mount.Exec, error) {
+    pod, container, err := kvh.mountPodManager.GetMountPod(pluginName)
+    return &containerExec{
+        pod:           pod,
+        containerName: container,
+        kl:            kvh.kubelet,
+    }, nil 
+}
+
+//run the cmd in specified pod for different plugin
+func (e *containerExec) Run(cmd string, args ...string) ([]byte, error) {
+    cmdline := append([]string{cmd}, args...)
+    return e.kl.RunInContainer(container.GetPodFullName(e.pod), e.pod.UID, e.containerName, cmdline)
+}
+
+func (m *basicManager) GetMountPod(pluginName string) (pod *v1.Pod, containerName string, err error) {
+    // Read /var/lib/kubelet/plugin-containers/<plugin name>.json
+    regPath := m.getVolumePluginRegistrationPath(pluginName)
+    regBytes, err := ioutil.ReadFile(regPath)
+    var reg volumePluginRegistration
+    json.Unmarshal(regBytes, &reg)
+    pod, ok := m.podManager.GetPodByName(reg.PodNamespace, reg.PodName)
+    for i := range pod.Spec.Containers {
+        if pod.Spec.Containers[i].Name == reg.ContainerName {
+            return pod, reg.ContainerName, nil
+        }
+    }
+}
+
+nfs:
+in host, has following mount 
+10.0.0.30:/data/k8s/default-www-nfs-web-0-pvc-017f63dd-0b48-11e9-8321-44a84224c9a3 on /var/lib/kubelet/pods/018017f4-0b48-11e9-8321-44a84224c9a3/volumes/kubernetes.io~nfs/pvc-017f63dd-0b48-11e9-8321-44a84224c9a3 type nfs4 (rw,relatime,vers=4.2,rsize=1048576,wsize=1048576,namlen=255,hard,proto=tcp,port=0,timeo=600,retrans=2,sec=sys,clientaddr=10.0.0.32,local_lock=none,addr=10.0.0.30)
+
+
+in container:
+HostConfig": {
+            "Binds": [
+                "/var/lib/kubelet/pods/018017f4-0b48-11e9-8321-44a84224c9a3/volumes/kubernetes.io~nfs/pvc-017f63dd-0b48-11e9-8321-44a84224c9a3:/usr/share/nginx/html",
+                "/var/lib/kubelet/pods/018017f4-0b48-11e9-8321-44a84224c9a3/volumes/kubernetes.io~secret/default-token-g8ftm:/var/run/secrets/kubernetes.io/serviceaccount:ro",
+                "/var/lib/kubelet/pods/018017f4-0b48-11e9-8321-44a84224c9a3/etc-hosts:/etc/hosts",
+                "/var/lib/kubelet/pods/018017f4-0b48-11e9-8321-44a84224c9a3/containers/nginx/4fdc4156:/dev/termination-log"
+            ],
+            ....
+}
+
+
+for emptydir:
+in container
+"HostConfig": {
+            "Binds": [
+                "/var/lib/kubelet/pods/2613f921-fe89-11e8-8321-44a84224c9a3/volumes/kubernetes.io~empty-dir/data:/prometheus",
+
+in host:
+    /var/lib/kubelet/pods/2613f921-fe89-11e8-8321-44a84224c9a3/volumes/kubernetes.io~empty-dir/data is a normal dir
