@@ -43,6 +43,7 @@ pgrep, pkill - look up or signal processes based on name and other attributes
 find . -name "*.go" -exec grep -wn 'main' {} +
 find . -name "*.go" -exec grep -wn 'main' {} \;
 find / -size +500M -exec ls -alh {} +
+find . -type f -exec sed -i 's/privelages/privileges/g' {} \;
 
 //remove all containers
 docker rm -f $(docker ps -a -q)
@@ -128,3 +129,5 @@ netstat np //show numbers, pid
 
 /proc/self/exe ---> current binary
 /proc/self     ---> current pid
+
+du -d 1 . | sort -k <col start from 1> -r -n //-r reverse -n sort number

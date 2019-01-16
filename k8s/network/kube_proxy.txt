@@ -19,3 +19,26 @@ modprobe -- ip_vs_sh
 modprobe -- nf_conntrack_ipv4
 sudo apt-get install -y ipset
 KUBE_PROXY_MODE=ipvs
+
+
+IPVS (IP Virtual Server) is built on top of the Netfilter and implements 
+transport-layer load balancing as part of the Linux kernel.
+
+IPVS is incorporated into the LVS (Linux Virtual Server), where it runs on 
+a host and acts as a load balancer in front of a cluster of real servers. 
+IPVS can direct requests for TCP- and UDP-based services to the real servers, 
+and make services of the real servers appear as virtual services on a single 
+IP address. 
+Therefore, IPVS naturally supports Kubernetes Service.
+
+
+However, iptables struggles to scale to tens of thousands of Services because it 
+is designed purely for firewalling purposes and is based on in-kernel rule lists.
+
+One example is that with NodePort Service in a 5000-node cluster, if we have 2000 
+services and each services have 10 pods, this will cause at least 20000 iptable 
+records on each worker node, and this can make the kernel pretty busy.
+On the other hand, using IPVS-based in-cluster service load balancing can help a 
+lot for such cases. IPVS is specifically designed for load balancing and uses more 
+efficient data structures (hash tables) allowing for almost unlimited scale under 
+the hood.

@@ -1,0 +1,12 @@
+use annotation to represent status of resource
+to avoid multi component update the same attribute
+    atomic attribute should has only one updator
+    use resource version to avoid concurrent update composite structure
+    use annotation key to notify unique owner
+    use more annotation key/status to enforce order
+    
+
+resourceVersion is changed on every write.
+since object is big, it has metadata, spec and status. Some controller
+only care spec change, so it use generation to notify that spec is changed.
+and use observedGeneration to persist the generation that was last acted on.

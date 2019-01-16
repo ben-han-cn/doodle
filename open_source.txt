@@ -18,3 +18,6 @@ badger:    https://github.com/dgraph-io/badger
 
 server, agent:
 merlin:    https://github.com/Ne0nd0g/merlin.git
+
+full text search engine:
+https://github.com/toshi-search/Toshi

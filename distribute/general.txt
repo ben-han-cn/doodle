@@ -1,0 +1,7 @@
+failure dectectors (heart beat)
+symmetry breaking (with leader election as an example)
+fault models
+replicated state machines
+quorums
+logical time
+coordination

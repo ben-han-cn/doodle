@@ -55,6 +55,7 @@ container runtime -- cri-o
 security:
     kube-hunter, penetration testing: https://github.com/aquasecurity/kube-hunter
     kube-bench, deployment is follow security best practices: https://github.com/aquasecurity/kube-bench
+    clair, Vulnerability Static Analysis for Containers  https://github.com/coreos/clair
 
 cluster status check:
     sonobuoy: https://github.com/heptio/sonobuoy

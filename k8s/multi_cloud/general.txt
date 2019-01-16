@@ -1,0 +1,17 @@
+requirements:
+1 perfer run workloads on cloud a, but automatically overflow to cloud b if run out of
+on-premise capacity
+2 some workload is privacy-sensitive it should run my local cluster, but others run on 
+open cloud
+3 avoid vendor lock-in, workload normally run across multiple cloud
+4 immune to any single data center or cloud outage
+5 unify two cluster(two location) into one 
+
+
+concrete requirement:
+location affinity
+cross-cluster scheduling
+cross-cluster service discovery
+cross-cluster migration
+cross-cluster load-balancing
+cross-cluster monitoring and auditing

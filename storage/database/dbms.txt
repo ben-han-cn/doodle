@@ -1,0 +1,16 @@
+client communication manager
+relational query processor
+    query parsing
+    query rewrite/optimizer
+    plan executor
+transactional storage manager
+    buffer 
+    lock
+    log
+process manager
+common shared components
+    catalog manager
+    memory manager
+    administatrion, monitoring
+    repliation and loading
+    batch utilities

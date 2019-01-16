@@ -1,0 +1,19 @@
+data structure
+    data organization
+    optional index
+    algorithms that support basic operation
+
+
+array
+link-list
+skip-list
+queue
+stack
+binary tree
+    red-black tree
+    radix tree
+    B+ tree
+    trie
+LSM 
+Bloom filter
+Graph

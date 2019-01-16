@@ -35,5 +35,7 @@ BPF used in two aspect:
 
 XDP:
 Framework for running BPF programs in driver’s RX path
+(dpdk related kernel by pass tech to enhance network performance is to move all the network 
+pkt processing from kernel to user space, and XDP does in fact the opposite) 
 
 seccomp is based on eBPF

@@ -1,0 +1,35 @@
+topic ---write to--> multi partition 
+each partition could resides on different node
+
+producer --> topic + partition
+consumer could operator in two mode:
+1 share mode, each one read its own message without 
+interfering with each other.
+2 consumer group --> balance between consumer, when one 
+consumer dead, its workload will be transferred to 
+other consumers.
+
+cluster == several brokers
+one broker will be selected as cluster controller,
+it will responsible for assign cluster to any other broker.
+any partition has one broker as owner, and several other
+brokers as replicator. If partition leader failed, replicator
+will be selected as leader.
+producer and consumer work on one topic should connect to
+the leader
+
+disk-based retention
+retention based on size or date
+
+message version
+{
+ msg_id: String,
+ type: String,
+ data: {
+    user_id: String,
+    msg: String
+ },
+ meta: {
+    version: 2
+ }
+}

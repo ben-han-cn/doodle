@@ -1,0 +1,101 @@
+1 Ecosystem
+    on top of k8s:
+        CI/CD
+        application middleware
+        logging and monitoring
+        data-processing plateforms
+        application-specific operator
+        PaaS
+        FaaS
+        workflow orchestration
+        configuration DSL
+    underlying k8s:
+        container runtime
+        image registry
+        cluster state store: Etcd
+        network
+        file storage
+        node management
+        cloud provider
+        cluster creation and management
+
+2 Interface layer:    Client libraries and tools
+    kubectl
+    client libraries (client-go)
+    cluster federation
+    dashboard
+    helm
+
+3 Governance layer:   Automation and Policy enforcement 
+    policy enforcement and high-level automation
+
+    automation:
+        metrics
+        horizontalPodAutoscaler
+        verticalPodAutoscaler
+        cluster autoscaling/node provisioning
+        podDisruptionBudget
+        dynamic volumen provisioning
+        dynamic load-balancer provisioning
+        podPreset 
+        service broker/catalog
+        template and templateinstance api
+    policy:
+        authorization
+        limitRange
+        resourceQuota
+        PodSecurityPolicy
+        ImageReview
+        NetworkPolicy
+
+4 Appliation layer:   Deployment and Routing
+    self-healing, scaling, application lifecycle management    
+    service discovery, load balancing, routing
+
+    scheduler: 
+        resource requests 
+        nodeSelector
+        node and pod affinity/anti-affinity
+        taints and tolerations
+    reschduler
+        reactively and proactively delete scheduled pods, so they
+        can be reschduled to other nodes
+    contiusously running applications
+        rollout and rollback, updates, cascading deletion and orphaning/adoption 
+        deployment
+        daemonset
+        statefulset
+        podTemplate
+    batch application
+        Job/CronJob
+    discovery, load balancing, routing
+        Service 
+        Ingress
+        DNS
+        
+5 Nucleus:            API and Execution
+    API:
+        authentication
+        authorization
+        REST sementics, watch, durability and consistency guarantees, API versioning, defaulting and validation
+        built-in admission-control semantics, synchronous admission-control hooks, asynchronous resource initialization
+        API registration and discovery
+        Third party resource
+        endpoint
+        namespace
+        event
+        cascading deletion garbage collector, finalization and orphaning
+        built-in add-on manager
+    Execution:
+        Pod api
+        checkpointing of API resources
+        container image and log lifecycles
+        secret 
+        configmap
+        node
+        node and pod network
+        node inventory, health and reachability
+        terminated-pod garbage collection
+        volume controller
+        pv
+        pvc

@@ -1,0 +1,53 @@
+Historically, all memory on x86 systems was equally accessible to all CPUs in the system. 
+This resulted in memory access times that were the same regardless of which CPU in the 
+system was performing the operation and was referred to as Uniform Memory Access (UMA).
+
+In modern multi-socket x86 systems system memory is divided into zones (called cells or nodes) 
+and associated with particular CPUs. This type of division has been key to the increasing 
+performance of modern systems as focus has shifted from increasing clock speeds to adding 
+more CPU sockets, cores, and – where available – threads. An interconnect bus provides 
+connections between nodes, so that all CPUs can still access all memory. While the memory 
+bandwidth of the interconnect is typically faster than that of an individual node it can 
+still be overwhelmed by concurrent cross node traffic from many nodes. The end result is 
+that while NUMA(Non-Uniform Memory Access) facilitates faster memory access for CPUs local to 
+the memory being accessed, memory access for remote CPUs is slower.
+
+# numactl --hardware
+available: 2 nodes (0-1)
+node 0 cpus: 0 1 2 3
+node 0 size: 8191 MB
+node 0 free: 6435 MB
+node 1 cpus: 4 5 6 7
+node 1 size: 8192 MB
+node 1 free: 6634 MB
+node distances:
+node   0   1
+  0:  10  20
+  1:  20  10
+
+In Uniform Memory Access (UMA) systems, typically only one CPU can access system
+memory at a time. This can lead to significant performance reductions in SMP systems, with
+more severe degradation occurring as the number of processors in a system is increased. The
+primary advantage NUMA offers over UMA is that because CPUs have their own local memory,
+they can effectively access this memory independently of other CPUs in the system.
+
+To optimize memory-processor locality, and thereby take advantage of potential NUMA
+performance improvements, a NUMA-aware operating should attempt to allocate most/all of a
+task’s memory to one CPU’s local RAM. Its process scheduler should also attempt to schedule
+a task to the CPU directly connected to the majority of that task’s memory.
+
+By default, x86 64 RHEL/SL6 enables Linux Transparent Huge Pages (THP). With THP
+enabled, the kernel attempts to allocate 2 MB pages for anonymous memory (i.e process heap
+and stack), rather than the x86 standard 4 KB, but will fall back to such allocations when
+necessary. The use of THP reduces process page table size, and thus increases Translation
+Lookaside Buffer (TLB) cache hits. This increases the performance of logical/virtual to physical
+address lookups performed by a CPU’s memory management unit, and generally overall system
+performance. As part of the THP subsystem, the kernel introduced khugepaged. khugepaged is
+a kernel daemon which periodically scans through system memory, attempting to consolidate
+small pages into huge pages, and defragment memory.
+
+
+disadvantage of huge page:
+potentially wasted memory 
+I/O amplification when swapping
+false sharing amplification on NUMA machines
