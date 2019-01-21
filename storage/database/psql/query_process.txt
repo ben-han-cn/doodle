@@ -1,0 +1,104 @@
+backend process handle all queries issued by connected client, it consists
+of five subsystem:
+Parser     SQL --> parse tree
+Analyzer   parse tree --> query tree
+Rewriter   based on rule system to transfrom query tree
+Planner    query tree --> plan tree
+Executor   execute query based on plan tree
+
+
+tuple structure
+t_xmin  txid of the tx inserted this tuple
+t_xmax  txid of the tx that deleted or updated this tuple
+t_cid   in current tx, how many sql cmds executed before this command was executed
+t_ctid  tid points to itself or a new tuple
+user data
+                      t_xmin         t_xmax       t_cid     t_ctid     user data
+insert row             99             0            0       (0,1)        'A'
+delete row             99             111          0       (0,1)        'A'
+
+update row             99             100          0       (0,2)        'A'
+                       100            0            0       (0,2)        'B'
+
+
+update row twice       99             100          0       (0,2)        'A'
+                       100            100          0       (0,3)        'B'
+                       100            0            1       (0,3)        'C'
+
+
+for each tx, there are four status:
+in_progress, commited, aborted, sub_commited
+
+
+Transaction Snapshot
+A transaction snapshot is a dataset that stored information about whether all transactions 
+are active, at a certain point in time for an individual transaction.
+
+SELECT txid_current_snapshot();
+xmin:xmax:xip_list
+xmin --- earliest tx that active
+xmax --- next txid to allocate, means tx with this id hasn't yet stated
+xip_list --- active tx between xmin and xmax
+
+100:104:100,102 
+100, 102 is the active tx which is in progress or hasn't yet started, --- invisible
+101, 103 is commited or aborted, if it's committed it will be visible
+
+
+visibility check
+Rule 1: If Status(t_xmin) = ABORTED ⇒ Invisible
+Rule 2: If Status(t_xmin) = IN_PROGRESS ∧ t_xmin = current_txid ∧ t_xmax = INVAILD ⇒ Visible
+Rule 3: If Status(t_xmin) = IN_PROGRESS ∧ t_xmin = current_txid ∧ t_xmax ≠ INVAILD ⇒ Invisible
+Rule 4: If Status(t_xmin) = IN_PROGRESS ∧ t_xmin ≠ current_txid ⇒ Invisible
+Rule 5: If Status(t_xmin) = COMMITTED ∧ Snapshot(t_xmin) = active ⇒ Invisible
+Rule 6: If Status(t_xmin) = COMMITTED ∧ (t_xmax = INVALID ∨ Status(t_xmax) = ABORTED) ⇒ Visible
+Rule 7: If Status(t_xmin) = COMMITTED ∧ Status(t_xmax) = IN_PROGRESS ∧ t_xmax = current_txid ⇒ Invisible
+Rule 8: If Status(t_xmin) = COMMITTED ∧ Status(t_xmax) = IN_PROGRESS ∧ t_xmax ≠ current_txid ⇒ Visible
+Rule 9: If Status(t_xmin) = COMMITTED ∧ Status(t_xmax) = COMMITTED ∧ Snapshot(t_xmax) = active ⇒ Visible
+Rule 10: If Status(t_xmin) = COMMITTED ∧ Status(t_xmax) = COMMITTED ∧ Snapshot(t_xmax) ≠ active ⇒ Invisible
+
+concurrent update
+(1)  FOR each row that will be updated by this UPDATE command
+(2)       WHILE true
+
+               /* The First Block */
+(3)            IF the target row is being updated THEN
+(4)	              WAIT for the termination of the transaction that updated the target row
+
+(5)	              IF (the status of the terminated transaction is COMMITTED)
+   	                   AND (the isolation level of this transaction is REPEATABLE READ or SERIALIZABLE) THEN
+(6)	                       ABORT this transaction  /* First-Updater-Win */
+	              ELSE 
+(7)                           GOTO step (2)
+	              END IF
+
+               /* The Second Block */
+(8)            ELSE IF the target row has been updated by another concurrent transaction THEN
+(9)	              IF (the isolation level of this transaction is READ COMMITTED THEN
+(10)	                       UPDATE the target row
+	              ELSE
+(11)	                       ABORT this transaction  /* First-Updater-Win */
+	              END IF
+
+               /* The Third Block */
+                ELSE  /* The target row is not yet modified or has been updated by a terminated transaction. */
+(12)	              UPDATE the target row
+                END IF
+           END WHILE 
+      END FOR 
+
+in general: 
+1 if target row is updating by other tx, waiting for it complete
+2 if target row has been updated,
+    if isolation is read commited, update the row (--> update lost)
+    if isolation is repeatable read/serializable , abort
+
+read phenomena
+dirty read:                 read uncommited data
+non-repeatable read:        same row has different data in two idenitcal read
+phantom read:               same row stays same, but different rows are selected in two identical read.
+
+serializable snapshot isolation
+wr conflict (dirty read)
+ww conflict (lost update)
+rw conflict

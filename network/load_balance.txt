@@ -1,0 +1,9 @@
+Direct server return (DSR)
+    client ---> router ----> servers
+       ^                        |
+       |                        |
+       +------------------------+
+    
+the return traffic doesn't go back through router. Backend
+server will rewrite the return packet to use the router's 
+ip and port

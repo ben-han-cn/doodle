@@ -15,3 +15,32 @@ when delete object there are three propatation policy
 3 orphan:
     owner is deleted immediately, set ownerReferences of children 
 to nil, to make them orphaned.
+
+it's controller's job to add its direct resource to its subresource's OwnerReferences.
+when delete object with DeleteOptions.OrphanDependents=true, "orphan" finalizer in gc
+will update the dependent resource's OwnerReferences to remove the deleted onwer.
+
+arch of gc (k8s.io/kubernetes/pkg/controller/garbagecollector)
+1 scanner
+    use discovery API to detect all the resources supported by the system
+    Periodically scans all resources in the system and adds each object to the Dirty Queue(DQ).
+2 garbage processor:
+    consists of the DQ and workers
+    each worker:
+        dequeue item from DQ
+        skip item with empty OwnerReferences
+        check each item in OwnerReferences:
+            If at least one owner exists, do nothing
+            otherwise, requests the API server to delete the object
+3 propagator:
+    optimization to find dirty object
+    consists of a Event Queue(EQ), a single worker and DAG of owner-dependent relations.
+        DAG only store a tuple(object ref) not the whole object
+        watch for create/update/delete events for all resources, enqueue events to EQ
+        worker:
+            dequeue events from EQ
+            update the DAG accordingly.
+            enqueue dirty object to DQ
+                for create/update, object has owner and owner doesn't exists in DAG
+                for deletion, enqueue all its dependent objects(children) to DQ
+        propatation doesn't do any RPCs, a single worker is sufficient

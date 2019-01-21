@@ -1,0 +1,33 @@
+logically:
+postgres --> databases
+database --> tables
+             indexes
+             views
+             functions
+             sequences
+             ..
+
+database and all it contains are object, with a object identifier(OID).
+
+
+physicall:
+object is stored in files, and file name is based on OID. 
+base directory: $PGDATA
+$PGDATA
+    base                per-database subdirectories
+    global              cluster-wide tables, like pg_database and pg_control
+    pg_tblspc           symbolic links to tablespaces 
+    pg_wal              WAL(write ahead logging) segment files
+    pg_xact             transaction commit state data
+
+    pg_hba.conf         control client authentication
+    postgresql.conf     configuration parameters
+
+table file:
+blocks(8k pages)
+  page(block)
+    header, line pointers, space, tuples
+    (tuple is added from bottom to top, and pointers is the offsets, so
+     tuple could be index by (block index, offset))
+
+(block number, offset) ---> line pointer --> heap tuples (record data)

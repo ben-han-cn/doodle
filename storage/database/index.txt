@@ -21,3 +21,7 @@ index lookup:
     travel tree
     follow leaf node chain(same column key)
     fetch the table data
+
+
+index is a sorted copy of the column and the pos in rows.
+multi-column indexes are sorted by column 1 then column 2, etc.

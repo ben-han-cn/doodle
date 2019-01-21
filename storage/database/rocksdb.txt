@@ -17,7 +17,7 @@ sst is all readonly
 since there is no delete, search is about to find where is the latest key.
 
 
-SST(static sorted table) files
+SST(static sorted table) files (immutable)
 All keys are sorted
 Block based format (data on SSD)
 Plain table format (data on RAM)

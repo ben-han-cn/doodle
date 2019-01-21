@@ -1,0 +1,91 @@
+k8s.io/apimachinery/pkg/apis/meta/v1
+
+type ObjectMeta struct {
+    Labels map[string]string
+    Annotations map[string]string
+    
+    OwnerReferences []OwnerReference
+
+    Initializers *Initializers
+    Finalizers []string
+}
+
+type Initializers struct {
+    // Pending is a list of initializers that must execute 
+    // in order before this object is visible.  When the 
+    // last pending initializer is removed, and no failing 
+    // result is set, the initializers  struct will be set 
+    // to nil and the object is considered as initialized 
+    // and visible to all clients.
+    Pending []Initializer 
+    // If result is set with the Failure field, the object will be persisted to storage and then deleted,
+    // ensuring that other clients can observe the deletion.
+    Result *Status 
+}
+
+// Initializer is information about an initializer that has not yet completed.
+type Initializer struct {
+    // name of the process that is responsible for initializing this object.
+    Name string 
+}
+
+
+The finalizer framework
+Finalizers:
+    like a controller, a finalizer is always running
+    third party finalizer could be deployed in the cluster without register with API server
+    only trigger action when update events meet two conditions:
+        1 the identifier of the finalizer is list in objectMeta.Finalizers
+        2 ObjectMeta.DeletionTimestamp is update from nil to non-nil.
+    apply the finalizing logic to the object in the event
+    when finalizing logic is completed, remove itself from the objectMeta.Finalizers
+    api server will only delete the object when object's Finalizers is empty
+
+built-in finalizer in garbage collection:
+    FinalizerOrphanDependents string = "orphan"
+    FinalizerDeleteDependents string = "foregroundDeletion"
+
+
+
+Life of a Deployment and its descendants
+1 User creates a deployment D1.
+2 The Propagator of the GC observes the creation. It creates an entry of D1 in the DAG.
+3 The deployment controller observes the creation of D1. It creates the replicaset R1, 
+whose OwnerReferences field contains a reference to D1, and has the "orphan" finalizer in its ObjectMeta.Finalizers map.
+4 The Propagator of the GC observes the creation of R1. It creates an entry of R1 in the DAG, with D1 as its owner.
+5 The replicaset controller observes the creation of R1 and creates Pods P1~Pn, all with R1 in their OwnerReferences.
+6 The Propagator of the GC observes the creation of P1~Pn. It creates entries for them in the DAG, with R1 as their owner.
+
+In case the user wants to cascadingly delete D1's descendants, then
+7 The user deletes the deployment D1, with DeleteOptions.OrphanDependents=false. API server 
+checks if D1 has "orphan" finalizer in its Finalizers map, if so, it updates D1 to remove 
+the "orphan" finalizer. Then API server deletes D1.
+8 The "orphan" finalizer does not take any action, because the observed deletion shows D1 has an empty Finalizers map.
+9 The Propagator of the GC observes the deletion of D1. It deletes D1 from the DAG. It adds its dependent object, 
+replicaset R1, to the dirty queue.
+10 The Garbage Processor of the GC dequeues R1 from the dirty queue. It finds R1 has an owner reference pointing to D1, 
+and D1 no longer exists, so it requests API server to delete R1, with DeleteOptions.OrphanDependents=false. 
+(The Garbage Processor should always set this field to false.)
+11 The API server updates R1 to remove the "orphan" finalizer if it's in the R1's Finalizers map. Then the API server 
+deletes R1, as R1 has an empty Finalizers map.
+12 The Propagator of the GC observes the deletion of R1. It deletes R1 from the DAG. It adds its dependent objects, 
+Pods P1~Pn, to the Dirty Queue.
+13 The Garbage Processor of the GC dequeues Px (1 <= x <= n) from the Dirty Queue. It finds that Px have an owner reference 
+pointing to D1, and D1 no longer exists, so it requests API server to delete Px, with DeleteOptions.OrphanDependents=false.
+14 API server deletes the Pods.
+
+In case the user wants to orphan D1's descendants, then
+7 The user deletes the deployment D1, with DeleteOptions.OrphanDependents=true.
+8 The API server first updates D1, with DeletionTimestamp=now and DeletionGracePeriodSeconds=0, increments the 
+Generation by 1, and add the "orphan" finalizer to ObjectMeta.Finalizers if it's not present yet. The API server does not 
+delete D1, because its Finalizers map is not empty.
+9 The deployment controller observes the update, and acknowledges by updating the D1's ObservedGeneration. The deployment 
+controller won't create more replicasets on D1's behalf.
+10 The "orphan" finalizer observes the update, and notes down the Generation. It waits until the ObservedGeneration 
+becomes equal to or greater than the noted Generation. Then it updates R1 to remove D1 from its OwnerReferences. At last, 
+it updates D1, removing itself from D1's Finalizers map.
+11 The API server handles the update of D1, because i) DeletionTimestamp is non-nil, ii) the DeletionGracePeriodSeconds is 
+zero, and iii) the last finalizer is removed from the Finalizers map, API server deletes D1.
+12 The Propagator of the GC observes the deletion of D1. It deletes D1 from the DAG. It adds its dependent, replicaset R1, 
+to the Dirty Queue.
+13 The Garbage Processor of the GC dequeues R1 from the Dirty Queue and skips it, because its OwnerReferences is empty.

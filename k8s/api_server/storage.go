@@ -257,3 +257,5 @@ func newStore(c *clientv3.Client, quorumRead, pagingEnabled bool, codec runtime.
 	}
 	return result
 }
+
+//k8s.io/apiserver/pkg/registry/generic/registry/store.go

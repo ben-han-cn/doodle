@@ -1,0 +1,34 @@
+The events can be categorized in one of two ways:
+1 same - The event is identical to previous events except it varies only on timestamp.
+2 similar - The event is identical to previous events except it varies on timestamp and message.
+
+event compression
+The goal is introduce event counting to increment same events, and event aggregation 
+to collapse similar events.
+
+Design:
+Instead of a single Timestamp, each event object contains the following fields:
+FirstTimestamp unversioned.Time
+    The date/time of the first occurrence of the event.
+LastTimestamp unversioned.Time
+    The date/time of the most recent occurrence of the event.
+    On first occurrence, this is equal to the FirstTimestamp.
+Count int
+    The number of occurrences of this event between FirstTimestamp and LastTimestamp.
+    On first occurrence, this is 1.
+
+The EventAggregator runs an aggregation function over each event. This function buckets each 
+event based on an aggregateKey and identifies the event uniquely with a localKey in that bucket.
+
+aggregateKey:
+event.Source.Component
+event.Source.Host
+event.InvolvedObject.Kind
+event.InvolvedObject.Namespace
+event.InvolvedObject.Name
+event.InvolvedObject.UID
+event.InvolvedObject.APIVersion
+event.Reason
+
+localKey:
+event.Message

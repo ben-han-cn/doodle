@@ -23,3 +23,14 @@ host os security for container
     readOnlyRootFilesystem: true
     allowPrivilegeEscalation: false
 use pod security policy
+
+
+api server:
+    authentication --> authorization --> mutating admission --> object vadliation ---> validating admission --> etcd
+                                                |                                          |
+                                                |                                          |
+                                        mutating webhook                               validating webhook
+
+
+except for specified logic, open policy agent(OPA) simplify deployment and logic for rule sets
+k8s policy controller

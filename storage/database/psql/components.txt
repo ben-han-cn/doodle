@@ -1,13 +1,19 @@
-user rw -->  sharedbuff --> os cache --> disk
+postgres server process
+    a parent of all in a PostgreSQL server.
+    pg_ctl start the process
+    allocate shared memory area
+    start background processes
+    when receive a connection request from client, start a backend process
 
-sharedbuffer
-    psql handle data in block(8k)
-        emp table with one record;
-        SELECT pg_relation_filepath('emp');
-        base/24741/24742  --> 8192 bytes = 8K
-    write normaly only change the buffer, and write to WAL, 
-    
+backend process
+    handle all queries issued by one connected client
+    communicates with the client by a single TCP connection, terminates when client disconnect
+    one backend process is only allowed to operate one database
+    max_connections control the maximum numbers of concurrent client
 
+
+background process:
+       
 checkpoint
     a process to sync the data(record, index) between mem and disk
     the basic unit to sync is block/page, and normally with 8k size
@@ -27,7 +33,7 @@ checkpoint
     special checkpoint record is written to the log file.
 
 
-WAL:
+WAL writer:
     write --> WAL buffer
     commit --> sync to WAL segments, (each WAL segment is 16M)
 
@@ -40,7 +46,15 @@ background writer:
 writing to disk specific dirty buffers based on an algorithm, whereas checkpointer
 write all dirty buffers. It ensure that thera are available buffers in shared buffer
 for new data to fulfill read requirement.
+    user rw -->  sharedbuff --> os cache --> disk
 
+    sharedbuffer
+        psql handle data in block(8k)
+            emp table with one record;
+            SELECT pg_relation_filepath('emp');
+            base/24741/24742  --> 8192 bytes = 8K
+        write normaly only change the buffer, and write to WAL, 
+ 
 vacuum:
     remove dead record which created for MVCC
 
@@ -63,8 +77,17 @@ stats collector
 WAL send and receive
 
 
-other mem:
-    work_mem --> for sort operation
-    maintenance_work_mem --> for vacuum
 
+memory architecture
+    local memory -- allocated by each backend processs for its own use
+    shared memory -- used by all process
 
+local memory:
+    work_mem                for sort,join  operation 
+    maintenance_work_mem    for vacuum
+    temp_buffers            storing temporary tables
+
+shared memory:
+    shared buffer pool   load pages within tables and indexes from a persistent storage 
+    WAL buffer           buffering area of WAL data before writing to a persistent storage
+    commit log           states of all transactions for concurrency control mechanism

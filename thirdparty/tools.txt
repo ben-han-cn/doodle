@@ -90,6 +90,7 @@ mcrouter(memcached management) https://github.com/facebook/mcrouter
 c++ lua binding           https://github.com/ThePhD/sol2
 c++ python binding        https://github.com/pybind/pybind11
 NuDB(A fast key/value insert-only database for SSD drives in C++11) https://github.com/vinniefalco/NuDB
+ArangoDB is a native multi-model database with flexible data models for documents, graphs, and key-values  https://github.com/arangodb/arangodb
 
 erlang
 DalmatinerDB(time serial db) https://github.com/dalmatinerdb/dalmatinerdb

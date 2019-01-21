@@ -1,0 +1,35 @@
+plugins
+    read/recevie data
+    parse data
+    filter/enrich data
+    buffer data
+    format data
+    write/send data
+
+
+row --> event -->   time
+                    tag (routing, identify data source)
+                    record (JSON object)
+
+
+input plugin
+    receive or pull logs from data source
+    emit logs to data pipeline
+    parse incoming logs for structured logging
+line --> event
+
+filter plugin
+    transform 
+    filter 
+    enrich
+
+buffer plugin (memory/file)
+    improve performance
+    provide reliability
+    provide thread-safety
+    (input ---> chunkes ---> output)
+
+output plugin
+    write or send event logs
+    sync or async
+    forward to other fluentd

@@ -1,14 +1,18 @@
 subtype
-    Cat <: Mammal
+    Cat -> Mammal (Cat -> Mammal)
+
+substitution priciple(SP)
+    if S -> T, it means that any term of type S can be safely
+used in a context where a term of type T is expected.
 
 variance:
     how subtypeing between the types affect subtypeing between the compostion type 
     wrapping them
 
-    if S <: T:
-    Covariant:      Composite<S> <: Composite<T>
-    Contravariant:  Composite<T> <: Composite<S>
+    if S -> T:
+    Covariant:      Composite<S> -> Composite<T>
+    Contravariant:  Composite<T> -> Composite<S>
     Bivariant:      Covariant and Contravariant
     Invariant:      !Covariant and !Contravariant
 
-Composite type: Container(Vecotr, Map), function
+Composite type: Container(Vector, Map), function

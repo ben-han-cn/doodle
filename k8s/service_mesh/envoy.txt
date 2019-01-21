@@ -21,3 +21,13 @@ configuration api (xDS), separate control and data plane, dynamic configuration
 advanced load balancing
 observability
 edge proxy
+
+
+
+
+
+service/edge                                   service/edge
+    |                                             ^
+    +----------->  filter chain + proxy  ---------+
+
+filter chain is extensible
