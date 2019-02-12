@@ -1,0 +1,11 @@
+cpu and memory 
+    kernel resources(pids, ports, open file handlers, sockets etc)
+    file system (utilization, iNodes)
+    i/o (net, disk)
+    cgropu statistic
+    quotas
+    apply RED/USE method
+
+typical issues:
+    long running pods filling up file systems
+    unbounded pods kill critical pods.

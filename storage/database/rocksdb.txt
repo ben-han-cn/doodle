@@ -9,9 +9,19 @@ LSM(log structured merge)
 write from application --> Memtable(RAM)    ---> sst (peroidically compact)   
                            Transaction log
 
+Structure of an LSM Tree: a memory-resident table, used for writes. Whenever the 
+memory table is large enough, it’s sorted contents are written on disk, becoming 
+an SSTable. Reads are served, hitting all SSTables and the memory-resident table, 
+requiring a merge process to reconcile the data.
+
+Every data item in SSTable has a timestamp associated with it. For inserts it specifies 
+the write time, for updates — an update time and removal time for deletes.
+
+During the read, the records that get shadowed by deletes will not returned to the client. 
+The same thing happens with the updates: out of the two records with the same key, the 
+one with the later timestamp is returned.
 
 read --> active memtab --> readonly memtab --> readonly Blockcache --> sst
-
 (when search sst, use Blooms to filter target instead of look each file)
 sst is all readonly
 since there is no delete, search is about to find where is the latest key.
@@ -19,6 +29,9 @@ since there is no delete, search is about to find where is the latest key.
 
 SST(static sorted table) files (immutable)
 All keys are sorted
+index and data blocks
+    index: key and offsets
+    data block: k/v pair concatenated one after another.
 Block based format (data on SSD)
 Plain table format (data on RAM)
 

@@ -1,6 +1,28 @@
+linux tracing system
+    event sources
+        kprobes (kernel functions)
+        uprobes (userspace c functions)
+        kernel trace point
+        USDT
+    ways to extract data
+        perf 
+        ftrace 
+        system tap
+        eBPF
+        sysdig
+    frontends
+        perf
+        ftrace
+        bcc
+        sysdig
+        
+
 BPF 
   programming compile to bytecode
   bytecode will be execute on vm in linux kernel
+
+  All interactions with userspace happen through eBPF "maps" which are key-value stores.
+  There are no loops, so every eBPF program will finish within some bounded execution time.
 
 cBPF == classic berkeley package filter which is mainly focus on filtering network packets
 eBPF == extended BPF 
@@ -39,3 +61,11 @@ Framework for running BPF programs in driver’s RX path
 pkt processing from kernel to user space, and XDP does in fact the opposite) 
 
 seccomp is based on eBPF
+
+
+Script syntax
+<event source> /<optional filter>/ { <program body> }
+
+kprobe:vfs_read { @start[tid] = nsecs; }
+<- 1 -><-- 2 -> <---------- 3 --------->
+

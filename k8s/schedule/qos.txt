@@ -1,0 +1,49 @@
+container process
+    kernel task structure
+        cgroups
+        namespaces
+        security capabilities
+        scheduling entity
+
+
+resources
+    cpu
+    memory
+    ephemeral storage
+    ...
+
+
+for each resources, Requests(R) and Limits(L) can be specified
+    those are specified at the container level
+    only CPU, Memory and ephemeral-storage allow for overcommitment (limit >= request)
+    they are read only after creation.
+
+sysctl
+    In Linux, the sysctl interface allows an administrator to modify kernel parameters 
+at runtime. Parameters are available via the /proc/sys/ virtual process file system. 
+    A number of sysctls are namespaced in today’s Linux kernels. This means that they 
+can be set independently for each pod on a node. Only namespaced sysctls are configurable 
+via the pod securityContext within Kubernetes.
+
+
+Resource Quota admission controller
+Default requests/limits ---> limitRanger admission controller
+
+
+scheduler:
+allocatable < node capacity
+
+
+node:
+cgroups are used to map Pod CPU and Memory resources.
+
+eviction order (1.9 and above):
+    usage > requests -> pod priority -> usage - request
+
+
+node resources reverse with labels/selectors
+
+
+language runtime has no cgroup aware, which make them see all the resources on the host
+which could make bad tunning decision, use configmap to pass the parameter will be a 
+good idea.

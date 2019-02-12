@@ -1,0 +1,12 @@
+external client ---> load balance ---> pods (instead of service)
+
+api server: high load
+controller/scheduler: high load 
+split api server with controller
+
+
+stateful set --> local volume --> pv name 
+avoid node with same name.
+
+
+zombies process 

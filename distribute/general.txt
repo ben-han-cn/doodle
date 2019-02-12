@@ -5,3 +5,9 @@ replicated state machines
 quorums
 logical time
 coordination
+
+
+
+two kinds of concurrency problem
+1 race condition
+2 inefficient scaling

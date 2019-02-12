@@ -91,3 +91,10 @@ PersistentVolumeReclaimPolicy
 unit
 M, G, T -> mulitplies of 1000     (based on power of 10)
 Mi, Gi, Ti --> mulitplies of 1024 (based on power of 2)
+
+
+
+storage process:
+    attach storage to node
+    mount the device to global path
+    bind mount the global path to pod

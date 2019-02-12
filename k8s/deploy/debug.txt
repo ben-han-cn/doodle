@@ -1,0 +1,57 @@
+etcd backup
+
+etcd member ----connect---> etcd
+
+cluster upgrade
+
+e2e test
+
+incompatible k8s change
+
+network stack health check
+
+evenly node scheduler
+
+old version ---> ingress ---> network & DNS ---> resource pressure ---> multi-tenancy
+old version:
+    changelog on k8s and core component
+    CVEs
+    test upgrades extensively
+    automate upgrades
+
+
+ingress:
+    nginx IC
+    separate controller
+    chaos testing
+
+network & DNS:
+    monitor network health
+    monitor DNS latency
+    check for known issues
+
+resource management
+    protect k8s and critical addons
+    add buffer node
+
+multi-tenancy:
+    separate and isolate namespaces with RBAC
+    no cluster-admins
+    separate clusters if possible
+    automate with CI/CD
+
+best practices
+    preemptive monitoring & alerting are key
+    logging and tracing help debug
+    have a postmortem process
+
+
+
+dev --> stage --> production
+
+reserve enough resources for kubelet and system daemons
+    --kube-reserved --kube-reserved-cgroup
+    --system-reserved --system-reserved-cgroup
+evict pressure pod early
+
+HA api-server/controller/scheduler ?

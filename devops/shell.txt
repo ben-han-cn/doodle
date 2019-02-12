@@ -131,3 +131,16 @@ netstat np //show numbers, pid
 /proc/self     ---> current pid
 
 du -d 1 . | sort -k <col start from 1> -r -n //-r reverse -n sort number
+
+ps -A -o pid,ppid,start_time,comm
+
+
+xargs:
+$ find Pictures/tecmint/ -name "*.png" -type f -print0 | xargs -0 tar -cvzf images.tar.gz
+xargs read all the input and make them all as the parameter to the tar command
+-0 to use null char as sep (default is blank or newline), -print0 in find make sure each file(find result) end with null char
+
+$ echo ./Templates/ ./Documents/ | xargs -n 1 cp -v ./Downloads/SIC_Template.xlsx 
+-n will make sure only at master n args will be passed to the cmd, in this case, cp will invoke twice.
+-p could be used to prompt the user about whether to run each command
+

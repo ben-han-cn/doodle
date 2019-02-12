@@ -71,3 +71,18 @@ labels:
    pod-template-hash: 55f4f658f4
 when deployment rollout to specified revision, related rs's replicas will be modified, it will start its own container with
 specified parameter which decide the pod template hash.
+
+
+When the users perform a rollback, i.e. kubectl rollout undo, the Deployment first looks at its existing ReplicaSets, 
+regardless of their number of replicas. Then it finds the one with annotation deployment.kubernetes.io/revision that 
+either contains the specified rollback revision number or contains the second largest revision number among all the 
+ReplicaSets (current new ReplicaSet should obtain the largest revision number) if the user didn't specify any revision 
+number (the user wants to rollback to the last change). Lastly, it starts scaling up that ReplicaSet it's rolling back to, 
+and scaling down the current ones, and then update the revision counter and the rollout annotations accordingly.
+
+
+Pausing and Resuming a Deployment
+
+kubectl rollout pause deploy vanguard
+//do some update to the deployment
+kubectl rollout resume deploy vanguard

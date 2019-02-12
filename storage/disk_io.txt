@@ -1,0 +1,82 @@
+filesystem -> partition -> hard driver
+
+each hard driver -> partition table -> up to four partition( primary + extend partition)
+one primary partition is bootable which os resides in.
+
+extend partition == container of logic partition
+
+mbr == boot loader(code) + partition table
+
+
+Block Device is a special file type providing buffered access to hardware devices such as 
+HDDs or SSDs. Block Devices work act upon sectors, group of adjacent bytes. Most disk devices 
+have a sector size of 512 bytes. Sector is the smallest unit of data transfer for block device, 
+it is not possible to transfer less than one sector worth of data. However, often it is possible 
+to fetch multiple adjacent segments at a time. The smallest addressable unit of File System is 
+block. Block is a group of multiple adjacent sectors requested by a device driver. Typical block 
+sizes are 512, 1024, 2048 and 4096 bytes. Usually IO is done through the Virtual Memory, which 
+caches requested filesystem blocks in memory and serves as a buffer for intermediate operations. 
+Virtual Memory works with pages, which map to filesystem blocks. Typical page size is 4096 bytes.
+
+In summary, Virtual Memory pages map to Filesystem blocks, which map to Block Device sectors.
+
+Standard IO
+Standard IO uses read() and write() syscalls for performing IO operations. When reading the data, 
+Page Cache is addressed first. If the data is absent, the Page Fault is triggered and contents 
+are paged in. This means that reads, performed against the currently unmapped area will take longer, 
+as caching layer is transparent to user.
+
+During writes, buffer contents are first written to Page Cache. This means that data does not reach 
+the disk right away. The actual hardware write is done when Kernel decides it’s time to perform 
+a writeback of the dirty page.
+
+Memory mapping(mmap)
+Memory mapping maps the process virtual pages directly to the Kernel Page Cache, avoiding additional 
+copy from and to user-space buffer as it is done with Standard IO.
+
+With mmap a file can be mapped to a memory segment privately or in shared mode. Private mapping allows 
+reading from the file, but any write would trigger copy-on-write of the page in question in order 
+to leave the original page intact and keep the changes private, so none of the changes will get 
+reflected on the file itself. In shared mode, the file mapping is shared with other processes so they 
+can see updates to the mapped memory segment. Additionally, changes are carried through to the underlying 
+file (precise control over which requires the use of msync).
+
+mmap is a very useful tool for working with IO: It avoids creating an extraneous copy of the buffer 
+in memory (unlike Standard IO, where the data has to be copied into the user-space buffers before 
+the system call is made). Besides, it avoids a system call (and subsequent context switch) overhead for 
+triggering actual IO operation, except when Page Faults occur. From a developers perspective, issuing a 
+random read using an mmapped file looks just like a normal pointer operation and doesn’t involve lseek 
+calls.
+
+
+Page Cache Optimizations
+One of the ways of informing the kernel about your intentions is using fadvise. Using the following 
+flags, it is possible to instruct the kernel about your intentions and let it optimize the use of 
+the page cache:
+
+FADV_SEQUENTIAL specifies that the file is read sequentially, from lower offsets to higher ones, so the 
+kernel can make sure to fetch the pages in advance, before the actual read occurs.
+
+FADV_RANDOM disables read-ahead, evicting pages that are unlikely to be accessed any time soon from 
+the page cache.
+
+FADV_WILLNEED notifies the OS that the page will be needed by the process in the near future. This 
+gives the kernel an opportunity to cache the page ahead of time and, when the read operation occurs, 
+to serve it from the page cache instead of page-faulting.
+
+FADV_DONTNEED advises the kernel that it can free the cache for the corresponding pages (making sure 
+that the data is synchronised with the disk beforehand).
+
+There’s one more flag (FADV_NOREUSE), but on Linux it has no effect.
+
+
+
+SSD attributes
+Minimal read unit on SSD is page. Reads and writes are performed in pages. Deleting a page worth of 
+data does not immediately remove data physically. Instead, a page is marked as stale and will wait 
+for Garbage Collection to reclaim free space.
+
+Because writes are performed in pages, even if a single byte has to be updated, the whole page will 
+be written anyway. At the same time, because of the specifics of NAND storage, pages can not be updated 
+in place, so writes can be performed only into the empty pages. These two properties attribute for 
+the write amplification on SSDs.

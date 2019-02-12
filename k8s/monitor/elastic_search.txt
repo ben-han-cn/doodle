@@ -1,0 +1,51 @@
+arch:
+    distributed/high available
+    REST based
+    powerful query DSL 
+    schemaless
+
+common terms:
+    document: a JSON object contains data in key value pairs
+    index: a logical namespace under which ElasticSearch store data
+    Doc types: A doc type in Elasticsearch represents a class of similar documents. 
+               A type consists of a name, such as a user or a blog post, and a mapping, 
+               including data types and the Lucene configurations for each field. (An index 
+               can contain more than one type.)
+    Shard: Shards are containers that can be stored on a single node or multiple nodes and 
+    are composed of Lucene segments. An index is divided into one or more shards to make the 
+    data distributable.
+
+compared to relational db
+
+db      --> index
+table   --> type
+row     --> document
+columns --> fields
+
+similarity algorithm
+TF-IDF term frequencies-inverse document frequencies
+TF (term): (The number of times a term appears in a document) / (The total number of terms in the document)
+IDF (term): log_e (The total number of documents / The number of documents with the t term in it)
+weight of TF-IDF == TF * IDF
+
+
+Inverted indexes
+example:
+
+two document with content field with the following string:
+I hate when spiders sit on the wall and act like they pay rent
+I hate when spider just sit there
+
+Term        Document:Position
+I               1:1, 2:1
+Hate            1:2, 2:2
+When            1:3, 2:3
+
+
+document --> analysis phase(char filters, tokenizer, token filter) --> document writer 
+--> inverted index
+
+mapping in doc type:
+like schemas which defines the fields or properties that type of document have.  it defines the data 
+type of each field, such as a string, integer, or date, and how these fields should be indexed and 
+stored by Lucene.

@@ -1,0 +1,3 @@
+restart docker if docker ps hangs 60s
+
+restart kubelet if healthz tasks 10+s

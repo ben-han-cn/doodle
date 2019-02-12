@@ -1,12 +1,8 @@
-Docker
-  namespace
-  cgroup
-  docker engine
-
+1 OCI:
 image spec
 runtime spec
 
-Dockerfile
+2 Dockerfile:
 CMD 
     the default value for, docker run, so it will be overwrite 
     if command parameter is specified.
@@ -30,34 +26,145 @@ RUN curl -SL http://example.com/postgres-$PG_VERSION.tar.xz | tar -xJC /usr/src/
 ENV PATH /usr/local/postgres-$PG_MAJOR/bin:$PATH
 
 
-docker engine:
+3 docker engine
 
-docker client  ----->             daemon     (api, image management, security, network, orchestration)
-                                  
-                                  containerd
-
-                  shim          shim
-                  runc          runc  
-                  container     container      ....
+                              +------------+
+                              |            |
+                              | Docker Hub |
+                              |            |
+                              +------------+
+                                    ↑
+                                    |
+                                  2 | REST
+                                    |
+                                    ↓
+                               +---------+
++--------+       REST          |         |    grpc      +-------------------+
+| docker |<------------------->| dockerd |<------------>| docker-containerd |
++--------+         1           |         |      3       +-------------------+
+                               +---------+                       ↑
+                                                                 |
+                                                                 | 4
+                                                                 ↓
+                                                      +------------------------+  5   +-------------+
+                                                      | docker-containerd-shim |<---->| docker-runc |
+                                                      +------------------------+      +-------------+
+                                                                                             ↑
+                                                                                             | 6
+                                                                                             ↓
+                                                                                         +-------+
+                                                                                         | hello |
+                                                                                         +-------+
 
 containerd == container supervisor
 runc       == container runtime (use libcontainer)
-
 runc as container parent, when container launched, runc will exists, and
-containerd-shim process becomes the container's parent process.
+containerd-shim process becomes the container's parent process:
+systemd───dockerd───docker-containerd───docker-containerd-shim───hello
 
 
-image name:
-<repsotory>:<tag>
+4 docker image
+                    +-----------------------+
+                    | Image Index(optional) |
+                    +-----------------------+
+                               |
+                               | 1..*
+                               ↓
+                    +----------------------+
+                    |    Image Manifest    |
+                    +----------------------+
+                               |
+                     1..1      |     1..*
+               +---------------+--------------+
+               |                              |
+               ↓                              ↓
+       +--------------+             +-------------------+
+       | Image Config |             | Filesystem Layers |
+       +--------------+             +-------------------+
 
+image name: <repsotory>:<tag>
+manifest file:describe image config and filesystem layers info (sha256 code)
+image config: archtecture, os, docker runtime configure, rootfs
+filesystem layers: modification type, file type and attribute
 layers are fully independent and have no concept of being part of a collective image
-id of image == hash of the config object(list of layers and some metadata) 
+id of image == hash of the image config 
 id of layer == hash of the layer content
 distribute hash of layer == hash of compressed content
+(manifest image digest == sha256 of layer tar + compression 
+ image config digest == sha256 of layer tar)
 
-docker image pull alphine@sha256:74f634b1bc1bd74535d5209589734efbd44a25f4e2dc96d78784576a3eb5b335
+get image steps:
+    get manifest
+    get image id from manifest, check whether local has the image
+    get image config
+    based on sha256 of each layer, check whether there the layer is fetched before
+    fetch unknown layer
+
+OCI image layout:
+    skopeo copy docker://hello-world oci:hello-world
+
+/var/lib/docker/image/aufs/resposities.json -->  image vs repository
+/var/lib/docker/image/aufs/imagedb/content/sha256 --> config files
+/var/lib/docker/aufs --> layer (diff, layers, mnt)
+    
+
+5 runtime
+runc handle bundle
+bundle == config file + rootfs
+confile standard:
+    Container Configuration file:
+        ociVersion, root pos, mounts, process (cmd to start the process), hostname, platform, linux, hooks, annotations
+    Linux Container Configuration:
+        namespace, uid/gid mapping, devices, cgroupPath, resources, intelRdt, sysctl, seccomp
+        rootfsPropagation, maskedPaths, readonlyPaths, mountLabel.
+runtime and lifecycle:
+    container state:
+                {
+                    "ociVersion": "0.2.0",
+                    "id": "oci-container1",
+                    "status": "running",
+                    "pid": 4422,
+                    "bundle": "/containers/redis",
+                    "annotations": {
+                        "myKey": "myValue"
+                    }
+                }
+    container supported operations:
+        state, create, start, kill, delete
+    lifecycle
+linux runtime
+    softlink for devices
+
+rootfs == merge two new layer + image layer 
+    init layer: read-only
+        /dev/console, hostname, hosts, resolv.conf, /etc/mtab
+    mount layer: mutable
+
+6 image storage
+path: /var/lib/docker
+image name:
+    official
+        name:tag
+        name:@sha256:sha256code
+            docker image pull alphine@sha256:74f634b1bc1bd74535d5209589734efbd44a25f4e2dc96d78784576a3eb5b335
+    personal:
+        user/name:tag
+        user/name:@sha256:sha256code
+    self-host registry:
+        ip:port/name:tag
+        ip:port/name:@sha256:sha256code
+        ip:port/user/name:tag
+        ip:port/user/name:@sha256:sha256code
+
+7 network:
+network mode:
+1 bridge (default, has isolated network namespace)
+2 host (share network namespace with host)
+3 container (share network namespace with other container)
+4 null (has isolated network namespace, but doesn't configure network)
 
 
+8 cmds & config & debug:
 docker container stop ---> send SIGTERM to the process, and if 10 seconds later, it doesn't exist 
 SIGKILL will be sent to it
 
@@ -66,25 +173,13 @@ ctrl-p + ctrl - q will detach shell from the container and leave it running at b
 //check the image info  which could be used to find the default entry point
 $ docker image inspect nigelpoulton/pluralsight-docker-ci
 $ docker container inspect id/name
-
-
 //check the instruction to build the image
 $ docker image history web:latest
-
 
 multi-stage build
 use several base image to build several targets
 only copy the targets into the final image
-
 docker port mapping is implemented by host iptables
-
-
-network mode:
-1 bridge (default, has isolated network namespace)
-2 host (share network namespace with host)
-3 container (share network namespace with other container)
-4 null (has isolated network namespace, but doesn't configure network)
-
 
 config use other registry:
 /etc/docker/daemon.json <<EOF
@@ -94,25 +189,26 @@ config use other registry:
 EOF
 
 docker build -t image_name:v1 .
-
 docker container run --rm -d --name web1 -p 8080:8080/udp test:latest
 docker run --rm -it --name counter-test -v /home/vagrant/workspace/code/go/src/counterservice:/counterservice alpine
 //host path should be full path
-
 /bin/sh: ./counterservice: not found
 readelf -l counterservice | grep "program interpreter"
       [Requesting program interpreter: /lib64/ld-linux-x86-64.so.2]
 the error is caused by the "program interpreter" (runtime linker) doesn't exist in the docker environment
-
 //retag docker image form ubuntu:15.10 ---> runoob/ubuntu:v3
 docker tag ubuntu:15.10 runoob/ubuntu:v3
-
-
 docker login
 docker tag counter bikecn81/counter
 docker push bikecn81/counter
-
-
 docker exec -it 91262536f7c9 bash
 docker attach --sig-proxy=false 91262536f7c9
 ctrl + p  + ctrl + q --> detach from a docker
+docker system df
+docker system prune
+docker image prune
+docker container prune
+docker volume prune
+docker network prune
+journalctl -u docker.service
+sudo apt-get install -y aufs-tools

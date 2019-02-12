@@ -62,3 +62,10 @@ cluster status check:
 
 k8s component:
     virtual kubelet     https://github.com/virtual-kubelet/virtual-kubelet
+
+simple k8s:
+    k3s https://github.com/ibuildthecloud/k3s
+
+
+client:
+    rust: https://github.com/ynqa/kubernetes-rust

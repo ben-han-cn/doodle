@@ -134,3 +134,7 @@ web-848d6c9894-pmgbv --- pod name
 
 //set node taint to avoid k8s to schedule other pod into this node
 k taint nodes <nodeName> postgres=:NoSchedule
+
+
+k config get-contexts
+k config set-context $(k config current-context) --namespace=mynamespace

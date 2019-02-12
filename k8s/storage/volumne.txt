@@ -118,3 +118,21 @@ type Mounter interface {
 }
 
 CSIPersistentVolumeSource
+
+
+Populating the data to the volumes
+A new DataSource field is proposed to be added to PVC to represent the 
+source of the data which is pre-populated to the provisioned volume. 
+For DataSource field, we propose to define a new type “TypedLocalObjectReference”. 
+It is similar to “LocalObjectReference” type with additional Kind field in order to 
+support multiple data source types. 
+
+
+resize volume
+
+expand_controller
+    watch pvc update request
+    volume.Expander will be added to volume plugin interface. The expander interface
+will also define if volume requires a file system resize.
+    filesystem resize is done by kubelet
+    AllowVolumeExpand is added to StorageClass

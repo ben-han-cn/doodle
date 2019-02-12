@@ -1,3 +1,115 @@
+A node's local storage can be broken into primary and secondary partitions.
+
+Primary Partitions
+    root
+        kubelet's root directory(default is /var/lib/kublet)
+        log directory (/var/log)
+    runtime
+        optional partition which runtimes can use for overlay filesystems
+    
+
+Secondary Partitions
+    All other partitions are exposed as local persistent volumes.
+    The term Partitions are used here to describe the main use cases for local 
+storage. However, the proposal doesn't require a local volume to be an entire 
+disk or a partition - it supports arbitrary directory. 
+
+
+node status has capacity and allocatable
+Kubelet running across all nodes will identify primary partition and expose capacity and 
+allocatable for the primary partitions. This allows primary partitions' storage capacity 
+to be considered as a first class resource when scheduling.
+
+apiVersion: v1
+kind: Node
+metadata:
+  name: foo
+status:
+  capacity:
+    storage.kubernetes.io/overlay: 100Gi
+    storage.kubernetes.io/scratch: 100Gi
+  allocatable:
+    storage.kubernetes.io/overlay: 100Gi
+    storage.kubernetes.io/scratch: 90Gi
+
+
+each pod has storage request for logs and overlay, overlay is optional
+apiVersion: v1
+kind: Pod
+metadata:
+ name: foo
+spec:
+ containers:
+ - name: fooc
+   resources:
+     limits:
+       storage.kubernetes.io/logs: 500Mi
+       storage.kubernetes.io/overlay: 1Gi
+   volumeMounts:
+   - name: myEmptyDir
+     mountPath: /mnt/data
+ volumes:
+ - name: myEmptyDir
+   emptyDir:
+     sizeLimit: 20Gi
+
+Kubelet will rotate logs to keep scratch space usage of “fooc” under 500Mi
+Kubelet will track the usage of pods across logs and overlay filesystem and restart the 
+container if it's total usage exceeds it's storage limits. If usage on EmptyDir volume 
+exceeds its limit, then the pod will be evicted by the kubelet. By performing soft 
+limiting, users will be able to easily identify pods that run out of storage.
+
+If a primary partition becomes unhealthy, the node is tainted and all pods running in it 
+will be evicted by default, unless they tolerate that taint. Kubelet’s behavior on a node 
+with unhealthy primary partition is undefined. Cluster administrators are expected to fix 
+unhealthy primary partitions on nodes.
+
+limit range could be added to namespace to set default value to emptydir, log and overlay
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mylimits
+spec:
+   - default:
+     storage.kubernetes.io/logs: 200Mi
+     storage.kubernetes.io/overlay: 200Mi
+     type: Container
+   - default:
+     sizeLimit: 1Gi
+     type: EmptyDir
+
+Local secondary partitions
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: local-fast
+topologyKey: kubernetes.io/hostname
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: local-pv-1
+spec:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - node-1
+  capacity:
+    storage: 100Gi
+  local:
+    path: /var/lib/kubelet/storage-partitions/local-pv-1
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-fast
+
+
+
+
 apiVersion: v1
 kind: Pod
 metadata:

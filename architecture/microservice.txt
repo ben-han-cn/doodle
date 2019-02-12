@@ -25,7 +25,7 @@ api design:
 
 
 database architecture: (core: embrace eventual consistency)
-    echo micro service application own its database
+    each micro service application own its database
         not only about dependency 
         same data may save in different db in different format for different reason: performance, ..
         but for same info, there should has only one auth, which create and update the data
@@ -265,3 +265,11 @@ Event soursing:
 service dependency:
     the api of other service
     the event emit by other service
+
+
+microservice testing:
+    unit test
+    service test
+    system test
+        test the whole system
+        load/stress test
