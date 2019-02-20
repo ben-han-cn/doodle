@@ -1,0 +1,33 @@
+software == control plane + data plane
+control plane usually more complicate than data plan
+
+control plane for cloud:
+    manage the life cycle of the resources
+    provision software
+    provision service configuration
+    provision user configuration
+
+
+control theory => close loop
+    desired state
+    acture state
+    measure between state/ correction between states / take actions 
+
+
+PID controller (a proportional-integral-derivative controller)
+continuously calculates an error value as the difference between a desired setpoint(SP) 
+and a measured process value(PV) and applies a correction based on proportional, integral and
+derivative terms.
+
+
+patterns:
+1 Checksum all of the things
+2 Cryptographic Authentication
+3 Cells, Shells, and Poison Tasters
+4 Asynchronous Coupling
+5 Closed Feedback Loops
+6 Small pushes and large pulls
+7 avoid cold start if cacheing lay is very expensive, self warming instead
+8 throttles and rate-limits
+9 use deltas, efficent to compute deltas and distribute deltas
+10 modality and constant-work

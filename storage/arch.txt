@@ -1,0 +1,3 @@
+data mode(query engine) ---> transaction moduel --> storage engine
+
+network storage

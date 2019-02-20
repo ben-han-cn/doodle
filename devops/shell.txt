@@ -144,3 +144,7 @@ $ echo ./Templates/ ./Documents/ | xargs -n 1 cp -v ./Downloads/SIC_Template.xls
 -n will make sure only at master n args will be passed to the cmd, in this case, cp will invoke twice.
 -p could be used to prompt the user about whether to run each command
 
+
+
+soft limit --> kernel used to limit the system resources for running processes
+hard limit --> maximum value that is allowed for soft limit

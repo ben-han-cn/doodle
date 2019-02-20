@@ -1,6 +1,24 @@
-pilot: config data to proxy(envoy)
-mixer: policy checks, telemetry
-citadel: tls certs to proxies
+control plane:
+    pilot: config data to proxy(envoy)
+    mixer: policy checks, telemetry
+    lstio-auth(citadel): tls certs to proxies
+
+data plane:
+    app + sidecar(envoy)
+ 
+lstio is a policy driven system
+policy:
+    route rules
+    quota policies (resource)
+    monitory policies
+    security policies
+
+policy extension: (mixer)
+    precondition and quota check
+    telemetry reporting
+    plugin model
+
+    based on traffic attribute and route to the backend to process
 
 envoy talk to mixer at runtime synronisely in the query flow, 
 but the other two component is in asyncrous way

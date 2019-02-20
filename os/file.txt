@@ -1,0 +1,11 @@
+file descriptor table --> open file table(system wide) --> i-node table (system wide)
+
+readiness of descriptors:
+    level triggered:
+        if there is data left in buffer, user get notification event
+    edge triggered:
+        only when new data arrive, user get notification event, so if 
+    after get one notification, user doesn't read all the data from 
+    buffer, he won't get any notification and the data left in buffer,
+    and when new data arrive which will append in the buffer, user will
+    get notification again 

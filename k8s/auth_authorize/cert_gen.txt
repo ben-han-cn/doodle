@@ -1,0 +1,116 @@
+root ca name:
+    kube-ca
+
+
+GenerateRKECerts
+    GenerateRKECACerts
+    GenerateRKEServicesCerts
+
+
+//generate two root ca
+GenerateRKECACerts
+    GenerateCACertAndKey("kube-ca", nil)
+    GenerateCACertAndKey("kube-apiserver-requestheader-ca", nil)
+
+GenerateRKEServicesCerts
+    GenerateKubeAPICertificate
+    GenerateServiceTokenKey
+    GenerateKubeControllerCertificate,
+    GenerateKubeSchedulerCertificate,
+    GenerateKubeProxyCertificate,
+    GenerateKubeNodeCertificate,
+    GenerateKubeAdminCertificate,
+    GenerateAPIProxyClientCertificate,
+    GenerateEtcdCertificates,
+
+
+GenerateXXXXCertificate:
+    ca
+    name
+    orgs
+    altname = ips + domains
+    extend_usage = ExtKeyUsageClientAuth | ExtKeyUsageClientAuth + ExtKeyUsageServerAuth
+
+    GenerateKubeAPICertificate
+        ca == kube-ca
+        name == "kube-apiserver"
+        orgs == ""
+        altname: ips == control node ip + kubenetes service ip //add more to support other 
+                                                                 host to connect to api server
+        domains == clusterDomain
+        extend_usage == ExtKeyUsageClientAuth + ExtKeyUsageServerAuth //as client and server
+
+    GenerateServiceTokenKey
+        ca == kube-ca
+        name == "kube-service-account-token"
+        orgs == ""
+        altname == ""
+        extend_usage == ExtKeyUsageClientAuth //only as client
+
+    GenerateKubeControllerCertificate
+        ca == kube-ca
+        name == "system:kube-controller-manager"
+        orgs == ""
+        altname == ""
+        extend_usage == ExtKeyUsageClientAuth //only as client
+    
+    GenerateKubeSchedulerCertificate
+        ca == kube-ca
+        name == "system:kube-scheduler"
+        orgs == ""
+        altname == ""
+        extend_usage == ExtKeyUsageClientAuth //only as client
+
+    GenerateKubeProxyCertificate
+        ca == kube-ca
+        name == "system:kube-proxy"
+        orgs == ""
+        altname == ""
+        extend_usage == ExtKeyUsageClientAuth //only as client
+    
+    GenerateKubeNodeCertificate
+        ca == kube-ca
+        name == "system:node"
+        orgs == "system:nodes"
+        altname == ""
+        extend_usage == ExtKeyUsageClientAuth //only as client
+
+    GenerateKubeAdminCertificate
+        ca == kube-ca
+        name == "kube-admin"
+        orgs == "system:masters"
+        altname == ""
+        extend_usage == ExtKeyUsageClientAuth //only as client
+
+    GenerateAPIProxyClientCertificate
+        ca == "kube-apiserver-requestheader-ca"
+        name == "kube-apiserver-proxy-client"
+        orgs == ""
+        altname == ""
+        extend_usage == ExtKeyUsageClientAuth | ExtKeyUsageServerAuth //as client and server
+
+    GenerateEtcdCertificates
+        for each etcd host
+            ca == kube-ca
+            name == "kube-etcd"
+            orgs == ""
+            altname 
+                ip == etcdHosts, + kubernetesServiceIP 
+                domains == clusterDomain
+            extend_usage == ExtKeyUsageClientAuth | ExtKeyUsageServerAuth//as client and server
+
+
+
+"k8s.io/client-go/util/cert"
+GenerateCACertAndKey
+    ca 
+    rootKey, err = cert.NewPrivateKey()  
+    caConfig := cert.Config{
+        CommonName: "kube-ca",
+    }
+    kubeCACert, _ := cert.NewSelfSignedCACert(caConfig, rootKey)
+    return kubeCACert, rootKey
+
+
+cert.NewPrivateKey:
+    rsa.GenerateKey(cryptorand.Reader, rsaKeySize) //rsaKeySize = 2048

@@ -165,6 +165,25 @@ network mode:
 
 
 8 cmds & config & debug:
+
+sudo docker run -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher
+restart policy:
+no	            -- Do not automatically restart the container. (the default)
+
+on-failure	    -- Restart the container if it exits due to an error, which manifests 
+as a non-zero exit code. 
+(--restart=on-failure:5, 5 is max retries)
+
+always	        -- Always restart the container if it stops. If it is manually stopped, 
+it is restarted only when Docker daemon restarts or the container itself is manually 
+restarted. (See the second bullet listed in restart policy details)
+
+unless-stopped	-- Similar to always, except when container is manually stopped, restart 
+docker service or reboot the host machine won't restart the container. means only manually
+stop container it won't be restart.
+
+
+
 docker container stop ---> send SIGTERM to the process, and if 10 seconds later, it doesn't exist 
 SIGKILL will be sent to it
 

@@ -1,0 +1,33 @@
+interface is a type in golang
+acatually there are two kind of interface
+1 empty interface (has no method)
+2 concrete interface (has a least one method)
+
+but the underlaying sturcture in mem is same
+
+|type and func table|
+----------------------
+|     data          |
+
+for two kind of interface if it's uninitialized, they
+are totally same, has same zero value
+
+var i io.Reader
+var e interface{}
+i == e 
+
+for empty interface it has no func table, type point to 
+the real type of the data it holds
+
+for concrete interface, func table only contain the method
+defined in its declare.
+
+var a Typexxx
+var i interface{}
+i = a
+runtime will make a copy of value of a to i's data part
+
+a := 10
+v = reflect.ValueOf(a)
+i = v // data part is the instance of reflect.Value 
+i = v.Interface() //data part is value of a

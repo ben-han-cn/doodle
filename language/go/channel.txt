@@ -1,0 +1,62 @@
+Characteristics:
+1 goroutine safe
+2 store and pass values between goroutine
+3 provide FIFO sementics
+4 can cause goroutine to block on unblock
+
+
+ch := make(chan T, buf_len)
+ch == a pointer to ch struct
+ch struct (resides in heap):
+    mutex
+    circular queue
+    send index
+    receive index
+
+    waiting sender    ---> point to waiting goroutine + elem to send
+    waiting receivers ---> point to waiting goroutine + elem to recv
+
+for unblock send/recv(when using buffered channel):
+    sender:
+        get the lock
+        mem copy value to buf
+        release the lock
+
+    receiver:
+        get the lock
+        mem copy value to buf
+        release the lock
+
+
+go runtime scheduler (M:N mode)
+
+| G (current goroutine)|
+        |
+| M (os thread)|
+        |
+| P (context for each core)| -----> |G| 
+                                     |
+                                    |G|
+
+for blocking (unbuffed or full channel)
+    sender:
+        get the lock
+        add current goroutine to waiting sender and the elem to send to elem
+        gopark (make sender goroutine into waiting state)
+        release the lock
+
+    receiver:
+        get the lock
+        for buffered channel
+            dequeue value from buffer
+            if there is waiting sender, enqueue the send elem, call goready which mark the waiting goroutine as runable 
+        for empty channel
+            directly copy the send elem and  call goready
+and if receiver come first, it will block the sender goroutine, and when sender goroutine get run,
+it will direct copy the elem to the receive elem in waiting receiver instead of copy it to buffer, 
+then make receiver goroutine runable.
+https://www.youtube.com/watch?v=KBZlN0izeiY
+
+
+
+

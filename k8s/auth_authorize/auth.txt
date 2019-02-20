@@ -1,0 +1,116 @@
+RSA
+    Asymmetric key ciphers
+    features:
+        generate key pair
+        encryption/decryption
+        digital signature
+        key-exchange algorithm
+
+    named after its authors (Rivest-Shamir-Adleman), including two algorithm
+        encryption/decryption
+        digital signature
+    key length: 1024 --> 4096
+
+    encryption/decryption in normal case
+        message ---> encryted by --> symmetric key --> encryted message
+        symmetric key --> encryted by --> public key --> encryted key
+    
+        encryted key --> decrypted by --> private key --> symmetric key
+        encryted message --> decrypted by --> symmetric key --> message
+
+    digital signature
+        message --> hash --> private key encrpty --> signature
+        signature --> decrypted by public key --> compared with message hash
+
+PKI: public key infrastructure
+    certificate == public key + owner info + signature (prove the key ownership) 
+    CA == party generate the signature use RSA or other algorithm
+    CA is in a strict hierarchy, top CA called root CA
+    root certificate is self signed and have to use other way to verify.
+    
+
+X509 is a standard for the format of certificates. 99% time it use RSA
+
+auth:
+X509 client certificates
+in cert
+    Common Name --> user name
+    Organization --> group
+
+
+authorization:
+    user/group:      core component
+    service account: pod in cluster
+
+k8s using ClusterRoleBinding assgin user to 
+ClusterRoleBinding:
+    roleRef:
+        apiGroup: xxxx
+        kind: ClusterRole
+        name: xxxx
+    subjects:
+        apiGroup: rbac.authorization.k8s.io
+        kind: User/Group
+        name: xxxx
+
+
+//k8s.io/apiserver/pkg/authentication/user/user.go
+predefined groups:
+    SystemPrivilegedGroup = "system:masters"
+    NodesGroup            = "system:nodes"
+
+predefined names:
+    AllUnauthenticated    = "system:unauthenticated"
+    AllAuthenticated      = "system:authenticated"
+    Anonymous     = "system:anonymous"
+    APIServerUser = "system:apiserver"
+    KubeProxy             = "system:kube-proxy"
+    KubeControllerManager = "system:kube-controller-manager"
+    KubeScheduler         = "system:kube-scheduler"
+
+
+
+
+//./plugin/pkg/auth/authorizer/rbac/bootstrappolicy/policy.go
+roles created during bootstrap
+ClusterRoles() {
+    cluster-admin
+    admin
+    system:discovery
+    system:basic-user
+    edit
+    view
+    system:aggregate-to-admin
+    system:aggregate-to-edit
+    system:aggregate-to-view
+    system:heapster
+    system:node
+    system:node-problem-detector
+    system:node-proxier
+    system:kubelet-api-admin
+    system:node-bootstrapper
+    ...
+}
+
+//plugin/pkg/auth/authorizer/rbac/bootstrappolicy/policy.go
+role binding created during bootstrap
+rbacv1helpers.NewClusterBinding("cluster-admin").Groups(user.SystemPrivilegedGroup).BindingOrDie(),
+rbacv1helpers.NewClusterBinding("system:node-proxier").Users(user.KubeProxy).BindingOrDie(),
+rbacv1helpers.NewClusterBinding("system:kube-controller-manager").Users(user.KubeControllerManager).BindingOrDie(),
+rbacv1helpers.NewClusterBinding("system:kube-dns").SAs("kube-system", "kube-dns").BindingOrDie(),
+rbacv1helpers.NewClusterBinding("system:kube-scheduler").Users(user.KubeScheduler).BindingOrDie(),
+
+
+//k8s.io/apiserver/pkg/authentication/request/x509
+var CommonNameUserConversion = UserConversionFunc(func(chain []*x509.Certificate) (*authenticator.Response, bool, error) {
+    if len(chain[0].Subject.CommonName) == 0 { 
+        return nil, false, nil 
+    }   
+    return &authenticator.Response{
+        User: &user.DefaultInfo{
+            Name:   chain[0].Subject.CommonName,
+            Groups: chain[0].Subject.Organization,
+        },  
+    }, true, nil 
+})
+
