@@ -1,0 +1,242 @@
+"k8s.io/client-go/rest"
+type rest.Interface interface {
+    GetRateLimiter() flowcontrol.RateLimiter
+    Verb(verb string) *Request
+    Post() *Request
+    Put() *Request
+    Patch(pt types.PatchType) *Request
+    Get() *Request
+    Delete() *Request
+    APIVersion() schema.GroupVersion
+}
+
+"k8s.io/client-go/kubernetes"
+type kubernetes.Interface interface {
+    Discovery() discovery.DiscoveryInterface
+    AdmissionregistrationV1alpha1() admissionregistrationv1alpha1.AdmissionregistrationV1alpha1Interface
+    AdmissionregistrationV1beta1() admissionregistrationv1beta1.AdmissionregistrationV1beta1Interface
+
+    AppsV1beta1() appsv1beta1.AppsV1beta1Interface
+    AppsV1beta2() appsv1beta2.AppsV1beta2Interface
+    AppsV1() appsv1.AppsV1Interface
+
+    AuditregistrationV1alpha1() auditregistrationv1alpha1.AuditregistrationV1alpha1Interface
+    AuthenticationV1() authenticationv1.AuthenticationV1Interface
+    AuthenticationV1beta1() authenticationv1beta1.AuthenticationV1beta1Interface
+
+    AuthorizationV1() authorizationv1.AuthorizationV1Interface
+    AuthorizationV1beta1() authorizationv1beta1.AuthorizationV1beta1Interface
+
+    AutoscalingV1() autoscalingv1.AutoscalingV1Interface
+    AutoscalingV2beta1() autoscalingv2beta1.AutoscalingV2beta1Interface
+    AutoscalingV2beta2() autoscalingv2beta2.AutoscalingV2beta2Interface
+
+    BatchV1() batchv1.BatchV1Interface
+    BatchV1beta1() batchv1beta1.BatchV1beta1Interface
+    BatchV2alpha1() batchv2alpha1.BatchV2alpha1Interface
+
+    CertificatesV1beta1() certificatesv1beta1.CertificatesV1beta1Interface
+
+    CoordinationV1beta1() coordinationv1beta1.CoordinationV1beta1Interface
+
+    CoreV1() corev1.CoreV1Interface
+
+    EventsV1beta1() eventsv1beta1.EventsV1beta1Interface
+
+    ExtensionsV1beta1() extensionsv1beta1.ExtensionsV1beta1Interface
+
+    NetworkingV1() networkingv1.NetworkingV1Interface
+
+    PolicyV1beta1() policyv1beta1.PolicyV1beta1Interface
+
+    RbacV1() rbacv1.RbacV1Interface
+    RbacV1beta1() rbacv1beta1.RbacV1beta1Interface
+    RbacV1alpha1() rbacv1alpha1.RbacV1alpha1Interface
+
+    SchedulingV1alpha1() schedulingv1alpha1.SchedulingV1alpha1Interface
+    SchedulingV1beta1() schedulingv1beta1.SchedulingV1beta1Interface
+
+    SettingsV1alpha1() settingsv1alpha1.SettingsV1alpha1Interface
+
+    StorageV1beta1() storagev1beta1.StorageV1beta1Interface
+    StorageV1() storagev1.StorageV1Interface
+    StorageV1alpha1() storagev1alpha1.StorageV1alpha1Interface
+}
+
+
+"k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+type Interface interface {
+    Discovery() discovery.DiscoveryInterface
+    ApiextensionsV1beta1() apiextensionsv1beta1.ApiextensionsV1beta1Interface
+    // Deprecated: please explicitly pick a version if possible.
+    Apiextensions() apiextensionsv1beta1.ApiextensionsV1beta1Interface
+}
+originall it's TPR(third party resource), now move to CRD(customer resource definition)
+
+
+k8s.io/client-go/discovery
+type DiscoveryInterface interface {
+    RESTClient() rest.Interface
+    ServerGroupsInterface      //get groups supported in api 
+    ServerResourcesInterface   //resource for group
+    ServerVersionInterface     //server version
+    OpenAPISchemaInterface     //get open api schema
+}
+get server verision
+
+
+k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/typed/apiextensions/v1beta1
+type ApiextensionsV1beta1Interface interface {
+    RESTClient() rest.Interface
+    CustomResourceDefinitionsGetter
+}
+
+type CustomResourceDefinitionsGetter interface {
+    CustomResourceDefinitions() CustomResourceDefinitionInterface
+}
+
+// CustomResourceDefinitionInterface has methods to work with CustomResourceDefinition resources.
+type CustomResourceDefinitionInterface interface {
+    Create(*v1beta1.CustomResourceDefinition) (*v1beta1.CustomResourceDefinition, error)
+    Update(*v1beta1.CustomResourceDefinition) (*v1beta1.CustomResourceDefinition, error)
+    UpdateStatus(*v1beta1.CustomResourceDefinition) (*v1beta1.CustomResourceDefinition, error)
+    Delete(name string, options *v1.DeleteOptions) error
+    DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
+    Get(name string, options v1.GetOptions) (*v1beta1.CustomResourceDefinition, error)
+    List(opts v1.ListOptions) (*v1beta1.CustomResourceDefinitionList, error)
+    Watch(opts v1.ListOptions) (watch.Interface, error)
+    Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1beta1.CustomResourceDefinition, err error)
+    CustomResourceDefinitionExpansion
+}
+
+k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1
+type CustomResourceDefinition struct {
+    metav1.TypeMeta   `json:",inline"`
+    metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+
+    // Spec describes how the user wants the resources to appear
+    Spec CustomResourceDefinitionSpec `json:"spec" protobuf:"bytes,2,opt,name=spec"`
+    // Status indicates the actual state of the CustomResourceDefinition
+    // +optional
+    Status CustomResourceDefinitionStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+}
+
+work with CRD
+
+----------------------------------------------------------------------------
+interface defined in rancher 
+
+"github.com/rancher/types/apis/apps/v1beta2"
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    DeploymentsGetter
+    DaemonSetsGetter
+    StatefulSetsGetter
+    ReplicaSetsGetter
+}
+
+
+
+
+"github.com/rancher/types/apis/project.cattle.io/v3"
+Project      projectv3.Interface
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    ServiceAccountTokensGetter
+    DockerCredentialsGetter
+    CertificatesGetter
+    BasicAuthsGetter
+    SSHAuthsGetter
+    NamespacedServiceAccountTokensGetter
+    NamespacedDockerCredentialsGetter
+    NamespacedCertificatesGetter
+    NamespacedBasicAuthsGetter
+    NamespacedSSHAuthsGetter
+    WorkloadsGetter
+    AppsGetter
+    AppRevisionsGetter
+    SourceCodeProvidersGetter
+    SourceCodeProviderConfigsGetter
+    SourceCodeCredentialsGetter
+    PipelinesGetter
+    PipelineExecutionsGetter
+    PipelineSettingsGetter
+    SourceCodeRepositoriesGetter
+}
+
+"github.com/rancher/types/apis/core/v1"
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    NodesGetter
+    ComponentStatusesGetter
+    NamespacesGetter
+    EventsGetter
+    EndpointsGetter
+    PersistentVolumeClaimsGetter
+    PodsGetter
+    ServicesGetter
+    SecretsGetter
+    ConfigMapsGetter
+    ServiceAccountsGetter
+    ReplicationControllersGetter
+    ResourceQuotasGetter
+    LimitRangesGetter
+}
+
+
+"github.com/rancher/types/apis/rbac.authorization.k8s.io/v1"
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    ClusterRoleBindingsGetter
+    ClusterRolesGetter
+    RoleBindingsGetter
+    RolesGetter
+}
+
+"github.com/rancher/types/apis/extensions/v1beta1"
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    PodSecurityPoliciesGetter
+    IngressesGetter
+}
+
+
+"github.com/rancher/types/apis/batch/v1"
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    JobsGetter
+}
+
+
+"github.com/rancher/types/apis/monitoring.coreos.com/v1"
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    PrometheusesGetter
+    AlertmanagersGetter
+    PrometheusRulesGetter
+    ServiceMonitorsGetter
+}
+
+"github.com/rancher/types/apis/networking.k8s.io/v1"
+type Interface interface {
+    RESTClient() rest.Interface
+    controller.Starter
+
+    NetworkPoliciesGetter
+}
+
+

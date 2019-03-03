@@ -1,0 +1,21 @@
+Just 1 describes a "computation", whose "result" is 1. Nothing describes a 
+computation which produces no results.
+
+The difference between a Monad and an Applicative is that in the Monad 
+there's a choice. The key distinction of Monads is the ability to choose 
+between different paths in computation (not just break out early). Depending 
+on a value produced by a previous step in computation, the rest of computation 
+structure can change.
+
+
+In case of Applicative, in all the functions work "inside" computations, there's 
+no chance to break up a chain. Each function just transforms a value it's fed. 
+The "shape" of the computation structure is entirely "on the outside" from the 
+functions' point of view.
+
+A function could return a special value to indicate failure, but it can't cause 
+next steps in the computation to be skipped. They all will have to process the 
+special value in a special way too. The shape of the computation can not be changed 
+according to received value.
+
+With monads, the functions themselves construct computations to their choosing.

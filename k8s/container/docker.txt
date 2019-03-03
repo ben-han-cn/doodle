@@ -231,3 +231,5 @@ docker volume prune
 docker network prune
 journalctl -u docker.service
 sudo apt-get install -y aufs-tools
+docker history --no-trunc <Image ID>
+

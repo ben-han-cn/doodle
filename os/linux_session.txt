@@ -13,3 +13,42 @@ Z	Zombie process, terminated but not yet reaped by its parent.
 s	This process is a session leader.
 +	This process is part of a foreground process group.
 
+
+a tty is a native terminal device, the backend is either hardware or kernel emulated.
+a pty (pseudo terminal device) is a terminal device which is emulated by an other program 
+a pts is the slave part of a pty
+
+pts is a psuedo terminal slave, it provide a interface for the the master part, ssh 
+is use pts the get input from user and send the input to the remote server. 
+
+When a process opens /dev/ptmx, it gets a file descriptor for a pseudoterminal master(PTM),  
+and a pseudoterminal slave (PTS)  device is created in the /dev/pts directory.
+
+Once both the pseudoterminal master and slave are open, the slave provides processes 
+with an interface that is identical to that of a real terminal. Data  written  to the 
+slave is presented on the master descriptor as input.  Data written to the master is 
+presented to the slave as input.
+
+
+   +--------------------------------------------------+
+   |                                                  |
+   |                         +-------------------+    |  +--------------+
+   |                         |                   | <-----| user process |
+   |            kernel       |                   |    |  +--------------+
+   |                         |                   |    |  +--------------+
+   |                         |                   | <--|--+ user process |
+   |                         |  tty driver       |    |  +--------------+
+   |  +-----------+          |  (PTY slave side) |    |  +--------------+
+   |  |line       |<---------+                   | <-----| user process |
+   |  |discipline |          +-------------------+    |  +--------------+
+   |  |           |                                   |
+   |  |           |          +------------------+     |
+   |  |           |          |                  |     |  +--------------+
+   |  |           |<---------+  PTY             |  <-----| xterm process|
+   |  +-----------+          |  master side     |     |  +--------------+
+   |                         |                  |     |
+   |                         +------------------+     |
+   +--------------------------------------------------+
+
+discipline: provide line editing fetures like backspace, clear line, etc.
+TTY driver (a lib): provide session management.

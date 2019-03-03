@@ -1,0 +1,4 @@
+types.go
+    Config
+        Schemas   ---> resources and handler
+        CRD       ---> customer resource definition

@@ -1,0 +1,39 @@
+Building a merkel tree
+Given a set of blocks [L1, L2], applying a one-way hashing function to L1, h(L1) = 9ec4.
+apply the same function to L2, h(L2) = 7e6a. concatenate both child hashes h(L1) and h(L2) 
+before applying, once again, the one-way hashing function, h(h(L1) || h(L2)) = aea9.
+
+
+
+
+Audit proof
+The Merkle audit proof is the missing nodes required to compute all of the nodes between 
+the data block and the Merkle root. If a Merkle audit proof fails to produce a root hash 
+that matches the original Merkle root hash, it means that our data block is not present 
+in the tree.
+
+                                       +-+
+                               +------>|R|<-------+
+                               |       +-+        |
+                             +-++               +-+-+
+                             |P1|               | P2|
+                             +^-+               +-^-+
+                        +-----+------+         +--+------+
+                      +-+--+       +-++      +-++       ++-+
+                      |9EC4|       |H2|      |H3|       |H4|
+                      +----+       +--+      +--+       +--+
+                        ^            ^        ^           ^
+                        |            |        |           |
+                      +-++         +-++      ++-+       +-++
+                      |L1|         |L2|      |L3|       |L4|
+                      +--+         +--+      +--+       +--+
+
+provide a proof that L1 exists in the tree. the audit proof of L1 is [H2, P2]
+
+
+Detect inconsistencies
+To compare the state of two nodes, they exchange the coressponding merkle by levels, only
+decending further down the tree if the corresponding hashes are different.
+
+P2P file sharing
+Fetch root of the tree from a trusted source, then fetch chunks of data from unstrusted sources.

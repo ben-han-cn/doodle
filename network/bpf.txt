@@ -32,6 +32,12 @@ these days, BPF == eBPF
 eBPF has in-kernel verifier which will verify the user code
 which will be executed in kernel mode is safe enough
 
+
+eBPF is a safe way to load user code into kernel without modify or restart kernel. Kernel provide
+a virtual machine which execute its own bytecode. Before run the bytecode asked by user, eBPF will
+check the safety to avoid infinite loop, invalid memory acessment, etc. With some llvm backed compiler,
+user normally use up level code to program and be translated to the bytecode by the compiler.
+
 BCC == BPF compiler collection which is a BPF frontend library
 
 BPF map
@@ -41,6 +47,24 @@ The maps are accessed from user space via BPF syscall, which has commands:
   map_fd = bpf(BPF_MAP_CREATE, union bpf_attr *attr, u32 size)
   lookup key/value, update, delete, iterate, delete a map
 userspace programs use this syscall to create/access maps that BPF programs are concurrently updating 
+in runtime, the byte code is simple enough to translate to native code via a JIT embed in kernel.
+
+
+                                           +-------------------+
+                                           |uplevel application|
+        +------------+                     +-------------------+
+        |instrumented|                         ^              ^
+        |application |                 high    |              | low
+        +-----+------+                 volume  |              | volume
+user space    |                        +-------v---+      +---v----+
+--------------|------------------------|Ring buffer|------|eBPF map|---------------
+kernel space  |                        +-------^---+      +---^----+
+       +------v---------+                      |              |
+       |system call path|                      |              |
+       | +---------+    |                   +--v--------------v----+
+       | |eBPF hook+------------------------|  eBPF       program  |
+       | +---------+    |                   +----------------------+
+       +----------------+
 
 
 BPF used in two aspect:

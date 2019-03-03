@@ -1,0 +1,66 @@
+primitive for go concurrency
+1 goroutine
+    user-level thread that the go runtime library
+manages and map to kernel-level threads in an M-to-N
+way.
+
+2 synchronized with shared memory
+Mutex
+RWMutex: write has a higher privilege
+Cond
+Once
+WaitGroup
+
+3 synchronized with message passing
+Chan:
+    send to or receive from a nil chan will block
+    send to a closed channel, or close a channel twice will panic
+
+select:
+    block until one of its cases can make progress, or execute 
+the default branch.
+    when more than one case are valid, go will randomly choose one
+to execute
+
+timer:
+    add timeout to heavy work
+
+context:
+    carry request specific data across goroutine, also support cancel 
+
+
+4 avoid concurrency bug
+4.1 make sure all the short-lived go routine will exist successfully
+4.2 data race on a shared variable reference to for loop tmp variable
+4.3 select choose case randomly when more than one case is valid
+ticker := time.NewTicker()
+for {
+    f()
+    select {   
+    case <- stopCh:
+        return
+    case <- ticker:
+    }
+}
+
+if stopCh is valid, heavy function f may execute twice when ticker is 
+trigger at the same time, fix by:
+ticker := time.NewTicker()
+for {
+    select {
+    case <- stopCh:
+        return
+    default:
+    }
+
+    f()
+    select {   
+    case <- stopCh:
+        return
+    case <- ticker:
+    }
+}
+
+funny study result:
+    message passing doesn't necessarily make multi-threaded programs less
+error-prone than shared memory.
