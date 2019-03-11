@@ -148,3 +148,6 @@ $ echo ./Templates/ ./Documents/ | xargs -n 1 cp -v ./Downloads/SIC_Template.xls
 
 soft limit --> kernel used to limit the system resources for running processes
 hard limit --> maximum value that is allowed for soft limit
+
+//find which process is using the files
+fuser -vu github.com/zdnscloud/singlecloud/pkg

@@ -1,5 +1,5 @@
-lvm (logical volumen management)
-physical volumn
+lvm (logical volume management)
+physical volumn --> physical device
 volume group  ---> logical device
 logical volumn ---> equivalent to partition, but could span several hard driver
 
@@ -7,6 +7,7 @@ device/driver ---> /dev/sda
 partition     ---> /dev/sda1, /dev/sda2, one partition one file system
 
 sudo lvmdiskscan
+//pvcreate could use disk or partition
 sudo pvcreate /dev/sda /dev/sdb --> create physical volume
 sudo pvs
 sudo vgcreate LVMVolGroup /dev/sda /dev/sdb --> create volume group
@@ -34,3 +35,7 @@ sudo mount /dev/LVMVolGroup/workspace /mnt/workspace
 /dev/LVMVolGroup/www /mnt/www ext4 defaults,nofail 0 0
 /dev/LVMVolGroup/db /mnt/db ext4 defaults,nofail 0 0
 /dev/LVMVolGroup/workspace /mnt/workspace ext4 defaults,nofail 0 0
+
+//extend logical volume
+lvextend -L +100 /dev/LVMVolGroup/projects
+resize2fs /dev/LVMVolGroup/projects

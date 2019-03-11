@@ -1,0 +1,65 @@
+PersistentVolume 
+    low level representation of a storage volumn
+    consumable resource 
+    have independent lifecycle from the pod use it
+    atomic unit cann't be split or used partially
+
+Volume
+    a directory, possibly with some data in it
+    accessible to containers in a pod
+    has same lifecycle with pod using it
+    Volume is the storage used directly by pod
+    inline volume: 
+        normally is local ephemeral volumes, 
+        referred to directly in pod spec (without pv/pvc)
+        emptyDir, config map, downward api, secret and projected
+
+Volume Driver
+    code to communicate with the backend storage provider
+    decide the medium and content for a volume
+
+PersistentVolumeClaim
+    the binding between a pod and PersistentVolume
+    one-to-one exclusive binding with PersistentVolume
+
+Storage class
+    dynaimc provisioning of PersistentVolume
+    provisioning == create and initialize it
+
+
+how a pod get storage:
+1 volume
+2 static pv
+3 dynamic pv
+4 VolumeClaimTemplate Way (in statefulset)
+  pod name and pvc name is perdictable
+  when scale down, pod will be deleted, but the pvc will be retained
+  when scale up, new pod will use old pvc.
+5 Flexvolume and CSI, third party implementation. 
+    
+
+Controllers and Kubelets
+Kubernetes has a number of controllers that run on the masters, monitor the 
+state of the cluster and initiate actions in response to events.
+
+It also runs a kubelet process on all of the worker nodes. The kubelet stays 
+in constant contact with the controllers, submitting metrics about current 
+running pods and listening for new instructions.
+
+Kubelet:
+- Mount and format new PersistentVolumes that are scheduled to this host
+- Start containers with PersistentVolume hostpath mounted inside the container
+- Stop containers and unmount the associated PersistentVolume
+- Constantly send metrics to the controllers about container & PersistentVolume state
+
+Controller:
+- to match a PersistentVolumeClaim to a PersistentVolume
+- to dynamically provision a new PersistentVolume if a claim cannot be met (if enabled)
+    in the case of EBS this is done via the AWS api from the masters
+- to attach the backend storage to a specific node if needed
+    in the case of EBS this is done via the AWS api from the masters
+- to instruct the kubelet for a node to mount (and potentially format) the volume
+this is done on the actual node
+- to instruct the kubelet to start a container that uses the volume
+The kubelet itself performs the low-level mount and mkfs commands when instructed by 
+the controller.

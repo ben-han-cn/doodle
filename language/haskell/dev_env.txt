@@ -1,0 +1,24 @@
+stack
+    curl -sSL https://get.haskellstack.org/ | sh
+    stack new hello
+    cd hello
+    stack build (stack setup)
+    stack run
+
+    {-- configure project --}
+    stack install hpack-convert //covert cabel file to yaml file
+    package.yaml 
+        dependencies:
+        - base
+        - classy-prelude   
+        - time //optional, for Data and Time
+        - time-lens //optional, for modify attirbute of time
+        - aeson //for json 
+
+        default-extensions:
+        - NoImplicitPrelude
+        - OverloadedStrings
+
+    {-- why use classy-prelude --}
+    prelude in GHC expose partial function
+    include almost must use lib like text and containers

@@ -1,3 +1,17 @@
+inode -- data structure contains metadata about a file
+each inode has a unique number
+inode has pointer to real data of a file
+directory is a table which map filenames to inodes.
+
+
+device name:
+ATA/IDE -> hd
+SCSI   -> sd
+
+df (diskfree)
+du (diskuage)
+
+
 file descriptor table --> open file table(system wide) --> i-node table (system wide)
 
 readiness of descriptors:

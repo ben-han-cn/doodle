@@ -1,0 +1,24 @@
+port and adapter architecture:
+
+seperate domain logic with the run time external part including
+    communication layer (rest api, protocol buffer, message middleware)
+    database layer
+
+port: 
+    contract on how external part may interact with the domain logic 
+    interface or typeclass in different language implementation
+
+
+type VerificationCode = Text 
+//how to store auth to external database
+class Monad m => AuthRepo m where
+  addAuth :: Auth -> m (Either RegistrationError VerificationCode)
+
+//how to ask external notification system to send email
+class Monad m => EmailVerificationNotify m where 
+    notifyEmailVerification :: Email -> VerificationCode -> m ()
+
+adaptor:
+    bridge between port and external entities, since for each external part 
+    may support different solution, like postgresql and mysql
+

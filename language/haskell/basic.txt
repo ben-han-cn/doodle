@@ -1,0 +1,222 @@
+1 code layout: offside rule
+in writing a sequence of definitions, it is therefore sensible
+to give them all the same level of indentation.
+
+splitSpaces :: String -> [String]
+splitSpaces "" = []
+splitSpaces str = 
+    let (rest, piece) = parse $ dropWhile isSpace str in
+    piece:(splitSpaces rest)
+    where 
+        parse :: String -> ( String, String)
+        parse ('{':s) = fmap ('{':) $ parseBracket s
+        parse (c:s) | isSpace c = (s, []) 
+        parse (c:s) = fmap (c:) $ parse s
+        parse "" = ("", "") 
+
+
+2 basic types:
+bool
+char 
+string -> list[char]
+
+read :: Read a => String -> a
+show :: show a =>  a -> String
+
+Integer 
+Int -> fixed size integer
+
+floor :: (RealFrac a, Integral b) => a -> b
+fromIntegral :: (Integral a, Num b) => a -> b
+
+
+3 String, Text, ByteString:
+String is not efficient for text processing. It's generally
+frowned upon, and it's best to avoid it for public APIs.
+Text: a array of unicode characters
+ByteString: same with []byte in golang
+LText, LByteString is the lazy version of Text and ByteString
+
+fromString :: String -> Text|LText|ByteString|LByteString
+unpack     :: LText|Text -> String
+encodeUtf8 :: Text -> ByteString
+decodeUtf8 :: ByteString -> Text
+
+fromStrict :: ByteString -> LByteString
+              Text -> LText
+
+toStrict    :: LText -> Text
+               LByteString -> ByteString
+
+
+
+4 Data and Time
+UTCTime:            absolute time
+NominalDiffTime:    duration between UTCTime
+TimeZone:           offset from UTC
+ZonedTime:          UTCTime + TimeZone --> time in a zone, doesn't support comparison
+
+import Data.Time
+getCurrentTime :: IO UTCTime
+getZonedTime :: IO ZonedTime
+zonedTimeToUTC :: ZonedTime -> UTCTime
+utcToZonedTime :: UTCTime -> ZonedTime
+diffUTCTime :: UTCTime -> UTCTime -> NominalDiffTime
+
+import Data.Time.Clock.POSIX
+posixSecondsToUTCTime :: POSIXTime -> UTCTime  //POSIXTime is a number for seconds offset
+utcTimeToPOSIXSecons  :: UTCTime -> POSIXTime
+
+parse time
+let dateTimeFormat = iso8601DateFormat (Just "%H:%M:%S%Q%z")
+let parseISO = parseTimeM True defaultTimeLocale dateTimeFormat
+parseISO "2019-01-08T12:45:30.550+0800" :: Maybe UTCTime | ZonedTime
+
+time-lens
+zt <- getZoneTime
+getL timeZone zt
+getL seconds zt
+getL minutes zt
+getL hours zt
+modL day (+20) zt
+setL year 1000 zt
+
+5 json
+data Value
+= Object Object
+| Array Array
+| String Text
+| Number Scientific | Bool Bool
+| Null
+type Object = HashMap Text Value 
+type Array = Vector Value
+
+toJSON :: haskell type -> Value
+fromJSON :: Value -> haskell type
+
+encode :: (ToJSON a) => a -> LByteString
+eitherDecode :: (ToJSON a) => LByteString -> Either String a
+
+
+data User = User { 
+    userId :: Int, 
+    userName :: Text, 
+    userHobbies :: [Text] 
+} deriving (Show)
+
+instance ToJSON User where
+    toJSON (User uId name hobbies) = 
+        object [ "id" .= uId , "name" .= name, "hobbies" .= hobbies ]
+
+instance FromJSON User where
+    parseJSON = withObject "User" $ \v ->
+      User <$> v .: "id"
+           <*> v .: "name"
+           <*> v .: "hobbies"
+
+
+6 exception (safe-exceptions included in ClassyPrelude)
+data ServerException
+= ServerOnFireException
+| ServerNotPluggedInException deriving (Show)
+
+instance Exception ServerException
+
+throw :: (MonadThrow m, Exception e) => e -> m a
+catch :: (MonadCatch m, Exception e) => m a -> (e -> m a) -> m a
+throw ServerOnFireException `catch` (\e -> putStrLn $ show (e :: ServerException))
+
+handle :: (MonadCatch m, Exception e) => (e -> m a) -> m a -> m a
+try :: (MonadCatch m, Exception e) => m a -> m (Either e a)
+catchAny :: MonadCatch m => m a -> (SomeException -> m a) -> m a
+
+
+7 list
+length      :: [a] -> Int
+zip         :: [a] -> [b] -> [(a, b)]
+unzip       :: [(a, b)] -> ([a], [b])
+:           :: a -> [a] -> [a]
+++          :: [a] -> [a] -> [a]
+!!          :: [a] -> Int -> a
+concat      :: [[a]] -> [a]
+head,last   :: [a] -> a
+tail, init  :: [a] -> [a]
+replicate   :: Int -> a -> [a]
+take        :: Int -> [a] -> [a]
+drop        :: Int -> [a] -> [a]
+splitAt     :: Int -> [a] -> ([a], [a])
+reverse     :: [a] -> [a]
+
+sum         :: [a] -> a
+product     :: [a] -> a
+
+
+8 algebra data type 
+//attribute name start with type name abbreviation
+data YesodRequest = YesodRequest
+    { reqGetParams  :: ![(Text, Text)]
+    , reqCookies    :: ![(Text, Text)]
+    , reqWaiRequest :: !W.Request
+    , reqLangs      :: ![Text]
+    , reqToken      :: !(Maybe Text)
+    }
+
+data ErrorResponse =
+      NotFound
+    | InternalError !Text
+    | InvalidArgs ![Text]
+    | NotAuthenticated
+    | PermissionDenied !Text
+    | BadMethod !H.Method
+    deriving (Show, Eq, Typeable, Generic)
+
+type ParentRunner parent
+    = HandlerFor parent TypedContent
+   -> YesodRunnerEnv parent
+   -> Maybe (Route parent)
+   -> W.Application
+
+type == alias
+newtype == a totally different type
+
+newtype WidgetFor site a = WidgetFor
+    { unWidgetFor :: WidgetData site -> IO a
+    }
+    deriving Functor
+WidgetFor   --> function/constructor from old type to new type
+unWidgetFor --> function/conversion between new type to old type 
+
+//there different reponse type, has same presentation
+newtype RepJson = RepJson Content
+newtype RepPlain = RepPlain Content
+newtype RepXml = RepXml Content
+
+9 pattern match
+pattern could be:
+- literal value, like 24
+- variable,  like x
+- wildcard _, match anything
+- constructor, (), [] is kind of constructor 
+
+10 map (Data.Map)
+null            :: Map k a -> Bool
+size            :: Map k a -> Int
+member          :: Ord k => k -> Map k a -> Bool
+notMember       :: Ord k => k -> Map k a -> Bool
+lookup          :: Ord k => k -> Map k a -> Maybe a
+findWithDefault :: Ord k => a -> k -> Map k a -> a 
+empty           :: Map k a
+singleton       :: k -> a -> Map k a
+insert          :: Ord k => k -> a -> Map k a -> Map k a  //overwrite old value
+insertWith      :: Ord k => (a -> a -> a) -> k -> a -> Map k a -> Map k a  //merge with old value
+delete          :: Ord k => k -> Map k a -> Map k a 
+adjust          :: Ord k => (a -> a) -> k -> Map k a -> Map k a
+update          :: Ord k => (a -> Maybe a) -> k -> Map k a -> Map k a // f return nothing then delete, 
+                                                                      // otherwise replace
+union           :: Ord k => Map k a -> Map k a -> Map k a //prefer left when conflict
+unionWith       :: Ord k => (a -> a -> a) -> Map k a -> Map k a -> Map k a 
+difference      :: Ord k => Map k a -> Map k a -> Map k a 
+intersection    :: Ord k => Map k a -> Map k a -> Map k a 
+10 module
+names can be thought of as being arranged in a hierarchy but not
+part of the language definition.

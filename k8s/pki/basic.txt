@@ -4,3 +4,10 @@ private key --> decrypt the message
 certificate ---> prove the owner of the public key, 
 bind the identity/other mete data to the public key, 
 it also includes issuer and expire time 
+
+
+SAN for server cert
+client verify server' cert has the same name, the client is accessing.
+since client may use different name(domain or ip) to visit the server.
+SAN(subject altantive name)is used to give the server several names not
+only its common name.
