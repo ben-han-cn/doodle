@@ -1,0 +1,2 @@
+k8s only has parent and child relationship not the use releationship
+if a configmap is used by one deployment, it could be removed.

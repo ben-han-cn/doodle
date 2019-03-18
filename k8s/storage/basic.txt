@@ -63,3 +63,41 @@ this is done on the actual node
 - to instruct the kubelet to start a container that uses the volume
 The kubelet itself performs the low-level mount and mkfs commands when instructed by 
 the controller.
+
+
+PV (PersistentVolume.spec.Class)
+PVC (PersistentVolume.spec.Class)
+steps:
+1 admin create the storage class
+2 pvc is specify the storage class
+3 pvc.Annotations["volume.beta.kubernetes.io/storage-provisioner"] = storageClass.Provisioner
+4 in tree
+    ProvisionableVolumePlugin --> NewProvisioner --> Provision(storageClassObj) -> no error
+    controller create the pv and set pv.Spec.Class to pvc.Spec.Class
+
+  out of tree
+    controller couldn't find ProvisionableVolumePlugin with specified storage class, it do nothing
+    external provisioner watch the pvc
+        pvc.Annotations["volume.beta.kubernetes.io/storage-provisioner"] == its name
+        pvc.Spec.VolumeName == ""
+        find the storage class resource 
+        use the attribute value in storage class, pvc.Spec.Selector to provision the volume 
+        create the pv
+            pv.Annotations["pv.kubernetes.io/provisioned-by"] = provisioner's name
+            pv.Annotations["volume.beta.kubernetes.io/storage-class"] = pvc.Spec.Class
+            pv.Spec.PersistentVolumeSource ==> created storage asset
+            pv.Spec.PersistentVolumeReclaimPolicy = delete 
+
+pv delete
+    pv.Status.Phase = Released
+    controller looks for pv.Annotations["pv.kubernetes.io/provisioned-by"], if found, it use provisioner/deleter 
+    if not, controller inspects pv.Spec to find in-tree deleter
+    use the deleter to delete the storage assets 
+
+    for external provisioner
+        watch for PV changes. When pv.Status.Phase == Released && 
+            pv.Annotations['pv.kubernetes.io/provisioned-by'] == <deleter name>
+        ignore pv.Spec.PersistentVolumeReclaimPolicy != delete
+        after delete the storage assets, it delete the pv
+                    
+        

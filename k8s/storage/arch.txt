@@ -61,15 +61,14 @@ Persistent Volumn: staitc storage
   plugins to connect to physical storage
   access mode
   retain policy
-    retained //data is keeped and couldn't be reused by other pvc
-    recycled //data is cleared and could be used by other pvc
+    retained //pv is kept, data is keeped and couldn't be reused by other pvc but the old pvc
+    recycled //pv is kept, data is cleared and could be used by other pvc
     deleted // pv and storage all will be deleted from k8s
 
 Storage Class:  dynamic storage 
 
 two pods could share the same pvc
 pvc is bind to pv which is done by controller, the bind is exclusive
-
 
 local disk:
 1 disk preparation
@@ -82,16 +81,9 @@ AccessModes
     ReadOnlyMany(ROX)  read only by only nodes
     ReadWriteMany(RWX) rw by many nodes
 
-PersistentVolumeReclaimPolicy
-    Retain: adminstrator needs to clean data manually
-    Recycle: rm -rf /thevolum/*
-    Delete: delete the volume, use by cloud provider
-
-
 unit
 M, G, T -> mulitplies of 1000     (based on power of 10)
 Mi, Gi, Ti --> mulitplies of 1024 (based on power of 2)
-
 
 
 storage process:

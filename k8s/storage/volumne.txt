@@ -58,7 +58,37 @@ const (
     VolumeFailed PersistentVolumePhase = "Failed"
 )
 
+type PersistentVolumeSource struct {
+    //cloud provider fields
 
+    HostPath *HostPathVolumeSource
+    NFS *NFSVolumeSource
+    CephFS *CephFSPersistentVolumeSource
+    Local *LocalVolumeSource
+    CSI *CSIPersistentVolumeSource
+}
+
+type LocalVolumeSource struct {
+    //full path to the volume on the node
+    Path string `json:"path" protobuf:"bytes,1,opt,name=path"`
+
+    // Filesystem type to mount.
+    // It applies only when the Path is a block device.
+    FSType *string
+}
+
+type NFSVolumeSource struct {
+    Server string `json:"server" protobuf:"bytes,1,opt,name=server"`
+    Path string `json:"path" protobuf:"bytes,2,opt,name=path"`
+    ReadOnly bool `json:"readOnly,omitempty" protobuf:"varint,3,opt,name=readOnly"`
+}
+
+type VolumeNodeAffinity struct {
+    // Required specifies hard node constraints that must be met.
+    Required *NodeSelector `json:"required,omitempty" protobuf:"bytes,1,opt,name=required"`
+}
+
+    
 //kubernetes/pkg/volume/volume.go
 type Volume interface {
     GetPath() string //which volume should be mounted for the pod

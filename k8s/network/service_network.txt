@@ -1,3 +1,14 @@
+service: 
+    specify the cluster ip ---> name
+    select which pods will be redirect traffic to
+    which port will the traffic will be sent
+
+endpoint:   
+    same name with the service it belongs
+    ready pod for the service
+    notready pod (not finish start, failed a readiness check or a liveness check)
+
+
 conf/apiserver
 KUBE_SERVICE_ADDRESSES="--service-cluster-ip-range=10.254.0.0/16"
 [Service]

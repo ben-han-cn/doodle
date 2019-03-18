@@ -14,7 +14,11 @@ FLANNEL_ETCD_ENDPOINTS="http://172.17.8.101:2379"
 FLANNEL_ETCD_PREFIX="/kube-centos/network"
 FLANNEL_OPTIONS="-iface=eth1"
 
-flannel create subnet, this is done by flanneld process in each node
+nodeipam controller in k8s controller manager will create pod subnet range
+for each node and save it to the podCIDR attribute for each node.
+
+flannel read alll the value and write it down in its configuration, and
+the range couldn't be changed later. 
 etcdctl ls /kube-centos/network/subnets
 /kube-centos/network/subnets/172.33.72.0-24
 /kube-centos/network/subnets/172.33.97.0-24
@@ -28,11 +32,10 @@ DOCKER_OPT_MTU="--mtu=1500"
 DOCKER_NETWORK_OPTIONS=" --bip=172.33.102.1/24 --ip-masq=true --mtu=1500"
 
 /run/flannel/docker [node2]
-OCKER_OPT_BIP="--bip=172.33.97.1/24"
+DOCKER_OPT_BIP="--bip=172.33.97.1/24"
 DOCKER_OPT_IPMASQ="--ip-masq=true"
 DOCKER_OPT_MTU="--mtu=1500"
 DOCKER_NETWORK_OPTIONS=" --bip=172.33.97.1/24 --ip-masq=true --mtu=1500"
-
 
 
 flannel create route in each node

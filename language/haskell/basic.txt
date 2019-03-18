@@ -191,6 +191,9 @@ newtype RepJson = RepJson Content
 newtype RepPlain = RepPlain Content
 newtype RepXml = RepXml Content
 
+different with data, newtype can only has one argument
+it means a totolly new interface for a known type
+
 9 pattern match
 pattern could be:
 - literal value, like 24

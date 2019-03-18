@@ -4,7 +4,17 @@ direct schedule
 
 scheduler:
     predicates == whether a pod fits into a particular node
+        NoDiskConflict: node has the volume to satisfy the pod
+        PodFitResources
+        PodFitsHostPorts
+        PodFitHost
+        PodSelectorMatches
+        CheckNodeLabelPresence
     priorities == choose one node if several nodes fit the pod
+        LeastRequestedPriority
+        CalculateNodeLabelProperty
+        CalculateSpreadPriority
+        CalculateAntiAffinityPriority
 
 
 schedule(pod): string (node name)
@@ -38,3 +48,96 @@ the predicates for the pod and node, the pod is marked as failed, if the pods
 has been created by a ReplicaSet, this failed pod doesn't count as an active
 member of ReplicaSet and thus a new pod will be create and scheduled onto a
 different node where it fits.
+
+
+scheduler queues:
+unscheduable queue --> active queue
+
+func (sched *Scheduler) scheduleOne() {
+    pod := sched.config.NextPod()
+    suggestedHost, err := sched.schedule(pod)
+    assumedPod := pod.DeepCopy()
+    allBound, err := sched.assumeVolumes(assumedPod, suggestedHost)
+    sched.assume(assumedPod, suggestedHost)
+    go func() {
+        if !allBound {
+            err := sched.bindVolumes(assumedPod)
+        }
+        sched.bind(assumedPod, &v1.Binding{
+             ObjectMeta: metav1.ObjectMeta{Namespace: assumedPod.Namespace, Name: assumedPod.Name, UID: assumedPod.UID},
+             Target: v1.ObjectReference{
+                 Kind: "Node",
+                 Name: suggestedHost,
+             },
+         })
+    }()
+}
+
+
+func (sched *Scheduler) schedule(pod *v1.Pod) (string, error) {
+    host, err := sched.config.Algorithm.Schedule(pod, sched.config.NodeLister)
+}
+
+func (sched *Scheduler) assumeVolumes(assumed *v1.Pod, host string) (allBound bool, err error) {
+    if utilfeature.DefaultFeatureGate.Enabled(features.VolumeScheduling) {
+        allBound, err = sched.config.VolumeBinder.Binder.AssumePodVolumes(assumed, host)
+    }
+}
+
+func (sched *Scheduler) assume(assumed *v1.Pod, host string) error {
+    // Optimistically assume that the binding will succeed and send it to apiserver
+    // in the background.
+    // If the binding fails, scheduler will release resources allocated to assumed pod
+    // immediately.
+    assumed.Spec.NodeName = host
+    // NOTE: Updates must be written to scheduler cache before invalidating
+    // equivalence cache, because we could snapshot equivalence cache after the
+    // invalidation and then snapshot the cache itself. If the cache is
+    // snapshotted before updates are written, we would update equivalence
+    // cache with stale information which is based on snapshot of old cache.
+    if err := sched.config.SchedulerCache.AssumePod(assumed); err != nil {
+        klog.Errorf("scheduler cache AssumePod failed: %v", err)
+
+        // This is most probably result of a BUG in retrying logic.
+        // We report an error here so that pod scheduling can be retried.
+        // This relies on the fact that Error will check if the pod has been bound
+        // to a node and if so will not add it back to the unscheduled pods queue
+        // (otherwise this would cause an infinite loop).
+        sched.config.Error(assumed, err)
+        sched.config.Recorder.Eventf(assumed, v1.EventTypeWarning, "FailedScheduling", "AssumePod failed: %v", err)
+        sched.config.PodConditionUpdater.Update(assumed, &v1.PodCondition{
+            Type:          v1.PodScheduled,
+            Status:        v1.ConditionFalse,
+            LastProbeTime: metav1.Now(),
+            Reason:        "SchedulerError",
+            Message:       err.Error(),
+        })  
+        return err 
+    }   
+    // if "assumed" is a nominated pod, we should remove it from internal cache
+    if sched.config.SchedulingQueue != nil {
+        sched.config.SchedulingQueue.DeleteNominatedPodIfExists(assumed)
+    }   
+
+    // Optimistically assume that the binding will succeed, so we need to invalidate affected
+    // predicates in equivalence cache.
+    // If the binding fails, these invalidated item will not break anything.
+    if sched.config.Ecache != nil {
+        sched.config.Ecache.InvalidateCachedPredicateItemForPodAdd(assumed, host)
+    }   
+    return nil 
+}
+
+func (sched *Scheduler) bind(assumed *v1.Pod, b *v1.Binding) error {
+    bindingStart := time.Now()
+    err := sched.config.GetBinder(assumed).Bind(b)
+    if finErr := sched.config.SchedulerCache.FinishBinding(assumed); finErr != nil {
+        klog.Errorf("scheduler cache FinishBinding failed: %v", finErr)
+    }   
+    sched.config.Recorder.Eventf(assumed, v1.EventTypeNormal, "Scheduled", "Successfully assigned %v/%v to %v", assumed.Namespace, assumed.Name, b.Target.Name)
+    return nil 
+}
+
+
+Multi schedulers could be lanched simmutanously in k8s
+PodSpec has schedulerName which could be used to notify which scheduler the pod want to be used

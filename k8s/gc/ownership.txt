@@ -9,7 +9,9 @@ object.metadata.ownerReferences
 
 when delete object there are three propatation policy
 1 forground:
-    owner will delete until all its children is deleted
+    owner will delete until all its children is deleted, the children are
+object which ownerReferences point to the target and blockOwnerDeleteion is 
+set to true.
 2 backgroud:
     owner will be delete immediately, gc will delete its children
 3 orphan:

@@ -1,0 +1,29 @@
+jx create ----> create a project
+
+import to github
+registr hook on github, then when code change in github
+jenkins pipeline could be triggered 
+
+
+release process
+build docker image
+push docker image to docker repository
+package the application to helm chart
+
+pull request trigger the ci job
+
+
+
+
+configure jenkins
+    set env variable
+    set account info and github hook
+
+    add jenkins in github from its Integration & services
+            add jenkins plugin 
+            set webhhook
+
+    in jenkins, create a freestyle project
+        github project
+        git as source code management tool
+        build trigger use github hook(build peroidically is also ok)

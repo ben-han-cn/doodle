@@ -1,0 +1,34 @@
+
+commit code   -->   unit & integration test --> deploy to test env --> acceptance test --> deploy to production env
+|--------- continuous integration ---------|
+|--------------------------------- continuous delivery  -----------------------------|
+|------------------------------------------   continuous deployment   --------------------------------------------|
+
+
+cd -- continuous delivery
+requirement analysis ---> development ---> QA  ---> operation team
+
+frequent release still keep the system stability:
+- Delta of code change is small
+- Release process is repeatable 
+
+
+ci --> automated acceptance testing --> configure management/deployment 
+ci = check out latest code --> compile --> run unit test
+automated acceptance testing: 
+    integration test 
+    acceptance test 
+    non-functional test(stablity, performance, security testing)
+configure management:
+    tracking and controlling the change in software and its env == app deployment
+    application monitoring, log analysis
+
+devops culture:
+    a single team is fully reponsible for development, quality assurance, operation
+
+
+
+
+
+make the build env/toolchain into a docker image, which will be 
+used to build the final binary

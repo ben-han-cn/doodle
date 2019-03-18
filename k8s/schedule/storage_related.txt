@@ -1,0 +1,75 @@
+volume binding occurs immediately by pv controller once a PersistentVolumeClaim 
+is created, In order for volume binding to take into account all of a pod's other 
+scheduling constraints, volume binding must be delayed until a Pod is being scheduled.
+
+type PersistentVolumeSpec struct {
+    ...
+    NodeAffinity *VolumeNodeAffinity
+}
+
+type VolumeNodeAffinity struct {
+    // these required constraints
+    Required *NodeSelector
+}
+
+type NodeSelector struct {
+    //The terms are ORed.
+    NodeSelectorTerms []NodeSelectorTerm 
+}
+
+type NodeSelectorTerm struct {
+    MatchExpressions []NodeSelectorRequirement
+    MatchFields []NodeSelectorRequirement 
+}
+
+
+bound pvc enforcement
+pvc already bind to a pv
+1 scheduler predicate: pod refer to a pvc which is bound to a pv with NodeAffinity
+predicate will evaluate the required NodeSelector to filter the nodes the pod can be
+scheduled to.
+2 kubelet will verify pv NodeAffinity against the Node when mounting the pvs.
+
+
+unbound pvc binding: Delayed Volume Binding
+type StorageClass struct {
+    BindingMode *BindingMode
+}
+
+type BindingMode string
+const (
+    BindingImmediate BindingMode = "Immediate"
+    BindingWaitForFirstConsumer BindingMode = "WaitForFirstConsumer"
+)
+
+
+work flow:
+1 Admin pre-provisions PVs and/or StorageClasses.
+2 User creates unbound PVC and there are no prebound PVs for it.
+3 NEW: PVC binding and provisioning is delayed until a pod is created that references it.
+4 User creates a pod that uses the PVC.
+5 Pod starts to get processed by the scheduler.
+6 Scheduler processes predicates.
+7 NEW: A new predicate function, called CheckVolumeBinding, will process both bound and 
+unbound PVCs of the Pod. It will validate the VolumeNodeAffinity for bound PVCs. For unbound 
+PVCs, it will try to find matching PVs for that node based on the PV NodeAffinity. If there 
+are no matching PVs, then it checks if dynamic provisioning is possible for that node based 
+on StorageClass AllowedTopologies.
+8 The scheduler continues to evaluate priority functions
+9 NEW: A new priority function, called PrioritizeVolumes, will get the PV matches per PVC per 
+node, and compute a priority score based on various factors.
+10 After evaluating all the predicates and priorities, the scheduler will pick a node.
+11 NEW: A new assume function, AssumePodVolumes, is called by the scheduler. The assume function 
+will check if any binding or provisioning operations need to be done. If so, it will update the 
+PV cache to mark the PVs with the chosen PVCs and queue the Pod for volume binding.
+12 AssumePod is done by the scheduler.
+13 NEW: If PVC binding or provisioning is required, a new bind function, BindPodVolumes, will be 
+called asynchronously, passing in the selected node. The bind function will prebind the PV to the 
+PVC, or trigger dynamic provisioning. Then, it waits for the binding or provisioning operation to 
+complete.
+14 In the same async thread, scheduler binds the Pod to a Node.
+15 Kubelet starts the Pod.
+
+
+Scheduler signal to the PV controller to start dynamic provisioning by setting the "annSelectedNode" 
+annotation in the PVC

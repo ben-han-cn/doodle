@@ -1,0 +1,10 @@
+key feature of load balance:
+1 service discovery
+2 health checking
+3 load balancing
+4 sticky sessions
+5 tls termination
+6 observability
+7 security and DoS mitigation
+8 configuration and control plane
+

@@ -1,2 +1,0 @@
-make the build env/toolchain into a docker image, which will be 
-used to build the final binary
