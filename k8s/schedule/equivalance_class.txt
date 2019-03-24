@@ -1,0 +1,68 @@
+Pods in Kubernetes cluster usually have identical requirements and constraints, 
+just think about a Deployment with a number of replications. So rather than 
+determining feasibility for every pending pod on every node, we can only do 
+predicates one pod per equivalence class – a group of tasks with identical 
+requirements, and reuse the predicate results for other equivalent pods.
+
+We hope to use this mechanism to help to improve scheduler's scalability, especially 
+in cases like Replication Controller with huge number of instances, or eliminate 
+pressure caused by complex predicate functions.
+
+The concept of equivalence class in scheduling is a proven feature used originally 
+in [Google Borg] .
+
+
+Equivalence class: a group of pods which has identical requirements and constraints.
+
+Equivalence class based scheduling: the scheduler will do predicate for only one pod 
+per equivalence class, and reuse this result for all other equivalent pods.
+
+
+Detailed Design
+1. Define equivalence class
+use controller reference, i.e. simply consider pods belonging to same controller reference 
+to be equivalent.
+
+2. Equivalence class in predicate phase
+Predicate is the first phase in scheduler to filter out nodes which are feasible to 
+run the workload. In detail:
+
+Predicates functions are registered in scheduler
+The predicates will be checked by scheduler.findNodesThatFit(pod, nodes, predicateFuncs ...).
+The check process scheduler.podFitsOnNode(pod, node, predicateFuncs ...) is executed in 
+parallel for every node.
+
+2.1 Design an equivalence class cache
+The step 3 is where registered predicate functions will be called against given pod and node. 
+This step includes:
+
+Check if given pod has equivalence class.
+If yes, use equivalence class cache to do predicate.
+In detail, we need to have an equivalence class cache to store all predicates results per node. 
+The data structure is a 3 level map with keys of the levels being: nodeName, predicateKey 
+and equivalenceHash.
+
+3. Keep equivalence class cache up-to-date
+The key of this equivalence class based scheduling is how to keep the equivalence cache up-to-date. 
+Since even one single pod been scheduled to a node will make the cached result not stand as the 
+available resource on this node has changed.
+
+One approach is that we can invalidate the cached predicate result for this node. But in a heavy 
+load cluster state change happens frequently and makes the design less meaningful.
+
+So in this design, we proposed the ability to invalidate cached result for specific predicate. 
+For example, when a new pod is scheduled to a node, the cached result for PodFitsResources should 
+be invalidated on this node while others can still be re-used. That's also another reason we use 
+predicate name as key for the cached value.
+
+During the implementation, we need to consider all the cases which may affect the effectiveness 
+of cached predicate result. The logic includes three dimensions:
+
+Operation:
+what operation will cause this cache invalid.
+Invalid predicates:
+what predicate should be invalidated.
+Scope:
+the cache of which node should be invalidated, or all nodes.
+Please note with the change of predicates in subsequent development, this doc will become out-of-date, 
+while you can always check the latest e-class cache update process in pkg/scheduler/factory/factory.go.

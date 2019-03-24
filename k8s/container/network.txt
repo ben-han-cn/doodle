@@ -1,0 +1,51 @@
+container network type:
+1 host networking
+    disable network isolation between container and host, all iterfaces
+and addresses on the host are visible within the container
+2 bridge networking (default)
+    container run in a private network internal to the host. Commuication
+between other container is through the bridge, Commuication with services
+outside the host goes through NAT
+    NAT and port mapping is implemented through iptable rules.
+
+3 Custom bridge networking
+    similar with Bridge neworking, but use a bridge explicitly crated for
+this container. (usage, db container connect to a exclusive bridge, another
+container has db accessment privilege connect to this bridge and default
+bridge)
+    $ docker network create mynetwork
+    $ docker run -it --rm --name=container-a --network=mynetwork busybox /bin/sh
+    $ docker run -it --rm --name=container-b --network=mynetwork busybox /bin/sh
+    
+4 container defined networking
+    a container can share the address and network configuration with another
+container.
+    $ docker run -it --rm --name=container-a busybox /bin/sh
+    $ docker run -it --rm --name=container-a --network=container:container-a busybox /bin/sh
+
+5 no networking
+    $ docker run -it --rm --name=container-a --net=none busybox /bin/sh
+    
+    
+
+
+
+overlay network:
+new l2 network based on underlaying l3 network (tunnel based on udp)
+
+container c1                         container c2
+     veth                               veth
+      |                                   |
+virtual switch(br0)               virtual switch(br0)
+      |                                   | 
+vtep (:4789/udp)                    vtep (:4789/udp)
+      |                                   |
+  host 1 network   ---------------    host 2 network
+
+
+messge (from c1 to c2 10.0.0.4)
+c1(10.0.0.3) -> br (br do arp broadcast) -> vtep return its own mac, this is 
+call ARP proxy
+vtep in host1 knows c2 through builtin gossip protocol
+
+vxlan add some info into ethereum frame which is used for vlan isolation

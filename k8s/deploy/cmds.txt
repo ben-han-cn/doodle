@@ -143,3 +143,14 @@ k -v (from 0 to 10) to print debug info
 
 //manually clean finalizer
 k patch ns cattle-system -p '{"metadata":{"finalizers": []}}' --type=merge
+
+
+
+//use token
+kubectl create serviceaccount k8dash-sa
+# Give that service account root on the cluster
+kubectl create clusterrolebinding k8dash-sa --clusterrole=cluster-admin --serviceaccount=default:k8dash-sa
+# Find the secret that was created to hold the token for the SA
+kubectl get secrets
+# Show the contents of the secret to extract the token
+kubectl describe secret k8dash-sa-token-xxxxx
