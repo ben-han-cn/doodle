@@ -7,3 +7,13 @@ generic type system & parametic polymorphism
 
 
 statefull class == method must be used in order
+
+functional vs imperative
+1 explicit vs  implicit
+functional program can be read as a series of equations
+whereas the imperative program has an overall effect which 
+isn't obvious from the program itself.
+
+2 replacement transparency
+all same varialbe in functional program can be replaced. 
+The value of same variable will be the same

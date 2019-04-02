@@ -18,7 +18,7 @@ splitSpaces str =
 2 basic types:
 bool
 char 
-string -> list[char]
+string -> list[char] //(:[]) :: a -> [a]
 
 read :: Read a => String -> a
 show :: show a =>  a -> String
@@ -28,7 +28,6 @@ Int -> fixed size integer
 
 floor :: (RealFrac a, Integral b) => a -> b
 fromIntegral :: (Integral a, Num b) => a -> b
-
 
 3 String, Text, ByteString:
 String is not efficient for text processing. It's generally
@@ -47,8 +46,6 @@ fromStrict :: ByteString -> LByteString
 
 toStrict    :: LText -> Text
                LByteString -> ByteString
-
-
 
 4 Data and Time
 UTCTime:            absolute time
@@ -136,6 +133,7 @@ length      :: [a] -> Int
 zip         :: [a] -> [b] -> [(a, b)]
 unzip       :: [(a, b)] -> ([a], [b])
 :           :: a -> [a] -> [a]
+:[]         :: a -> [a]
 ++          :: [a] -> [a] -> [a]
 !!          :: [a] -> Int -> a
 concat      :: [[a]] -> [a]
@@ -220,6 +218,86 @@ union           :: Ord k => Map k a -> Map k a -> Map k a //prefer left when con
 unionWith       :: Ord k => (a -> a -> a) -> Map k a -> Map k a -> Map k a 
 difference      :: Ord k => Map k a -> Map k a -> Map k a 
 intersection    :: Ord k => Map k a -> Map k a -> Map k a 
-10 module
+
+11 module
 names can be thought of as being arranged in a hierarchy but not
 part of the language definition.
+
+
+12 operator
+<$> (a -> b) -> f a -> f b
+<*> f (a -> b) -> f a -> f b
+
+pure (Applicative)  a -> f a 
+*> (Applicative) f a -> f b -> f b
+<* (Applicative) f a -> f b -> f a
+
+return (Monad)      a -> m a
+>> (Monad)  m a -> m b -> m b
+
+13 common typeclass
+Enum
+//minimal complete definition: toEnum, fromEnum
+class Enum a where
+    succ :: a -> a 
+    pred :: a -> a Source #
+    toEnum :: Int -> a Source #
+    fromEnum :: a -> Int Source #
+    enumFrom :: a -> [a]
+
+
+Foldable
+//minimal complete definition: foldMan | foldr
+class Foldable t where
+    foldMap  :: Monoid m => (a -> m) -> t a -> m
+    foldr    :: (a -> b -> b) -> b -> t a -> b
+    foldl    :: (b -> a -> b) -> b -> t a -> b
+    toList   :: t a -> [a]
+    null     :: t a -> Bool
+    length   :: t a -> Int
+    elem     :: Eq a => a -> t a -> Bool
+    maximum  :: Ord a => t a -> a
+    minimum  :: Ord a => t a -> a
+    sum      :: Num a => t a -> a
+    product  :: Num a => t a -> a
+
+Traversable
+It is commonly described as a way to traverse a data structure, mapping a function inside 
+a structure while accumulating the applicative contexts along the way.
+//minimal complete definition: traverse | sequenceA
+class (Functor t, Foldable t) => Traversable t where
+    -- Map each element of a structure to an action,
+    -- evaluate these actions from left to right, and
+    -- collect the results.
+    traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
+    -- Evaluate each action in the structure from
+    -- left to right, and collect the results.
+    sequenceA :: Applicative f => t (f a) -> f (t a)
+    [sequence :: (Monad m, Traversable t) => t (m a) -> m (t a)]
+
+Alternative
+//minimum complete definition: empty, (<|>)
+class Applicative f => Alternative f where
+    empty :: f a
+    <|>   :: f a -> f a -> f a
+    some  :: f a -> f [a]
+    many  :: f a -> f [a]
+
+
+14 QQ string
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE QuasiQuotes       #-}
+module WantedStrict where
+import Data.Aeson
+import Data.ByteString.Lazy (ByteString) import Text.RawString.QQ
+sectionJson :: ByteString
+sectionJson = [r|
+{ "section": {"host": "wikipedia.org"},
+"whatisit": {"red": "intoothandclaw"} }
+|]
+
+15 file/io
+import Data.ByteString
+type FilePath = String Source 
+readFile :: FilePath -> IO ByteString
+writeFile :: FilePath -> ByteString -> IO ()

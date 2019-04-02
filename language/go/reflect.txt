@@ -31,3 +31,26 @@ a := 10
 v = reflect.ValueOf(a)
 i = v // data part is the instance of reflect.Value 
 i = v.Interface() //data part is value of a
+
+
+nil is typed, and is default value for
+pointers, slices, maps, channels, functions, interfaces
+nil is predefined but not keywords, which means
+    var nil = 10 
+is valid
+
+nil interface == (nil type, nil value)
+var p *Persion
+var s fmt.Stringer = p
+s == nil // false , s == (*Persion, nil)
+don't return concrete error types
+
+
+const s1 = "string"
+s2 := "string" 
+s1 is untyped, it could be used to any place where the type could
+convert from string, for example 
+    type Foo string
+but s2 is typed, its type is string
+only const could be untyped (maybe because it will disappared at runtime, and will
+be converted to other type during compiling)

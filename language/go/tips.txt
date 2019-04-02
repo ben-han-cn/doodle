@@ -19,9 +19,5 @@ golang resourceleak:
     ticker := time.NewTicker(memoryCheckInterval)
     defer ticker.Stop()
 
-
-
-
-
 GO111MODULE=on
 go mod vendor

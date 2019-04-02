@@ -14,6 +14,7 @@ stack
         - time //optional, for Data and Time
         - time-lens //optional, for modify attirbute of time
         - aeson //for json 
+        - random // randomRIO
 
         default-extensions:
         - NoImplicitPrelude

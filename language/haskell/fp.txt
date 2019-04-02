@@ -4,5 +4,7 @@ type Strategy = [Move] -> Move
 alternate stragetyOne stragetyTwo moves 
   = map ($ moves) [stragetyOne, stragetyTwo] !! (length moves `rem` 2)
 
-$ :: (a -> b) -> a -> b
-($ a) :: (a -> b) -> b
+
+
+higher kind
+Functor :: (type -> type) -> constraint

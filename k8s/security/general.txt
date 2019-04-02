@@ -1,3 +1,25 @@
+security in general:
++ defense in depth
++ least privilege
++ limiting the attack surface
+
+
+api server 
+kubelet 
+close insecure port, in v1.10 insecure port is deprecated
+only authorized user can access, --anonymous-auth=false.
+
+The Center for Internet Security 
+    CIS Benchmark for Kubernetes
+    CIS Benchmark for Docker
+
+Penetration Testing
+     kube-hunter
+
+security image:
+    scan image, detect vulnerable code
+    rescan in regular base
+    
 kube-bench: CIS(center of internet security) k8s benchmark
     a list of tests to ensure basic best practices
     

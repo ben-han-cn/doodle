@@ -1,0 +1,40 @@
+Kernel functionality:
++ timer and system-clock handling, descriptor management, and process management
++ security: conventional unix model, sandboxing, virtualization, event auditing and
+  cryptographic services
++ memory management: paging and swapping 
++ generic system interface: I/O, control and multiplexing operations performed on 
+  descriptors
++ filesystem: files, directories, pathname translation, file locking, and I/O buffer
+  management
++ terminal handling support: the pseudo-terminal interface and terminal line disciplines
++ interprocess-communication facility: sockets
++ network communication
+
+
+System call:
+Normally implemented as a hardware trap that changes the CPU's execution mode and the 
+current address-space mapping. All system calls appear synchronous to applications.
+
+
+Signal:
+Signal are modeled after hardware interrupt. A process may specify a user-level subroutine
+to be a hanlder to which a signal should be delivered. When a signal is generated, it is
+blocked from further occurrence while it is being caught by handler. Catching a signal 
+involves saving the current process context and building a new one in which to run the 
+handler.
+
+
+Process groups and sessions:
+Processes are organized into Process groups. Process groups are used to control access to
+terminals and to provide a means of distributing signals to collections of related proceses.
+A terminal has a process-group identifier assigned to it. A job-control shell may create 
+several process groups associated with the same terminal, the terminal is the controlling 
+terminal for each process in these groups.
+
+A set of process groups can be collected into a session. The main uses for sessions are to
+create an isolated environment for a daemon process and its children, and to collect a user's
+login hsell and the jobs that shell spawns.
+
+FreeBSD implements the UNIX set-user-identity and set-group-identity permissions that allow
+programs executed by one user to operate with the privileges of another user or group.

@@ -47,3 +47,6 @@ The preceding example probably sounds simple, but it conveys the basic manner in
 computers operate.
 
 Katas originated in martial arts training, but the idea has spread beyond the dojo
+
+The prevailing belief at the time was that an operation system had to be written in
+assembly language to provide reasonable efficiency and to get access to the hardware.

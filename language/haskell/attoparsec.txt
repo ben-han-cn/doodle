@@ -1,0 +1,61 @@
+Data.Attoparsec.ByteString.Char8 //bytestring
+Data.Attoparsec.Text //text (unicode)
+
+Parser i a //i == input, a == result
+
+Data.Attoparsec.ByteString.Internal //bytestring
+type Parser = T.Parser ByteString
+
+Parsers:
+digit :: Parser Char
+space :: Parser Char
+char :: Char -> Parser Char
+char8 :: Char -> Parser Word8
+notChar :: Char -> Parser Char
+anyChar :: Parser Char
+string :: ByteString -> Parser ByteString
+//case insensitive
+stringCI :: ByteString -> Parser ByteString
+//consume input as long as the predicate returns 'True'
+//return the consumed input
+takeWhile :: (Char -> Bool) -> Parser B.ByteString 
+//opposite to takeWhile
+takeTill :: (Char -> Bool) -> Parser B.ByteString
+skipWhile :: (Char -> Bool) -> Parser ()
+skipSpace :: Parser ()
+satisfy :: (Char -> Bool) -> Parser Char
+    inClass :: String -> Char -> Bool //inClass "aeiou", inClass "a-nA-N"
+    notInClass :: String -> Char -> Bool
+take :: Int -> Parser ByteString
+//parse and decode an unsigned hexadecimal number
+hexadecimal :: (Integral a, Bits a) => Parser a
+decimal :: Integral a => Parser a
+//parse number with an optional leading +/-
+signed :: Num a => Parser a -> Parser a
+double :: Parser Double
+peekChar :: Parser (Maybe Char)
+endOfLine :: Parser ()
+
+
+Combinator:
+//attempt a parse, and if it failes rewind the input
+try :: Parser i a -> Parser i a 
+
+//word = many1 letter
+option :: Alternative f => a -> f a -> f a
+choice :: Alternative f => [f a] -> f a
+many1 :: Alternative f => f a -> f [a] //apply 1 to many times
+sepBy :: Alternative f => f a -> f s -> f [a]
+sepBy1 :: Alternative f => f a -> f s -> f [a]
+manyTill :: Alternative f => f a -> f b -> f [a]
+skipMany :: Alternative f => f a -> f ()
+skipMany1 :: Alternative f => f a -> f ()
+count :: Monad m => Int -> m a -> m [a]
+eitherP :: (Alternative f) => f a -> f b -> f (Either a b)
+
+
+Run:
+// Run a parser and print its result to standard output
+parseTest :: (Show a) => I.Parser a -> B.ByteString -> IO ()
+parse :: Parser a -> ByteString -> Result a
+parseOnly :: Parser a -> ByteString -> Either String a
