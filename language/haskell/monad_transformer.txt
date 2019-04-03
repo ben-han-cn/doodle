@@ -1,0 +1,45 @@
+newtype Compose f g a = Compose {getCompose :: f(g a)}
+kind of Compose: (* -> *) -> (* -> *) -> * -> * 
+
+Compose [Just 1, Nothing] :: Compose [] Maybe Int 
+
+//functor is composable, same with applicative
+instance (Functor f, Functor g) => Functor (Compose f g) where
+    fmap f (Compose fga) = Compose $ (fmap . fmap) f fga
+
+
+combine two general monad into one is impossible. In order to make the join
+happen, we need to reduce the polymorphism and get concrete information about
+one of the monads we are working with. And the other monad remains polymorphic as
+a variable type argument to our type constructor.
+
+MaybeT m a == m (Maybe a)  (MaybeT, runMaybeT)
+ExceptT e m a == m (Either e a) (ExceptT, runExceptT)
+  mapExceptT  :: (m (Either e a) -> n (Either e' b)) -> ExceptT e m a -> ExceptT e' n b 
+  withExceptT :: Functor m => (e -> e') -> ExceptT e m a -> ExceptT e' m a 
+  throwE      :: Monad m => e -> ExceptT e m a 
+  catchE      :: Monad m => ExceptT e m a -> (e -> ExceptT e' m a) -> ExceptT e' m a 
+
+ReaderT r m a == r -> m a (runReaderT)
+  ask    ::  Monad m => ReaderT r m r 
+  local  ::  (r -> r) -> ReaderT r m a -> ReaderT r m a 
+  asks   ::  Monad m => (r -> a) -> ReaderT r m a 
+
+StateT s m a == s -> m (a, s) (StateT, runStateT)
+  evalStateT :: Monad m => StateT s m a -> s -> m a 
+  execStateT :: Monad m => StateT s m a -> s -> m s 
+  mapStateT  :: (m (a, s) -> n (b, s)) -> StateT s m a -> StateT s n b 
+  withStateT :: (s -> s) -> StateT s m a -> StateT s m a 
+  get ::     Monad m => StateT s m s 
+  put ::     Monad m => s -> StateT s m ()
+  modify ::  Monad m => (s -> s) -> StateT s m ()
+  modify' :: Monad m => (s -> s) -> StateT s m () // the computation is strict
+  gets ::    Monad m => (s -> a) -> StateT s m a 
+
+(m is the base monad which is structurally outermost)
+
+class MonadTrans t where
+  lift :: Monad m => m a -> t m a  //like return in monad, wrap type in container/context
+
+class (Monad m) => MonadIO m where //lift io into m, but don't ask any particular innser structure for m
+  liftIO :: IO a -> m a 

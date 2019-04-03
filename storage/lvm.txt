@@ -1,7 +1,10 @@
 lvm (logical volume management)
-physical volumn --> physical device
-volume group  ---> logical device
-logical volumn ---> equivalent to partition, but could span several hard driver
+physical volumn (PV)--> physical storage like partitions or whole disks
+volume group  (VG)---> logical device
+physical extents (PE) --> same-size chunks included in VG
+logical extents (LE) --> abstract chucnks of storage mapped by lvm to PE in a VG
+logical volumn (LV) ---> virtual disk device made up of LEs, must always contain
+at least one LE, but more can be added and removed in real-time as needed.
 
 device/driver ---> /dev/sda
 partition     ---> /dev/sda1, /dev/sda2, one partition one file system

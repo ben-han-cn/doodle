@@ -21,3 +21,6 @@ golang resourceleak:
 
 GO111MODULE=on
 go mod vendor
+
+
+go test $(go list ./... | grep -v /vendor/)
