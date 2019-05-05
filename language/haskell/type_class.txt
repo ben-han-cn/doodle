@@ -1,0 +1,56 @@
+//minimal complete definition: toEnum, fromEnum
+class Enum a where
+    toEnum :: Int -> a 
+    fromEnum :: a -> Int 
+
+    succ :: a -> a 
+    pred :: a -> a 
+    enumFrom :: a -> [a]
+
+//minimal complete definition: foldMan | foldr
+//collapse a structure to get one value
+class Foldable t where
+    foldMap  :: Monoid m => (a -> m) -> t a -> m
+    foldr    :: (a -> b -> b) -> b -> t a -> b
+
+    foldl    :: (b -> a -> b) -> b -> t a -> b
+    toList   :: t a -> [a]
+    null     :: t a -> Bool
+    length   :: t a -> Int
+    elem     :: Eq a => a -> t a -> Bool
+    maximum  :: Ord a => t a -> a
+    minimum  :: Ord a => t a -> a
+    sum      :: Num a => t a -> a
+    product  :: Num a => t a -> a
+
+//minimal complete definition: fmap 
+class Functor f where
+    <$> fmap :: (a -> b) -> f a -> f b
+
+//minimal complete definition: <*>, pure
+//thread the effect 
+class Functor f => Applicative f where
+    (<*>) :: f (a -> b) -> f a -> f b
+    pure :: a -> f a
+
+It is commonly described as a way to traverse a data structure, mapping a function inside 
+a structure while accumulating the applicative contexts along the way.
+//minimal complete definition: traverse | sequenceA
+class (Functor t, Foldable t) => Traversable t where
+    -- Map each element of a structure to an action,
+    -- evaluate these actions from left to right, and
+    -- collect the results.
+    traverse :: Applicative f => (a -> f b) -> t a -> f (t b)
+    traverse f = sequenceA . fmap f 
+    -- Evaluate each action in the structure from
+    -- left to right, and collect the results.
+    sequenceA :: Applicative f => t (f a) -> f (t a)
+
+Alternative
+//minimum complete definition: empty, (<|>)
+class Applicative f => Alternative f where
+    empty :: f a
+    <|>   :: f a -> f a -> f a
+
+    some  :: f a -> f [a]
+    many  :: f a -> f [a]

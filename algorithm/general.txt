@@ -1,0 +1,11 @@
+7 essential algorithms
+1 PageRank
+2 Key exchange encryption
+3 Backpropagation
+4 Compression
+5 Searching and Sort
+    quicksort, mergesort, bubble, heapsort
+6 dijkstra's shortest path
+7 TCP/IP routing protocol
+  DVRPA(distance-vecotr routing protocol algorithm)
+  LSRPA(link-state routing protocol algorithm)

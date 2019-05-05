@@ -99,3 +99,15 @@ local tracking branch
     git br -vv //show branch and it's tracking branch
     it's tracking remote tracking branch
     git pull //update remote tracking branch, then merge with local tracking branch
+
+git checkout . //revert all local changes
+git diff --staged //including those added to the index
+git branch -m old-name new-name //git rename branch
+git whatchanged --since='2 weeks ago'
+
+//remove file from last commit
+git rm --cached <file-to-remove>
+git commit --amend
+
+//clean local repo
+git gc --prune=now --aggressive

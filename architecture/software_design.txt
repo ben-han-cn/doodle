@@ -1,0 +1,6 @@
+1 prefer deep class(interface) to shallow class
+    deep class means simple abstraction hide very much implementation detail
+    like linux file interface
+2 make interface hard to make mistake, hide the exception to let 
+  callee to think less
+3 working code isn't enough, keep clean code always

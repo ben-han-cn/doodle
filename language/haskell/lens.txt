@@ -1,0 +1,113 @@
+TemplateHaskell
++ Lens
+A universal API for immutable data access and modification.
+
+lens :: (s -> a) -> (s -> a -> s) -> Lens' s a
+
+import Control.Lens
+import Control.Lens.TH
+
+data Student = Student 
+  { _name :: Text
+  , _age  :: Int
+  }
+makeLenses ''Student
+=>
+name :: Lens' Student Text
+name = lens _name (\s n -> s { _name = n})
+
+ben = Student "ben" 32
+ben ^. name
+ben & name .~ "benjamin"
+
+view :: Lens' s a -> s -> a      (^.)
+set :: Lens' s a -> s -> a -> s  (.~)
+
+
++ lens composibility
+la :: Lens' s x
+lb :: Lens' x a
+la . lb :: Lens' s a
+
+data SocialMedia = SocialMedia 
+  { _smTwitter :: Text }
+makeLenses ''SocialMedia
+
+data Person = Person
+  { _pName :: Text
+  , _pSMedia :: SocialMedia
+  }
+makeLenses ''Person
+
+ben = Person "ben" $ SocialMedia "ben@twitter.com"
+ben ^. pSMedia . smTwitter
+ben & pSMedia . smTwitter .~ "rb@ben.com"
+
+-- chain multiple update
+ben
+  & pName .~ "benjamin"
+  & pSMedia . smTwitter .~ "rbsdd@twitter.com"
+
+ben & pSMedia . smTwitter %~ ("https://twitter.com/" <>)
+
+%~ == apply function)
+<>~ == append
+
+
+Prism: lens when uncertian path
+model the constructors of Sum types and the values within 
+each constructor which may or may not be present
+
+import Control.Lens
+
+data UserID = InternalId Int | TwitterUser Text
+makePrisms ''UserID
+==
+_InternalId :: Prism UserID Int
+_TwitterUser :: Prism UserID Text
+
+data Person = Person 
+  { _personId :: UserID 
+  }
+makeLenses ''Person
+
+p = Person (InternalId 4)
+p ^? personId . _InternalId == Just 4
+p ^? personId . _TwitterUser == Nothing 
+^? == preview :: Prism' s a -> s -> Maybe a
+reivew :: Prism' s a -> a -> s
+p & personId . _InternalId .~ 42
+
+
+
++ Traversals 
+
+
+type Lens' s a = Functor f => (a -> f a) -> s -> f s
+type Getter' a s a  = (a -> Const a a) -> (s -> Const a s) // (a -> a) -> (s -> a)
+type Setter' s a   = (a -> Identity a) -> (s -> Identity s) // (a -> a) -> (s -> s)
+
+
+
+lens is semantic editor combinators 
+
+comb1 is from left to right which will move between the data struct
+mutator is the function apply to the data
+(<comb1> . <comb2> . <comb3>) <mutator> d1
+semantic-editor-combinator == (comb*) <mutator>
+semantic-editor-combinator can also chained together
+let c05 = (inPos 0) (const 5)
+let c06 = (inPos 0) (const 6)
+(c05 . c06) [0,1]  ==> [5, 1]
+(c06 . c05) [0,1]  ==> [6, 1]
+semantic-editor-combinator is applied from right to left
+
+countE :: Num n => Event b -> Event (b,n)
+countE_ :: Num n => Event b -> Event n
+countE_ = (result.fmap) snd countE 
+
+snapshot :: Event a -> Reactive b -> Event (a,b)
+snapshot_ :: Event a -> Reactive b -> Event b
+snapshot_ = (result.result.fmap) snd snapshot
+
+

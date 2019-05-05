@@ -1,0 +1,12 @@
+1 OverlappingInstances
+    class Foo a where
+        foo :: a -> String
+
+    instance Foo a => Foo [a] where
+        foo = concat . intersperse ", " . map foo
+
+
+    instance Foo String where 
+        foo = id
+
+String is overlapped with [a], GHC will use more specific implementation 

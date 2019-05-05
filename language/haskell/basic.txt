@@ -25,6 +25,7 @@ show :: show a =>  a -> String
 
 Integer 
 Int -> fixed size integer
+Word (unsigned Int)
 
 floor :: (RealFrac a, Integral b) => a -> b
 fromIntegral :: (Integral a, Num b) => a -> b
@@ -33,6 +34,7 @@ fromIntegral :: (Integral a, Num b) => a -> b
 String is not efficient for text processing. It's generally
 frowned upon, and it's best to avoid it for public APIs.
 Text: a array of unicode characters
+ByteString.Char8: a array of ascii code 
 ByteString: same with []byte in golang
 LText, LByteString is the lazy version of Text and ByteString
 
@@ -144,9 +146,18 @@ take        :: Int -> [a] -> [a]
 drop        :: Int -> [a] -> [a]
 splitAt     :: Int -> [a] -> ([a], [a])
 reverse     :: [a] -> [a]
+break,span  :: (a -> Bool) -> [a] -> ([a], [a])
+isPrefixOf, isSuffixOf, isInfixOf :: [a] -> [a] -> Bool
+elem        :: a -> t a -> Bool
+notElem     :: a -> t a -> Bool
+filter      :: (a -> Bool) -> [a] -> [a]
 
 sum         :: [a] -> a
 product     :: [a] -> a
+
+special for string:
+lines       :: String -> [String]
+words       :: String -> [String]
 
 
 8 algebra data type 
@@ -297,7 +308,43 @@ sectionJson = [r|
 |]
 
 15 file/io
-import Data.ByteString
+import Data.ByteString(Data.ByteString.Lazy) //strict and lazy both provoid 
+                                             //readFile,writeFile
 type FilePath = String Source 
-readFile :: FilePath -> IO ByteString
+readFile :: FilePath -> IO ByteString //this is lazy read
 writeFile :: FilePath -> ByteString -> IO ()
+interact :: (String -> String) -> IO ()
+pack :: [Word8] -> ByteString
+unpack :: ByteString -> [Word8]
+
+-- this code could handle file size bigger than memory
+-- writeFile won't keep all the string in memory
+main = do
+  inpStr <- readFile "input.txt"
+  writeFile "output.txt" (map toUpper inpStr)
+
+System.FilePath (splitFileName, (</>), dropTrailingPathSeparator, 
+replaceExtension, takeExtension, getPermissions)
+takeExtension "foo/bar.c" => ".c"
+splitFileName "foo/bar" => ("foo/", "bar")
+"foo" </> "bar" => "foo/bar"
+dropTrailingPathSeparator "foo/" => "foo"
+getPermissions "." => Permissions {readable = True, writable = True, 
+executable = False, searchable = True}
+
+import System.Directory (doesDirectoryExist, doesFileExist,
+getCurrentDirectory, getDirectoryContents, renameDirectory, renameFile)
+
+16 vector
+import qualified Data.Vector as V
+V.fromList [1..10000]
+
+
+17 GADT 
+data constructor carry information about result type
+data IntBool a where
+    Int :: Int -> IntBool Int
+    Bool :: Bool -> IntBool Bool
+
+compared with
+data IntBool a = Int Int | Bool Bool 

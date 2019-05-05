@@ -4,7 +4,28 @@ type Strategy = [Move] -> Move
 alternate stragetyOne stragetyTwo moves 
   = map ($ moves) [stragetyOne, stragetyTwo] !! (length moves `rem` 2)
 
-
-
 higher kind
 Functor :: (type -> type) -> constraint
+
+2 structure/record is same with a function
+
+data FileInfo = FileInfo
+  { fiPath :: FilePath
+  , fiPerm :: Permission
+  , fiSize :: Integer
+  , fiLastModified :: ClockTime
+  }
+
+type Infop a = FilePath -> Permission -> Int -> ClockTime -> a
+
+fiPath, fiPerm, ... is subset of Infop
+Infop could also a function which calculated from attributes of a FileInfo
+
+sizeP :: Infop Integer
+sizeP _, _, size, _ = size
+
+equalP :: (Eq a) => Infop a -> a -> Infop Bool
+equalP f k = \w x y z -> f w x y z == k
+
+use Infop make all the attribute accessment like a function call, and this 
+functions could be chained

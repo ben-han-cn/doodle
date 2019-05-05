@@ -43,7 +43,6 @@ eviction order (1.9 and above):
 
 node resources reverse with labels/selectors
 
-
 language runtime has no cgroup aware, which make them see all the resources on the host
 which could make bad tunning decision, use configmap to pass the parameter will be a 
 good idea.

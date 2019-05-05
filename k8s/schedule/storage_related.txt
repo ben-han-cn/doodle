@@ -97,6 +97,7 @@ object, and provision a volume based on those topology values. In the common use
 supporting a single topology domain, if nodeName is set, then allowedTopologies can be ignored by 
 the provisioner. However, multi-domain volume provisioners may still need to look at allowedTopologies 
 to restrict the remaining domains.
+allowedTopologies allow storage resources can now understand where they live.
 
 In-tree provisioners:
 Provision(selectedNode *v1.Node, allowedTopologies *storagev1.VolumeProvisioningTopology) (*v1.PersistentVolume, error)
@@ -163,11 +164,13 @@ AssumePodVolumes(pod *v1.pod, node *v1.node) (pvcbindingrequired bool, err error
 Bind
 A separate go routine performs the binding operation for the Pod.
 
-If AssumePodVolumes returns pvcBindingRequired, then BindPodVolumes is called first in this go routine. It will handle binding and provisioning of PVCs that were assumed, and wait for the operations to complete.
+If AssumePodVolumes returns pvcBindingRequired, then BindPodVolumes is called first in this go routine. It will 
+handle binding and provisioning of PVCs that were assumed, and wait for the operations to complete.
 
 Once complete, or if no volumes need to be bound, then the scheduler continues binding the Pod to the Node.
 
-For the alpha phase, the BindPodVolumes function will be directly called by the scheduler. We’ll consider creating a generic scheduler interface in a subsequent phase.
+For the alpha phase, the BindPodVolumes function will be directly called by the scheduler. We’ll consider creating 
+a generic scheduler interface in a subsequent phase.
 
 BindPodVolumes(pod *v1.Pod, node *v1.Node) (err error)
 1 For pre-provisioned PV binding:
@@ -184,7 +187,8 @@ TODO: pv controller has a high resync frequency, do we need something similar fo
 
 
 Access Control
-Scheduler will need PV update permissions for prebinding pre-provisioned PVs, and PVC update permissions for triggering dynamic provisioning.
+Scheduler will need PV update permissions for prebinding pre-provisioned PVs, and PVC update permissions for triggering 
+dynamic provisioning.
 
 Caching
 There are two new caches needed in the scheduler.
@@ -210,7 +214,9 @@ through all the PVs again in priority and assume functions.
 
 Event handling
 Move pods into active queue
-When a pod is tried and determined to be unschedulable, it will be placed in the unschedulable queue by scheduler. It will not be scheduled until being moved to active queue. For volume topology scheduling, we need to move pods to active queue in following scenarios:
+When a pod is tried and determined to be unschedulable, it will be placed in the unschedulable queue by scheduler. 
+It will not be scheduled until being moved to active queue. For volume topology scheduling, we need to move pods to 
+active queue in following scenarios:
 
 + on PVC add
 
@@ -218,26 +224,38 @@ Pod which references nonexistent PVCs is unschedulable for now, we need to move 
 
 + on PVC update
 
-The proposed design has the scheduler initiating the binding transaction by prebinding the PV and waiting for PV controller to finish binding and put it back in the schedule queue. To achieve this, we need to move pods to active queue on PVC update.
+The proposed design has the scheduler initiating the binding transaction by prebinding the PV and waiting for PV 
+controller to finish binding and put it back in the schedule queue. To achieve this, we need to move pods to active queue 
+on PVC update.
 
 + on PV add
 
-Pods created when there are no PVs available will be stuck in unschedulable queue. But unbound PVs created for static provisioning and delay binding storage class are skipped in PV controller dynamic provisioning and binding process, will not trigger events to schedule pod again. So we need to move pods to active queue on PV add for this scenario.
+Pods created when there are no PVs available will be stuck in unschedulable queue. But unbound PVs created for 
+static provisioning and delay binding storage class are skipped in PV controller dynamic provisioning and binding process, 
+will not trigger events to schedule pod again. So we need to move pods to active queue on PV add for this scenario.
 
 + on PV update
 
-In scheduler assume process, if volume binding is required, scheduler will put pod to unschedulable queue and wait for asynchronous volume binding updates are made. But binding volumes worker may fail to update assumed pod volume bindings due to conflicts if PVs are updated by PV controller or other entities. So we need to move pods to active queue on PV update for this scenario.
+In scheduler assume process, if volume binding is required, scheduler will put pod to unschedulable queue and wait for 
+asynchronous volume binding updates are made. But binding volumes worker may fail to update assumed pod volume bindings 
+due to conflicts if PVs are updated by PV controller or other entities. So we need to move pods to active queue on PV update 
+for this scenario.
 
 + on Storage Class add
 
-CheckVolumeBindingPred will fail if pod has unbound immediate PVCs. If these PVCs have specified StorageClass name, creating StorageClass objects with late binding for these PVCs will cause predicates to pass, so we need to move pods to active queue when a StorageClass with WaitForFirstConsumer is added.
+CheckVolumeBindingPred will fail if pod has unbound immediate PVCs. If these PVCs have specified StorageClass name, creating 
+StorageClass objects with late binding for these PVCs will cause predicates to pass, so we need to move pods to active queue 
+when a StorageClass with WaitForFirstConsumer is added.
 
 Invalidate predicate equivalence cache
-Scheduler now have an optional equivalence cache to improve scheduler's scalability. We need to invalidate CheckVolumeBinding/NoVolumeZoneConflict predicate cached results in following scenarios to keep equivalence class cache up to date:
+Scheduler now have an optional equivalence cache to improve scheduler's scalability. We need to invalidate 
+CheckVolumeBinding/NoVolumeZoneConflict 
+predicate cached results in following scenarios to keep equivalence class cache up to date:
 
 + on PVC add/delete
 
-When PVCs are created or deleted, available PVs to choose from for volume scheduling may change, we need to invalidate CheckVolumeBinding predicate.
+When PVCs are created or deleted, available PVs to choose from for volume scheduling may change, we need to invalidate 
+CheckVolumeBinding predicate.
 
 + on PVC update
 
@@ -245,12 +263,15 @@ PVC volume binding may change on PVC update, we need to invalidate CheckVolumeBi
 
 + on PV add/delete
 
-When PVs are created or deleted, available PVs to choose from for volume scheduling will change, we need to invalidate CheckVolumeBinding predicate.
+When PVs are created or deleted, available PVs to choose from for volume scheduling will change, we need to 
+invalidate CheckVolumeBinding predicate.
 
 + on PV update
 
-CheckVolumeBinding predicate may cache PVs in pod binding cache. When PV got updated, we should invalidate cache, otherwise assume process will fail with out of sync error.
+CheckVolumeBinding predicate may cache PVs in pod binding cache. When PV got updated, we should invalidate cache, otherwise 
+assume process will fail with out of sync error.
 
 + on StorageClass delete
 
-When a StorageClass with WaitForFirstConsumer is deleted, PVCs which references this storage class will be in immediate binding mode. We need to invalidate CheckVolumeBinding and NoVolumeZoneConflict.
+When a StorageClass with WaitForFirstConsumer is deleted, PVCs which references this storage class will be in immediate 
+binding mode. We need to invalidate CheckVolumeBinding and NoVolumeZoneConflict.

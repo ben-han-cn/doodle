@@ -82,7 +82,6 @@ Data.Vector (Mutable Vectors: Data.Vector.Mutable)
 Data.Text(Data.Text.Lazy)
 Data.ByteString(Data.ByteString.Lazy)
 
-
 MonadTrans, MonadBase, MonadTransControl, MonadPlus, Alternative, MonadError, MonadThrow, MonadCatch
 
 term -> type -> kind
@@ -90,6 +89,9 @@ type has term is inhabited type,
 maybe isnot inhabited type, they are type constructors.
 kind is the way to distinguish the difference between these types.
     kind of inhabited type is * 
+:k Maybe => * -> *
+:k Show  => * -> GHC.Prim.Constraint //Show is typeclass
+:k Functor =>  (* -> *) -> GHC.Prim.Constraint
 
 data Either a b = Left a | Right b
 Either is type constructor, kind of Either is * -> * -> *

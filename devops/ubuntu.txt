@@ -2,3 +2,7 @@ apt only use ipv4
 1 echo 'Acquire::ForceIPv4 "true";' | sudo tee /etc/apt/apt.conf.d/99force-ipv4
 2 -o Acquire::ForceIPv4=true
 
+
+disable automic upgrade
+/etc/apt/apt.conf.d/10periodic
+
