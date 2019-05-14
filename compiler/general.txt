@@ -40,3 +40,18 @@ LOAD           0x000154 0x08049154 0x08049154 0x00004 0x00004 RW  0x1000
 
 load segment will be loaded into process memory space, the entry is sorted by virtual address.
 use pmap $Pid will get the same memory layout
+
+
+Optimization in general:
+Inline
+Unroll (and vectorize)
+CSE (common subexpression elimination)
+DCE (dead code elimination)
+Code Motion
+    move code outside the body of a loop
+Constant Fold
+Peephole
+    delete useless operations
+    replace several operation with one equivalent
+    use algebraic laws to simplify or reorder instructions
+    use instructions designed for special oprand cases

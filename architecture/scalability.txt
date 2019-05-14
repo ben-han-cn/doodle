@@ -1,0 +1,9 @@
+database level:
+fedaration:
+    based on functionality, split data into different host
+sharding:
+    based on query key, split data into different host
+denormalization:
+    improve read performance at the expense of some write 
+performance. Redundant copies of the data are written in
+multiple tables to avoid expensive join.

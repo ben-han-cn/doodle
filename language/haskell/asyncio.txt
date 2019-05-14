@@ -1,0 +1,30 @@
+data Async a
+instance of Functor, Ord, Eq, Hashable
+
+async :: IO a -> IO (Async a)
+spawn an asynchronous action in a seperate thread
+
+wait :: Async a -> IO a //exception will be rethrow
+wait an asynchronous action to complete
+
+waitCatch :: Async a -> IO (Either SomeException a)
+
+poll :: Async a -> IO (Maybe (Either SomeException a))
+if async isnot completed return Nothing
+otherwise if async done return Right a
+otherwise Left ex
+
+cancel :: Async a -> IO ()
+cancel an asynchronous action by throwing AsyncCancelled to it,
+and waiting for the thread to quit, if async already completed,
+this function has no effect
+
+waitAny:: [Async a] -> IO (Async a, a)
+waitAnyCatch :: [Async a] -> IO (Async a, Either SomeException a)
+wait for multi async aciton to complete, return the first complete 
+one and the result that would be returned by wait on that async
+
+waitEither ::       Async a -> Async b -> IO (Either a b)
+waitEitherCancel :: Async a -> Async b -> IO (Either a b)
+same with waitEither, but cancel the other before return.
+waitBoth :: Async a -> Async b -> IO (a, b)

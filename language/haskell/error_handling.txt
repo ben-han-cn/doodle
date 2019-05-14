@@ -1,0 +1,41 @@
+import Control.Monad.Error
+
+-- This is the type to represent length calculation error.
+data LengthError = EmptyString  
+          | StringTooLong Int  
+          | OtherError String   
+
+-- make LengthError throwable
+instance Error LengthError where
+  noMsg    = OtherError "A String Error!"
+  strMsg s = OtherError s
+
+instance Show LengthError where
+  show EmptyString = "The string was empty!"
+  show (StringTooLong len) =
+      "The length of the string (" ++ (show len) ++ ") is bigger than 5!"
+  show (OtherError msg) = msg
+
+
+type LengthMonad = ErrorT String IO
+
+main = do
+  r <- runErrorT calculateLength
+  reportResult r
+
+calculateLength :: LengthMonad Int
+calculateLength = do
+  liftIO $ putStrLn "Please enter a non-empty string: "
+  s <- liftIO getLine
+  if null s
+    then throwError "The string was empty!"
+    else return $ length s
+
+reportResult :: Either String Int -> IO ()
+reportResult (Right len) = putStrLn ("The length of the string is " ++ (show len))
+reportResult (Left e) = putStrLn ("Length calculation failed with error: " ++ (show e))
+
+
+class Monad m => MonadError e m | m -> e where
+  throwEroror :: e -> m a
+  catchError :: m a -> (e -> m a) -> m a

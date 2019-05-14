@@ -154,3 +154,6 @@ hard limit --> maximum value that is allowed for soft limit
 
 //find which process is using the files
 fuser -vu github.com/zdnscloud/singlecloud/pkg
+
+youtube-dl --extract-audio --audio-format mp3 <video URL>
+

@@ -90,3 +90,26 @@ T: 'a ---> T can be any type, but if it contains any reference, the lifetime
 of reference >= 'a //samilar with 'b: 'a --> 'b >= 'a
 
 trait object should be a reference, its default lifetime is static
+
+
+
+//Cow -- clone on write
+const OPT_DEFAULT_AUTHORITY: &[u8] = b"grpc.default_authority\0";
+pub struct ChannelBuilder {
+    options: HashMap<Cow<'static, [u8]>, Options>,
+}
+
+pub fn default_authority<S: Into<Vec<u8>>>(mut self, authority: S) -> ChannelBuilder {
+    let authority = CString::new(authority).unwrap();
+    self.options.insert(
+            Cow::Borrowed(OPT_DEFAULT_AUTHORITY),
+            Options::String(authority),
+            );
+    self
+}
+
+pub fn raw_cfg_int(mut self, key: CString, val: i32) -> ChannelBuilder {
+        self.options
+            .insert(Cow::Owned(key.into_bytes_with_nul()), Options::Integer(val));
+        self
+    }

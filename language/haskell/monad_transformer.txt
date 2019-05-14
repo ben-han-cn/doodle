@@ -20,7 +20,7 @@ ExceptT e m a == m (Either e a) (ExceptT, runExceptT)
   throwE      :: Monad m => e -> ExceptT e m a 
   catchE      :: Monad m => ExceptT e m a -> (e -> ExceptT e' m a) -> ExceptT e' m a 
 
-ReaderT r m a == r -> m a (runReaderT)
+ReaderT r m a == r -> m a (ReaderT, runReaderT)
   ask    ::  Monad m => ReaderT r m r 
   local  ::  (r -> r) -> ReaderT r m a -> ReaderT r m a 
   asks   ::  Monad m => (r -> a) -> ReaderT r m a 
@@ -43,3 +43,5 @@ class MonadTrans t where
 
 class (Monad m) => MonadIO m where //lift io into m, but don't ask any particular innser structure for m
   liftIO :: IO a -> m a 
+
+

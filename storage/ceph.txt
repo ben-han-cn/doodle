@@ -1,5 +1,12 @@
 ceph /sef/ 
 
+unified storage:
+block device
+filesystem
+object
+
+rdb -- kernel module to support ceph block device
+
 user space distributed application
 based on hosts filesystem
 provide several interface
@@ -11,6 +18,7 @@ metadata node + monitor node + osd(object storage device) node
 monitor node has the cluster info
 osd handle the data replication and management
 metadata node has the attribute for objects including file system info
+(block and object store doesn't need metadata daemon)
 
 object look up is done by library(CRUSH algorithm: controlled replication under scalable hash)
 mintor use paxo as consensus algorithm
@@ -44,3 +52,6 @@ it's a logic container holding multiple objects, such that the logic container i
 mapped to multiple OSDs.
 
 PG --> a acting set( a set of OSDs, first OSD is the primary)
+
+pool is logic partition, pool includes PG, PG has object, PG is the basic replication unit.
+which will be saved in different OSDs.

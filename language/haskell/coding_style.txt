@@ -1,0 +1,35 @@
+1 use guard to avoid nested case 
+atMostThreePictures :: Iterator [FilePath]
+atMostThreePictures paths info 
+  | length paths == 3 = Done paths
+  | isDirectory info && takeFileName path == ".svn"
+    = Skip paths
+  | extension `elem` [".jpg", ".png"]
+    = Continue (path : paths)
+  | otherwise
+    = Continue paths
+  where 
+    extension = map toLower (takeExtension path)
+    path = infoPath info
+
+2 monad is kind of a control flow, the implementation of
+monad to decide, after execute the computation, based on
+the result what to do next
+(==>) :: Parse a -> (a -> Parse b) -> Parse b
+firstParser ==> secondParser = Parse chainedParser 
+  where 
+    chainedParser initState =
+      case runParse firstParser initState of 
+        Left errMessage -> Left errMessage
+        Right (firstResult, newState) ->
+          runParse (secondParser firstResult) newState
+
+3 newtype is a type alias, normally it defines two funciton
+to convert between newtype and the aliased type:
+  newtype Parse a = Parse { runParse :: ParseState -> Either String (a, ParseState) }
+  Parse :: ParseState -> Either String (a, ParseState) -> Parse a
+  runParse :: Parse a -> ParseState -> Either String (a, ParseState)
+
+4 avoid add type constraint to new type definition, it will force you
+to add type contraints to every function that will operate on values of that type,
+instead add type constraint to the function really needs it.

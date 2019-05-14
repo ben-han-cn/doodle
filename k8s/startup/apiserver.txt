@@ -1,0 +1,4 @@
+k8s.io/kubernetes/pkg/master
+create default namespace
+create kuberentes service
+create kubernetes endpoint

@@ -69,3 +69,6 @@ simple k8s:
 
 client:
     rust: https://github.com/ynqa/kubernetes-rust
+
+test:
+    https://github.com/Comcast/kuberhealthy
