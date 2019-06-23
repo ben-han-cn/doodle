@@ -1,0 +1,22 @@
+variance is a property of the type-constructors (build type with type parameter).
+If type-constructors has multiple parameters, then variance is computed with respect
+to each parameter individually.
+
+Three type of variance:
+F<T> is covariant over T if F<Subtype> is subtype of F<Supertype>
+F<T> is contravariant over T if F<Subtype> is supertype of F<Supertype>
+F<T> is invariant over T if F<Subtype> is neither a subtype nor a supertype of F<Supertype>
+
+for lifetime 'a, if 'a is subtype of 'b means, 'a is longer than 'b, 'static is the subtype
+of all lifetime
+
+                        'a                T                U
+&'a T                covariant        covariant
+&'a mut T            covariant        invariant
+Box<T>                                covariant
+Vec<T>                                covariant
+UnsafeCell<T>                         invariant
+Cell<T>                               invariant
+fn(T) -> U                            covariant       covariant
+*const T                              covariant
+*mut T                                invariant

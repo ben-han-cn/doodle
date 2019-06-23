@@ -60,7 +60,6 @@ let result;
 print!("{:?}", *result);
 
 
-
 lifetime subtyping
 struct Context<'a> (&'a str);
 //context will live longer than parser

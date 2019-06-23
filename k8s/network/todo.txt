@@ -1,0 +1,10 @@
+https://github.com/intel/multus-cni
+    attach multi ether into one pod
+
+https://github.com/hustcat/sriov-cni
+    support nic with SR-IOV(single root, i/o virtualization) capabilities.
+    physical functions(PFs) used by host
+    assign virtual functions(VFs) to container
+
+
+open-vswitch == dpdk

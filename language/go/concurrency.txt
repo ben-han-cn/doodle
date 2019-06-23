@@ -64,3 +64,7 @@ for {
 funny study result:
     message passing doesn't necessarily make multi-threaded programs less
 error-prone than shared memory.
+
+
+go scheduler isn't preemptive
+only when go function go to checkpoint, it will be come to the hand of scheduler

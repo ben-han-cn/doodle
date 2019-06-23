@@ -56,7 +56,6 @@ class Applicative f => Alternative f where
     many  :: f a -> f [a]
 
 
-
 Multiparameter typeclass
 class (Monad m) => MonadSupply s m | m -> s where
     next :: m (Maybe s)
@@ -65,3 +64,7 @@ MonadSupply s m ==  (MonadSupply s) m
 m is a instance of type class (MonadSupply s)
 when m is used under the context of MonadSupply s, s must be known or inferrable from m
 type class like interface, which improve the extensibility of the code
+
+{-# LANGUAGE MultiParamTypeClasses #-}
+class Vector v => Vectorizable e v where
+  toVector :: e -> v //e cloud be referred from function call

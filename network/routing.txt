@@ -1,0 +1,15 @@
+Commonly, there are two distinct layers in the inbound packet path:
+
+IP firewall
+network stack
+These are conceptually distinct. The IP firewall is usually a stateless piece 
+of software (let's ignore conntrack and IP fragment reassembly for now). The 
+firewall analyzes IP packets and decides whether to ACCEPT or DROP them. 
+Please note: at this layer we are talking about packets and port numbers - 
+not applications or sockets.
+
+Then there is the network stack. This beast maintains plenty of state. Its main 
+task is to dispatch inbound IP packets into sockets, which are then handled by 
+userspace applications. The network stack manages abstractions which are shared 
+with userspace. It reassembles TCP flows, deals with routing, and knows which 
+IP addresses are local.

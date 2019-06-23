@@ -1,0 +1,29 @@
+Semigroups 
+    associative 
+    binary operations
+
+Monoids
+    associative
+    binary operations
+    a neutral elements
+
+instance (Monoid a, Monoid b) => Monoid (a, b)
+instance (Monoid b) => Monoid (a -> b)
+
+endomorphism:
+    a function with return a value of the same 
+type as its input argument
+    f :: a -> a
+    the composition of such method is a monoid.
+
+
+bifunctor
+    a container that can be translated over tow dimensions (independently of each other)
+    a functor can be translated over a single dimensions
+
+Isomorphism
+is a mapping for which an inverse mapping also exists. It's a way to describe equivalence.
+(tuple is isomorphism to struct)
+
+curry :: ((a, b) -> c) -> a -> b -> c
+uncurry :: (a -> b -> c) -> (a, b) -> c

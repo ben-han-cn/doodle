@@ -14,6 +14,8 @@ core api:
 other api:
 /apis/<api group>/version/resource
 
+restMapper: GVR -> GVK
+scheme: handle GVK --> go type
 
 resource == general type appears in http path and in plurs (jobs)
 kind     == logial type in json result about one object (job)
@@ -21,6 +23,9 @@ resource is http endpoint for interface, some operation isn't related to
 a real object, so there is logical resource like "jobs/status" which has
 kind job which is same with resource jobs
 jobs/resources is sub resource of jobs
+
+each resource has inner version(store in etcd) and several external versions(used in json/yaml)
+api server handle the conversion between the conversion
 
 use resourceVersion to deletect object change, also to avoid concurrent update
 

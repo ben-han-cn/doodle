@@ -1,0 +1,97 @@
+Types in Rust can be sized and unsized. Unsized types, as their name suggests, 
+do not have a size required to store values of this type which is known to the compiler. 
+For example, [u32] is an unsized array of u32s; because the number of elements 
+is not specified anywhere, the compiler doesn't know its size. Another example 
+is a bare trait object type, for example, Display, when it is used directly as a type:
+
+let x: Display = ...;
+
+In this case, the compiler does not know which type is actually used here, it is erased, 
+therefore it does not know the size of values of these types. The above line is not valid 
+you can't make a local variable without knowing its size (to allocate enough bytes on the stack), 
+and you can't pass the value of an unsized type into a function as an argument or return it from one.
+
+Unsized types can be used through a pointer, however, which can carry additional information - 
+the length of available data for slices (&[u32]) or a pointer to a virtual table (Box<SomeTrait>). 
+Because pointers always have a fixed and known size, they can be stored in local variables and 
+be passed into or returned from functions.
+
+Given any concrete type you can always say whether it is sized or unsized. With generics, 
+however, a question arises - is some type parameter sized or not?
+
+fn generic_fn<T>(x: T) -> T { ... }
+If T is unsized, then such a function definition is incorrect, as you can't pass unsized values 
+around directly. If it is sized, then all is OK.
+
+In Rust all generic type parameters are sized by default everywhere - in functions, in structs 
+and in traits. They have an implicit Sized bound;  Sized is a trait for marking sized types:
+
+fn generic_fn<T: Sized>(x: T) -> T { ... }
+This is because in the overwhelming number of times you want your generic parameters to be sized. 
+Sometimes, however, you'd want to opt-out of sizedness, and this can be done with ?Sized bound:
+
+fn generic_fn<T: ?Sized>(x: &T) -> u32 { ... }
+Now generic_fn can be called like generic_fn("abcde"), and T will be instantiated with str which 
+is unsized, but that's OK - this function accepts a reference to T, so nothing bad happens.
+
+However, there is another place where question of sizedness is important. Traits in Rust are 
+always implemented for some type:
+
+trait A {
+    fn do_something(&self);
+}
+
+struct X;
+impl A for X {
+    fn do_something(&self) {}
+}
+However, this is only necessary for convenience and practicality purposes. It is possible to 
+define traits to always take one type parameter and to not specify the type the trait is 
+implemented for:
+
+// this is not actual Rust but some Rust-like language
+
+trait A<T> {
+    fn do_something(t: &T);
+}
+
+struct X;
+impl A<X> {
+    fn do_something(t: &X) {}
+}
+That's how Haskell type classes work, and, in fact, that's how traits are actually implemented 
+in Rust at a lower level.
+
+Each trait in Rust has an implicit type parameter, called Self, which designates the type this 
+trait is implemented for. It is always available in the body of the trait:
+
+trait A {
+    fn do_something(t: &Self);
+}
+This is where the question of sizedness comes into the picture. Is the Self parameter sized?
+
+It turns out that no, Self is not sized by default in Rust. Each trait has an implicit ?Sized bound on  Self. 
+One of the reasons this is needed because there are a lot of traits which can be implemented for unsized types 
+and still work. For example, any trait which only contains methods which only take and return Self by reference 
+can be implemented for unsized types. You can read more about motivation in RFC 546.
+
+Sizedness is not an issue when you only define the signature of the trait and its methods. Because 
+there is no actual code in these definitions, the compiler can't assume anything. However, when you 
+start writing generic code which uses this trait, which includes default methods because they take an 
+implicit Self parameter, you should take sizedness into account. Because Self is not sized by default, 
+default trait methods can't return Self by value or take it as a parameter by value. Consequently, you 
+either need to specify that Self must be sized by default:
+
+trait A: Sized { ... }
+or you can specify that a method can only be called if Self is sized:
+
+trait WithConstructor {
+    fn new_with_param(param: usize) -> Self;
+
+    fn new() -> Self
+    where
+        Self: Sized,
+    {
+        Self::new_with_param(0)
+    }
+}

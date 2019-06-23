@@ -1,0 +1,37 @@
+zkp = zero knowledge proof
+probability of proof, after several round test, it will close to zero 
+
+1 Anna wants to prove to Carl that she knows a value x such 
+that y = g^x to a base g.
+2 Anna picks a random value v from a set of values Z, and computes 
+t = g^v and sends t to Carl.
+3 Carl picks a random value c from the set Z and sends it to Anna.
+4 Anna computes r = v-c*x and returns r to Carl.
+5 Carl checks if t= g^r * y^c  holds or not ( since r= v-c*x, y= g^x 
+and by simple substitution, g^(v-c*x)* g ^ c*x = g^v = t).
+6 Carl doesn’t know the value of x, by merely checking if t = g^r * y^c 
+he can verify that Anna does indeed know the value of x.
+
+zk-snark
+G,P,V
+G(c, lambda) => (pk, vk)   //c is the programe which includes the claim
+perf = P(pk, x, w) //w is the secret answer
+V(vk, x, perf) => True
+
+
+1 ./zokrates compile -i /path/to/add.code => out.code
+2 ./zokrates compute-witness -a 1 2 3 => witness
+3 ./zokrates setup => proving.key and verifying.key.
+4 ./zokrates export-verifier 
+    use verifying.key + out.code
+    => verfier.sol
+5 ./zokrates generate-proof
+    use proving.key + out.code + witeness
+
+
+Homomorphic hiding:
+    from E(x), it's very hard to get x
+    x <> y => E(x) <> E(y)
+    E(x), E(y) ==>  E(f(x,y)) //f is arithmetic expression like +, x
+
+

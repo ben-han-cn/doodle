@@ -72,3 +72,7 @@ client:
 
 test:
     https://github.com/Comcast/kuberhealthy
+
+
+operators:
+    https://github.com/zalando/postgres-operator

@@ -1,0 +1,39 @@
+abstraction:
+appliation -> os -> architecture(ISA) -> micro-architecture -> logic
+-> digital circuits -> analog circuits -> device -> physics
+
+
+three-y to management complexity:
+Hierarchy:  divide and conque
+Modularity: well-defined interface
+Regularity:  uniformity
+
+supply voltage == Vdd. 5v -> 3.3v -> ... -> 1.2v
+logic level: 
+    valid zone (range) of input voltage to produce predicatable one or zero
+noise margins:
+    circuit toleration of outside interruption
+logic family:
+    define the valid voltage input which will produce valid logic output
+    TTL/CMOS/LVTTL/LVCMOS (later one has lower Vdd)
+
+logic gate == electrically controlled switch
+
+each digital circuit is a black box, with functional and time sepcification.
+Time sepcification consists of lower and upper bounds on the delay from input
+to output.
+
+The timing specification of a combinational circuit consists of the propagation
+and contamination delays through the circuit. These indicate the longest and
+shortest time between an input change and the consequent output change. Calculating
+the propagation delay of a circuit involves identifying the criticial path 
+throught the circuit, then adding up the propagation delays of each element
+along the path.
+
+circult design:
+FSM
+state encoding
+
+clock
+The clock period has to be long enough for all signals to settle. This sets a limit
+on the speed of the system.

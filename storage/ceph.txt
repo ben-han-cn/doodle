@@ -55,3 +55,53 @@ PG --> a acting set( a set of OSDs, first OSD is the primary)
 
 pool is logic partition, pool includes PG, PG has object, PG is the basic replication unit.
 which will be saved in different OSDs.
+
+
+
+ceph rook
+
+CRD:
+    CephCluster
+        cephVersion
+        mon (counter)
+        network (hostNetwork)
+        rdbMirroring (workers)
+        storage (nodes-name-path)
+
+    CephFilesystem
+        metadataPool
+        dataPool
+        metadataServer
+
+Pods:
+belongs to rook
+    rook-ceph-agent (all worker nodes)
+    rook-discover (all worker nodes)
+    rook-ceph-operator (one)
+
+belongs to csi
+    csi-cephfsplugin (node controller in each worker node except master)
+    csi-cephfsplugin-attacher (external attacher)
+    csi-cephfsplugin-provisioner (external provisioner, has controller container inside)
+    
+belongs to ceph
+    rook-ceph-mgr
+    rook-ceph-mds
+    rook-ceph-mon
+    rook-ceph-osd
+    rook-ceph-tools
+
+
+implementation for csi:
+    operator:
+        start agent daemonset (flex related)
+        start discover (update cm for device, support hotplug)
+        StartCSIDrivers (start csi related pods)
+        o.clusterController.StartWatch(namespaceToWatch, stopChan)
+            start rook component
+            start controller for CRDs (pool, object store, object store user, file system, nfs 
+            start mon, osd health checker, start ceph status check
+            addFinalizer to cluster obj
+
+
+    file system controller:

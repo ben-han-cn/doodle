@@ -1,8 +1,25 @@
+How CNI plugin works:
+A CNI binary:
+    handles connectivity - configures the network interface of the pod
+A daemon:
+    handles reachability - manages routings across the cluster
+
+
 config file folder: /etc/cni/net.d
 plugin folder: /opt/cni/bin
 
 each node will check network status, if cni isn't configured, the node status will be NotReady.
 so if the previous two folder is empty, no pod will be setup
+
+
+when kubelet execute CNI binary, it will pass:
+1 container info as env 
+    command 
+    container id 
+    network interface
+    network namespace
+2 cni config to stdin
+    
 
 type CNI interface {
     AddNetworkList(net *NetworkConfigList, rt *RuntimeConf) (types.Result, error)

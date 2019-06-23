@@ -1,0 +1,68 @@
+consensus in classical setting
+    multiple processors coming to agreement on an output
+    termination, agreement, validity
+consensus in blockchain setting
+    deal with permissionless consensus
+    all honest nodes logs agree with each other although some nodes may progress faster
+    transactions submitted by an honest user get incorporated into ledger sufficiently fast
+
+pos
+    nodes <- validators <- committee 
+                           proposer
+    chain-based:
+        pow in validators set, blocks are probabilistically finalized as they move deeper into the chain
+    BFT:
+        one of these validators is randomly chosen as a proposer, rest of validators vote based on the
+        bonds they have staked.
+
+network model
+    message propagated to every node via a gossip protocol
+    fully sync network: 
+        known upper bound on message delay and all messages are received in the exact liner ordring in 
+        which they send
+    sync network
+        assume a known upper bound on message delay, however messages don't needd to be ordered
+    paritial sync
+        a unknown upper bound
+    async
+        on fixed upper bound on how long it takes for a message to be delivered
+
+
+adversrial/failure mode:
+    static/adaptive adversaries
+    crash failure
+        process stop without warning
+    byzantine failure
+        process exhibit any arbitrary type of malfunciton.
+
+    traditional distributed consensus protocol
+        executed in non adversarial setting only tolerate crash
+    blockchain consensus protocol
+        tolerate both crash and byzantine failures
+
+economic mode:
+    incentive strucutre are developed given some assumptions of human behavior.
+
+
+terndermint:
+1 proposer & committee election and randomness generation
+    a new proposer very round via diterministic round robin between validators
+    committee is deterministcally selected and composed of validators
+2 propagation and creation of block
+    a a proposer chosen to propose a new block
+    b that proposer compiles and propose a block
+    c if 2/3 validators agree on the block 
+    d if 2/3 validators agree on the pre-voted block
+if a block isn't proposed in time or block doesn't receive enough votes, then a new
+round occurs with a new block proposed at the same height
+3 finality
+    more than 1/3 validator became unresponsive
+4 handling churn
+    validator can be removed and added, by bound and unbound
+    offline validators are implicitly unbound remving them from the validator-set
+
+scalability:
+    handle growth efficiently, measuring such via latency and throughput of blocks and transaction finalization
+    message passing time growth is logarithmic in the number of users.
+    latency increases as block size increase per round
+    one way to achieve scalability is to run the protocols mostly inside a randomly selected committ instead of a whole network

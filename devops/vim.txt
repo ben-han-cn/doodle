@@ -57,10 +57,11 @@ W -- big word like abc-goo
 D == d$
 49,82d //delete from line 49 to 82
 
-
-
 select block, then :fold
 zo - open
 zc - close
 
+ctrl-A just increments the first number on every line. 
+g ctrl-A, on the other hand, will bump the increment by one for each matching line.
 
+:1,20 co . // copy line from 1 to 20 to current line
