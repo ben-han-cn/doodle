@@ -6,6 +6,8 @@ positional argument
 flag    ---> no value is specified   -v, -h
 option  ---> has value       -c config   //takes_value(true)
 
+slog: for log
+grpcio
 
 serde
   serialization
@@ -13,6 +15,17 @@ serde
 parking_lot
   synchronization primitive
 
-
 azul
     Desktop GUI framework (https://github.com/maps4print/azul.git)
+
+gpu
+    emu (https://github.com/calebwin/emu)
+
+blockchain
+    HyperledgerSawtooth (https://github.com/hyperledger/sawtooth-core)
+
+ffi:
+    rust-cpython (https://github.com/dgrunwald/rust-cpython)
+
+macro:
+    syn (https://github.com/dtolnay/syn)

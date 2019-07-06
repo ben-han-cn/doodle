@@ -1,3 +1,34 @@
+BFT(Byzantine fault tolerance) system
+
+Byzantine general problem:
+    two-thirds of the generals are loyal.
+
+POW
+
+POS
+    a set of validator with stake
+    proposer is select randomly from validators
+    proposer will create the block and broadcast to other validators
+    other validators will vote on the block
+    punish dishonset validator
+
+DPOS
+    one miner verify the block
+DBFT
+    token holder vote to consensus node
+    speaker and delegate node is from consensus node
+    66%
+
+PBFT
+    nodes <- validators <- committee 
+                           proposer
+    
+    pre-prepare, prepare, commit, reply
+
+    one of these validators is randomly chosen as a proposer, rest of validators vote based on the
+    bonds they have staked.
+
+
 consensus in classical setting
     multiple processors coming to agreement on an output
     termination, agreement, validity
@@ -6,14 +37,6 @@ consensus in blockchain setting
     all honest nodes logs agree with each other although some nodes may progress faster
     transactions submitted by an honest user get incorporated into ledger sufficiently fast
 
-pos
-    nodes <- validators <- committee 
-                           proposer
-    chain-based:
-        pow in validators set, blocks are probabilistically finalized as they move deeper into the chain
-    BFT:
-        one of these validators is randomly chosen as a proposer, rest of validators vote based on the
-        bonds they have staked.
 
 network model
     message propagated to every node via a gossip protocol
@@ -44,7 +67,7 @@ economic mode:
     incentive strucutre are developed given some assumptions of human behavior.
 
 
-terndermint:
+terndermint: (it's almost impossible to generate fork, but it cann't guarantee finality in each round)
 1 proposer & committee election and randomness generation
     a new proposer very round via diterministic round robin between validators
     committee is deterministcally selected and composed of validators

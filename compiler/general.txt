@@ -43,6 +43,9 @@ use pmap $Pid will get the same memory layout
 
 
 Optimization in general:
+(function inlining, constant propagation, dead code elimination, high-quality instruction selection and
+register allocation)
+
 Inline
 Unroll (and vectorize)
 CSE (common subexpression elimination)
