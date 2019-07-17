@@ -125,7 +125,7 @@
     the standard C types have any specific size. Furthermore, there is no guarantee 
     that an int is the same size as a long.
 
-  * Socket
+## Socket
     A TCP/UDP connection is identified by a tuple of five values: 
       {<protocol>, <src addr>, <src port>, <dest addr>, <dest port>}
     Any unique combination of these values identifies a connection. As a result, 
@@ -198,71 +198,7 @@
     and port as a dying socket in TIME_WAIT state can have unexpected, and usually undesired, 
     side effects in case the other socket is still "at work" 
 
-* DIO(direct IO)
-  * ![""](direct_io.png)
-* AIO/DIO(async Direct IO)
-  ![""](io_tradeoffs.png)
-
- ```
-  计世资讯（CCW Research）预计，按照销售额计算，2016年中国服务器虚拟化市场规模将达到21.7亿元。 
-  到2020年，市场规模将达到44.1亿元。
- ```
-
-## Virtualization Solution & CMP(Cloud Management Platform)
-
-### VMWare
-
-### OpenStack
-
-## Why Virtualization & Private Cloud?
-* Converged Infrastructure 
-    * Virtual Machine/Compute
-        * Cloud compution(On-demand self service, Resource pooling, Rapid elasticity, Measured service)
-        * Multi-tenant isolation and resource limitation
-
-    * Virtual Network
-        * Central control over/knowledge of logical network topology
-        * Decouple control and data plane
-        * Network isolation
-        * Virtualize network device(switch, router, load balance, firewall)
-        * Programmatic integration with CMP
-
-    * Virtual Storage
-* Benefit
-    * Wire once
-    * Agility and flexibility 
-    * Visibility 
-
-* Virtual device
-    * Distributed version(vDS), software is much easier to create abstraction
-
-## Common Networking Challenges in Private Cloud Environment
-
-* Manually Network configuration for VM is time-consuming and error-prone
-* Solutions lack visibility and auditing capability
-* Lack of centrialize IP address and DNS managelent
-
-## Available Solution
-
-### Infoblox Cloud Network Automation
-
-* Support mainstream cloud management platform(CMP, 2014)
-* Architecutre 
-    * Adaptor
-    * Cloud Platform Applicance
-    * Grid Master
-
-    Infoblox Cloud Platform Appliances are fully virtualized Infoblox Grid members
-    that run on ESXi, Hyper-V, KVM or XenServer hypervisors. They deliver the full suite
-    of Infoblox DNS, DHCP, and IPAM to cloud environments such as VMware,
-    OpenStack, and Microsoft. These appliances, optimized for cloud deployments
-    in the data center, also deliver a range of cloud-enabling functions including:
-      * Automated IP address provisioning and reclamation when VMs are decommissioned
-      * Automated DNS naming and reclamation when VMs are decommissioned
-      * Automated DHCP lease assignment with fixed address support—especially
-        important in OpenStack environments
-
-### Our plan
-  * Network view support/ virtual zdns slave
-  * VMWare plugin
-  * Openstack ipam agent
+## PCB/TCB
+    In linux kernel, no process or thread, only task (data structure task_struct), two tasks share
+    same mm_sturct is in main/child thread relationship, each task has kernel and user mod stack.
+    Kernel thread is a special task with empty mm_struct. 
