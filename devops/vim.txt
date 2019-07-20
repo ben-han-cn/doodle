@@ -4,19 +4,17 @@
 
 :%s/`[^`]*`//g  ----> remove `....`
 
-
 qq                  #start to record and save it to q
+q                   #end the record
 :9,$norm! @q        #apply the macro from 9 to the end of file
 g/pattern/norm! @q  #apply the macro  to line match the pattern
 @q                  #apply the macro 
 10@q                #apply the macro 10 times
 
-
 ctrl - n  #next match word
 ctrl - p  #prev match word
 
 /\ctarget #case insensitive search
-
 
 vim-go
 https://github.com/fatih/vim-go.git
@@ -53,7 +51,6 @@ word-wise: wW, eE, bB
 w -- small word like abc
 W -- big word like abc-goo
 
-
 D == d$
 49,82d //delete from line 49 to 82
 
@@ -63,5 +60,9 @@ zc - close
 
 ctrl-A just increments the first number on every line. 
 g ctrl-A, on the other hand, will bump the increment by one for each matching line.
-
 :1,20 co . // copy line from 1 to 20 to current line
+:r!ls //read ls output into cursor position
+
+f 'x' //search next x
+; //to next x
+, //to prev x
