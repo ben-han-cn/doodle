@@ -10,14 +10,30 @@
 ### Paradigm
 ### Type System
 **Haskell**
-1. type constructor, data constructor
-1. generic type and generic funciton
-1. generic is used to model common behavior, but too general is meaningless or just truth
-   which means the implementation is quite limited 
-1. typeclass/interface adds constrait to the generic types, they are used to model generic
-   behavior for a group of types
-1. algebra data type: sum and product type (enum and record/struct)
+- type constructor, data constructor
+- generic type and generic funciton
+- generic is used to model common behavior, but too general is meaningless or just truth
+- which means the implementation is quite limited 
+- typeclass/interface adds constrait to the generic types, they are used to model generic
+- behavior for a group of types
+- algebra data type: sum and product type (enum and record/struct)
    recursive type: list, tree
+
+### Generic & Polymorphism
+- **Dynamic polymorphism**
+  - vtable, all the object should inhereted from a base class
+  - fat pointer which including real object pointer and vtable pointer
+  - use dictionary/map as a hidden parameter 
+- **Static polymorphism**
+  - monomorphisation, generate different version for different type
+  - constrait/trait/concept
+- **Generic struct/class**
+  - Type to generate another concrete type, in Haskell, it's called kind.
+  - variance: covariant, contravariant, invariant
+- **metaprogramming**
+  - macro
+  - language hook support
+
 
 ### Data structure
 
@@ -67,6 +83,10 @@ generate by mmu when:
   - kernel return from the exception handler, and process wil resume
 
 ### Concurrency model
+- **race condition**
+  a flaw in software, which caused by non-determinism event affect the program's correctness
+- **data race**
+  more than one threads access the same memory location and at least one of them is write
 
 ## OS<a id="os"></a>
 ### Linux
@@ -97,10 +117,36 @@ generate by mmu when:
     - Use bloom filter to decide whether a SST file contains a given key
     - Backend compact process to merge the SST files then free the space
  * Log-Structured Hash-table
+
 ## Network<a id="network"></a>
-* TCP/IP
-* Async programming
-* Virtualization
-* Mobile network
+### TCP/IP
+### Mobile network
+### Async programming
+### Virtualization
 
 ## Architecture<a id="architecture"></a>
+### Distribute system
+- **Design Principles**
+  - Test recovery procedures
+  - Automatically recover from failure
+  - Scale horizontally to increate aggregate system availability
+  - Stop guessing capacity
+  - Mange change in automation
+- **Application Design for Availablity**
+  - Fault Isolation Zones
+  - Redundant components
+  - Micro-service architecture
+  - Recovery oriented Computing: roll back changes, monitoring and diagnostics.
+  - Distributed systems best priactices
+    - Throttling
+    - Retry with exponential fallback
+    - Fail fast
+    - Use of idempotency tokens/interface
+    - Constant work
+    - Circuit breaker
+    - Bi-modal behavioir and static stability
+- **Monitoring and Alarming**
+  - Generation
+  - Aggregation
+  - Real-time processing and alarming
+  - Storage and analytics

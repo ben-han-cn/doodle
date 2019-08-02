@@ -25,16 +25,29 @@ large, complex computer systems, which would be overwhelming if viewed in their 
 at a detailed level.
 
 Indeed 实际上
+    It is indeed a remarkable achievement.
+    I don't mind at all, indeed, I would be delighted to help
 moreover 此外
+    The price is too hight, and moreover, the house isn't in a suitable position.
 however 然而
+    I'd like to go with you; however my hands are full.
+    Victory, however it was brough about, was very sweet. //无论
 thus 因此，于是
+    Even in a highly skilled workforce some people will be more capable and thus better paid
+than others.
+
 in short 简单说
 in particular 特别，尤其
 At first glance 咋一看
 In contrast to 和xx相反
 Under these circumstances 在这种情况下
 otherwise 否则
+    We're committed to the project, we won't be here otherwise
+    He was slightly bruised but otherwise unhurt //除此之外
 whereas 然而（对比两个事实），鉴于
+    I hate, whereas you merely dislike, him
+    One's life is finite, whereas one's passion for life is infinite
+    Movements and shapes can be perceived whereas all other details are swallowed in blurry light.
 suppose ... 假设
 In addition to 除此之外
 
@@ -50,3 +63,15 @@ Katas originated in martial arts training, but the idea has spread beyond the do
 
 The prevailing belief at the time was that an operation system had to be written in
 assembly language to provide reasonable efficiency and to get access to the hardware.
+
+By deliberately inducing faults, you ensure that the fault-tolerance machinery is continually
+exercised and tested, which can increase your confidence taht faluts will be handled correctly
+when they occur naturally.
+
+If a system is expected to provide some guarantee, it can constantly check itself which 
+it's running and raise an alert if a discrepancy is found.
+
+A clever system obfuscates the internal working of the process, reducing the human to a passive
+user who simply consume the insights provided by the machine. AI should be a tool to be wielded,
+not a lens through which we view the world. To steer such a powerful tool, we must be equipped with
+the knowledge to understand and operate it without eroding the human quality of our human system.

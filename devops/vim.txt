@@ -66,3 +66,5 @@ g ctrl-A, on the other hand, will bump the increment by one for each matching li
 f 'x' //search next x
 ; //to next x
 , //to prev x
+
+d0 , d^ //delete from cursor to begin of current line

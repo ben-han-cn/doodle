@@ -1,0 +1,8 @@
+rest, organize model/data from different view/hierarchy
+    duplication
+    links
+
+aggregate resource
+    deploy, service, ingress
+
+global state
