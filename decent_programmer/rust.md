@@ -120,6 +120,29 @@ Not all type in rust implement Any.
 RefCell make immutable reference could also change the state, which make state
 share in same thread much easier 
 
+# vec manipulate pattern
+```rust
+fn drop(&mut self) {
+    //drain will clean the old the vec
+    for (_, outbound) in self.outbound_streams.drain() {
+        self.mutex.destroy_outbound(outbound);
+    }
+}
+
+//pop from the vec and handle it, if failed push back
+fn poll(&mut self) {
+    for n in (0..self.outbound_streams.len()).rev() {
+        let (user_data, mut outbound) = self.outbound_streams.swap_remove(n);
+        match self.muxer.poll_outbound(&mut outbound) {
+            Ok(_) => {}
+            Err(_) => {
+                self.outbound_streams.push((user_data, outbound));
+            }
+    }
+}
+```
+
+
 # Gotchas
 ## mutable variable and mutable reference 
 ```rust

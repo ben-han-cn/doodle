@@ -44,17 +44,18 @@
   - used by software, in both user or kernel space
 
 - **MMU**
-  ![""](virtual_memory_system_hardware.png)
+  ![""](diagram/virtual_memory_system_hardware.png)
   - hardware that transparently handles all memory accesses from Load/Store instructions.
   - also handle permission and Memory move/swap
   - operate on basic units of memory called pages, page is abstract, the physical
     part is called frame
   - a mapping often covers multiple pages
   - memory mapping for a process is save in page table, ``struct_mm``, ``vm_area_struct``
-  - TLB is limited hardware buffer
+  - TLB as part of MMU, is a list of mapping from virtual to physcial addess space in hardware
+    it is limited hardware buffer
 
 - **Page fault**  
-generate by mmu when:
+generate by MMU when:
   - access the virtual memory which isn't mapped for current process
   - current process has insufficient permissions
   - virtual addresses is valid but has been swapped out
@@ -87,6 +88,58 @@ generate by mmu when:
   a flaw in software, which caused by non-determinism event affect the program's correctness
 - **data race**
   more than one threads access the same memory location and at least one of them is write
+- Models
+  - CSP
+    - channel + goroutine 
+      ring buffer with mutex lock, has point to the reading/writing goroutine block on it   
+      select just create a fake goroutine on each channel   
+
+```go
+func createQueueFromSlice(slice interface{}) (int, chan interface{}, error) {
+    sliceVal := reflect.ValueOf(slice)
+    if sliceVal.Kind() != reflect.Slice {
+        return 0, nil, ErrInvalidParameter
+    }   
+
+    size := sliceVal.Len()
+    if size == 0 { 
+        return 0, nil, nil 
+    }   
+
+    ch := make(chan interface{}, size)
+    for i := 0; i < size; i++ {
+        ch <- sliceVal.Index(i).Interface()
+    }   
+    close(ch)
+    return size, ch, nil 
+}
+
+func Batch(tasks interface{}, worker func(interface{}) (interface{}, error)) (<-chan interface{}, error) {
+    workerCount, taskCh, err := createQueueFromSlice(tasks)
+    if err != nil {
+        return nil, err 
+    }   
+
+    var group Group
+    resultCh := make(chan interface{}, workerCount)
+    for i := 0; i < workerCount; i++ {
+        group.Go(func() error {
+            for task := range taskCh {
+                if result, err := worker(task); err != nil {
+                    return err 
+                } else {
+                    resultCh <- result
+                }   
+            }   
+            return nil 
+        })  
+    }   
+    err = group.Wait()
+    close(resultCh)
+    return resultCh, err 
+}
+```
+- Async future/promise
 
 ## OS<a id="os"></a>
 ### Linux
@@ -102,13 +155,29 @@ generate by mmu when:
 ### Block device
 ### File system
 ### Database
+1. Data model
+  relational data model could handle all three relationship, but if the relationship is
+more common in one type, the other two data model will be more appropirate
+  - one-to-many: document
+  - many-to-one: 
+  - many-to-many: graph
 1. SQL
   - **SQLite**  
-  ![""](sqlite_stack.gif)
+  ![""](diagram/sqlite_stack.gif)
 1. NOSQL
+  - Document
+  - Graph
 1. Data Structure
   - **B+ tree**
+    - page as basic unit and update in place
+    - random write is slow than append only
+    - one update may change several pages
+    - mature enought and has stable performance
   - **Log-Structured Merge Tree(LSM)**
+    - append only write
+    - additional backgroud compact process is mandatory
+    - when compacting pace counld catch up with write pace, with limited disk bandwidth,
+      the performance may downgrade and unpredictable
   - **RocksDB**
     - Memtable, Transaction log, Static Sorted Table(SST)
     - Key, Value are sorted and has associated timestamp
@@ -116,7 +185,13 @@ generate by mmu when:
     - Read will go through Memtable and SST then merged based on timestamp
     - Use bloom filter to decide whether a SST file contains a given key
     - Backend compact process to merge the SST files then free the space
- * Log-Structured Hash-table
+  - OLTP vs OLAP
+    ![datawarehouse](diagram/datawarehouse.jpg)
+  - Row vs Column oriented storage
+    - for table with wide columns, some query pattern only need seldom part
+    - store each column in one file with same order based on row number
+    - Normally the number of distinct value in column is samll, which lend it to compression
+
 
 ## Network<a id="network"></a>
 ### TCP/IP
@@ -150,3 +225,57 @@ generate by mmu when:
   - Aggregation
   - Real-time processing and alarming
   - Storage and analytics
+- **consistency**
+  - Master-Slave
+  - Conflict-free replicated data type (CRDT)
+  - Consensus
+    - network model: fully sync, sync, partial sync, async
+    - failure model: crash failure vs Byzantine failure
+- encoding/decoding
+  - rpc
+  - rest
+  - message broker
+- replication
+  - leader based
+    - all write goes to leader
+    - synchronize vs asynchronize
+    - add node
+      - follower get snapshot from leader
+      - ask all the data change since the snapshot, try to catch up
+    - recover node
+      - get data change since the last check point from leader
+    - eventually consistency
+      - read after write, when reading something that the user may modified, read
+        from leader; otherwise, read it from follower.
+      - each user always makes their reads from the same replica to avoid monotonic reads
+        monotonic reads cause time appears to go backward.
+  - leader-less
+    - client write to all nodes and wait for at least w nodes to report succeed 
+    - client read the data from r nodes, and do data fix when some nodes has stale data
+    - w + r > node count
+    - there is no gurantee that client won't read stale data, it's a eventually consistent system
+    - sloppy quorums are used when w available node aren't available for a specific user, the 
+      system could still accept the write. and when the node come back, a hinted handoff will 
+      be executed to write the data to the right node, sloppy quorums particularly useful for
+      increasing write availability. 
+    - detecting concurrent writes
+      - LWW(last write wins) although could make sure eventually consistent potentially lose data
+      - Version vector(version clock), return version number to client, and client should carray 
+        the version when
+        they do write, which let server knows the sequence.
+- partition/sharding
+  - partition is the base unit for replication
+  - partition by key range
+  - partition by hash of key/use compound key for range query
+  - global secondary index
+  - reblancing
+    - partition number is bigger than node 
+    - partition is the basic unit which will be moved between nodes
+    - static vs dynamic partition, since partition size is proportional to partition count
+  - request routing
+    - any node could handle the request, if it isn't the owner, it will forward the query
+    - has a routine tier
+    - let client knows the owner of each partition
+    - parallel query execution
+     
+
